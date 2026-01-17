@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">billrt</string>
+    <string name="dashboard_title">HALAMAN DASHBOARD\nSelamat Datang, %1$s!</string>
+    <string name="logout">LOGOUT</string>
+</resources>

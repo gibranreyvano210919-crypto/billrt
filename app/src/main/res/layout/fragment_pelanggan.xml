@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#1A237E">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Dashboard Pelanggan"
+                android:textColor="@android:color/white"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="16dp"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <Spinner
+                    android:id="@+id/spinner_month_pelanggan"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:backgroundTint="@android:color/white"/>
+
+                <Spinner
+                    android:id="@+id/spinner_year_pelanggan"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:backgroundTint="@android:color/white"/>
+
+            </LinearLayout>
+
+            <GridLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:columnCount="2"
+                android:alignmentMode="alignMargins"
+                android:columnOrderPreserved="false">
+
+                <!-- Total Pelanggan -->
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/card_total_pelanggan"
+                    style="@style/DashboardMenuCard">
+                    <LinearLayout style="@style/DashboardMenuLayout">
+                        <TextView android:id="@+id/tv_total_pelanggan" android:text="0" style="@style/DashboardMenuTitle" android:textSize="28sp"/>
+                        <TextView style="@style/DashboardMenuTitle" android:text="Total Pelanggan" android:textSize="14sp"/>
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+
+                <!-- Pelanggan Baru -->
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/card_pelanggan_baru"
+                    style="@style/DashboardMenuCard">
+                    <LinearLayout style="@style/DashboardMenuLayout">
+                        <TextView android:id="@+id/tv_pelanggan_baru" android:text="0" style="@style/DashboardMenuTitle" android:textSize="28sp"/>
+                        <TextView style="@style/DashboardMenuTitle" android:text="Pelanggan Baru" android:textSize="14sp"/>
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+
+                <!-- Pelanggan Lama -->
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/card_pelanggan_lama"
+                    style="@style/DashboardMenuCard">
+                    <LinearLayout style="@style/DashboardMenuLayout">
+                        <TextView android:id="@+id/tv_pelanggan_lama" android:text="0" style="@style/DashboardMenuTitle" android:textSize="28sp"/>
+                        <TextView style="@style/DashboardMenuTitle" android:text="Pelanggan Lama" android:textSize="14sp"/>
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+
+                <!-- Total Pendapatan -->
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/card_total_pendapatan"
+                    style="@style/DashboardMenuCard">
+                    <LinearLayout style="@style/DashboardMenuLayout">
+                        <TextView android:id="@+id/tv_total_pendapatan" android:text="Rp 0" style="@style/DashboardMenuTitle" android:textSize="22sp"/>
+                        <TextView style="@style/DashboardMenuTitle" android:text="Pendapatan" android:textSize="14sp"/>
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+
+                <!-- Lunas -->
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/card_lunas"
+                    style="@style/DashboardMenuCard">
+                    <LinearLayout style="@style/DashboardMenuLayout">
+                        <TextView android:id="@+id/tv_lunas" android:text="0" style="@style/DashboardMenuTitle" android:textSize="28sp"/>
+                        <TextView style="@style/DashboardMenuTitle" android:text="Lunas" android:textSize="14sp"/>
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+                
+                <!-- Belum Bayar -->
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/card_belum_bayar"
+                    style="@style/DashboardMenuCard">
+                    <LinearLayout style="@style/DashboardMenuLayout">
+                        <TextView android:id="@+id/tv_belum_bayar" android:text="0" style="@style/DashboardMenuTitle" android:textSize="28sp"/>
+                        <TextView style="@style/DashboardMenuTitle" android:text="Belum Bayar" android:textSize="14sp"/>
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+
+            </GridLayout>
+
+            <Button
+                android:id="@+id/btn_tambah_pelanggan"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:text="Tambah Pelanggan"
+                app:backgroundTint="?attr/colorAccent"
+                android:textColor="@android:color/white"/>
+
+        </LinearLayout>
+    </ScrollView>
+
+    <ProgressBar
+        android:id="@+id/progressBar_pelanggan"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:visibility="gone" />
+
+</RelativeLayout>

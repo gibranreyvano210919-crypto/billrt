@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/tab_layout_wizard"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        app:tabGravity="center"
+        app:tabIndicatorHeight="0dp"/>
+
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/view_pager_wizard"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_above="@+id/navigation_buttons"
+        android:layout_below="@+id/tab_layout_wizard" />
+
+    <RelativeLayout
+        android:id="@+id/navigation_buttons"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:padding="16dp">
+
+        <Button
+            android:id="@+id/btn_previous"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:text="Sebelumnya"
+            android:visibility="invisible" />
+
+        <Button
+            android:id="@+id/btn_next"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:text="Berikutnya" />
+
+    </RelativeLayout>
+
+</RelativeLayout>

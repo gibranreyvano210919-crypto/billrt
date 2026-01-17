@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#1A237E">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <TextView
+            android:id="@+id/tv_welcome"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Selamat Datang, Pengguna!"
+            android:textColor="@android:color/white"
+            android:textSize="24sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tv_date_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Hari, Tanggal, Jam"
+            android:textColor="#B0BEC5"
+            android:textSize="18sp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:orientation="horizontal">
+
+            <Spinner
+                android:id="@+id/spinner_month"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:backgroundTint="@android:color/white"/>
+
+            <Spinner
+                android:id="@+id/spinner_year"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:backgroundTint="@android:color/white"/>
+
+        </LinearLayout>
+
+        <GridLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:alignmentMode="alignMargins"
+            android:columnCount="3"
+            android:columnOrderPreserved="false">
+
+            <!-- User -->
+            <androidx.cardview.widget.CardView style="@style/DashboardMenuCard" android:id="@+id/card_user">
+                <LinearLayout style="@style/DashboardMenuLayout">
+                    <androidx.appcompat.widget.AppCompatImageView style="@style/DashboardMenuIcon" app:srcCompat="@android:drawable/ic_menu_myplaces" />
+                    <TextView style="@style/DashboardMenuTitle" android:text="User" />
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- OLT -->
+            <androidx.cardview.widget.CardView style="@style/DashboardMenuCard" android:id="@+id/card_olt">
+                <LinearLayout style="@style/DashboardMenuLayout">
+                    <androidx.appcompat.widget.AppCompatImageView style="@style/DashboardMenuIcon" app:srcCompat="@android:drawable/ic_menu_share" />
+                    <TextView style="@style/DashboardMenuTitle" android:text="OLT" />
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- Mikrotik -->
+            <androidx.cardview.widget.CardView style="@style/DashboardMenuCard" android:id="@+id/card_mikrotik">
+                <LinearLayout style="@style/DashboardMenuLayout">
+                    <androidx.appcompat.widget.AppCompatImageView style="@style/DashboardMenuIcon" app:srcCompat="@android:drawable/ic_menu_directions" />
+                    <TextView style="@style/DashboardMenuTitle" android:text="Mikrotik" />
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- Kas -->
+            <androidx.cardview.widget.CardView style="@style/DashboardMenuCard" android:id="@+id/card_kas">
+                <LinearLayout style="@style/DashboardMenuLayout">
+                    <androidx.appcompat.widget.AppCompatImageView style="@style/DashboardMenuIcon" app:srcCompat="@android:drawable/ic_menu_save" />
+                    <TextView style="@style/DashboardMenuTitle" android:text="Kas" />
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- Map -->
+            <androidx.cardview.widget.CardView style="@style/DashboardMenuCard" android:id="@+id/card_map">
+                <LinearLayout style="@style/DashboardMenuLayout">
+                    <androidx.appcompat.widget.AppCompatImageView style="@style/DashboardMenuIcon" app:srcCompat="@android:drawable/ic_menu_mapmode" />
+                    <TextView style="@style/DashboardMenuTitle" android:text="Map" />
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- Teknisi -->
+            <androidx.cardview.widget.CardView style="@style/DashboardMenuCard" android:id="@+id/card_teknisi">
+                <LinearLayout style="@style/DashboardMenuLayout">
+                    <androidx.appcompat.widget.AppCompatImageView style="@style/DashboardMenuIcon" app:srcCompat="@android:drawable/ic_menu_myplaces" />
+                    <TextView style="@style/DashboardMenuTitle" android:text="Teknisi" />
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- Pengaduan -->
+            <androidx.cardview.widget.CardView style="@style/DashboardMenuCard" android:id="@+id/card_pengaduan">
+                <LinearLayout style="@style/DashboardMenuLayout">
+                    <androidx.appcompat.widget.AppCompatImageView style="@style/DashboardMenuIcon" app:srcCompat="@android:drawable/ic_dialog_email" />
+                    <TextView style="@style/DashboardMenuTitle" android:text="Pengaduan" />
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- Laporan -->
+            <androidx.cardview.widget.CardView style="@style/DashboardMenuCard" android:id="@+id/card_laporan">
+                <LinearLayout style="@style/DashboardMenuLayout">
+                    <androidx.appcompat.widget.AppCompatImageView style="@style/DashboardMenuIcon" app:srcCompat="@android:drawable/ic_menu_agenda" />
+                    <TextView style="@style/DashboardMenuTitle" android:text="Laporan" />
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+        </GridLayout>
+    </LinearLayout>
+</ScrollView>

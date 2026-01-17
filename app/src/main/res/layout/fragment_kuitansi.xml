@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center_horizontal"
+    android:padding="16dp"
+    tools:context=".KuitansiFragment">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Pembayaran Berhasil"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:textColor="?attr/colorPrimary"
+        android:layout_marginBottom="24dp"/>
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:cardCornerRadius="8dp"
+        app:cardElevation="4dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <TextView style="@style/TextAppearance.AppCompat.Title" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Kuitansi Pembayaran"/>
+
+            <View android:layout_width="match_parent" android:layout_height="1dp" android:background="?android:attr/listDivider" android:layout_marginTop="8dp" android:layout_marginBottom="16dp"/>
+
+            <TextView style="@style/TextAppearance.AppCompat.Caption" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Dibayarkan kepada"/>
+            <TextView android:id="@+id/kuitansi_nama_pelanggan" style="@style/TextAppearance.AppCompat.Body1" android:layout_width="wrap_content" android:layout_height="wrap_content" tools:text="Adi (ID: 63)"/>
+
+            <TextView style="@style/TextAppearance.AppCompat.Caption" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="12dp" android:text="Tanggal Pembayaran"/>
+            <TextView android:id="@+id/kuitansi_tgl_bayar" style="@style/TextAppearance.AppCompat.Body1" android:layout_width="wrap_content" android:layout_height="wrap_content" tools:text="13 Jan 2026"/>
+
+            <TextView style="@style/TextAppearance.AppCompat.Caption" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="12dp" android:text="Untuk Pembayaran"/>
+            <TextView android:id="@+id/kuitansi_periode" style="@style/TextAppearance.AppCompat.Body1" android:layout_width="wrap_content" android:layout_height="wrap_content" tools:text="Tagihan Bulan Januari 2026"/>
+
+            <TextView style="@style/TextAppearance.AppCompat.Caption" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="12dp" android:text="Metode Pembayaran"/>
+            <TextView android:id="@+id/kuitansi_metode_bayar" style="@style/TextAppearance.AppCompat.Body1" android:layout_width="wrap_content" android:layout_height="wrap_content" tools:text="CASH"/>
+
+            <View android:layout_width="match_parent" android:layout_height="1dp" android:background="?android:attr/listDivider" android:layout_marginTop="16dp" android:layout_marginBottom="8dp"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="end"
+                android:orientation="horizontal">
+                <TextView style="@style/TextAppearance.AppCompat.Body2" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Total: "/>
+                <TextView android:id="@+id/kuitansi_total_bayar" style="@style/TextAppearance.AppCompat.Title" android:layout_width="wrap_content" android:layout_height="wrap_content" tools:text="Rp. 100.000"/>
+            </LinearLayout>
+
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+
+    <Button
+        android:id="@+id/btn_kuitansi_selesai"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Selesai"
+        android:layout_marginTop="24dp"/>
+
+</LinearLayout>
