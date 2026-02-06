@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "127019698983",
+    "project_id": "redaman-5b2ae",
+    "storage_bucket": "redaman-5b2ae.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:127019698983:android:955846597df09e68b53702",
+        "android_client_info": {
+          "package_name": "com.linkbit.billrt"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA4-7jT5kkQrgM1uPfuGbzY3HmqD1Qxde8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

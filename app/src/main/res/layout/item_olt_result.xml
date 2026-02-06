@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:layout_margin="8dp"
+    android:background="@android:drawable/dialog_holo_light_frame">
+
+    <TextView
+        android:id="@+id/tv_olt_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textStyle="bold"
+        android:textSize="18sp"
+        tools:text="OLT_27" />
+
+    <TextView
+        android:id="@+id/tv_olt_address"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        tools:text="id-27.hostddns.us:13936" />
+
+    <TextView
+        android:id="@+id/tv_olt_status"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        tools:text="CONNECTED" />
+
+    <TextView
+        android:id="@+id/tv_olt_summary"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        tools:text="Total: 182, Online: 63, Offline: 119" />
+
+    <LinearLayout
+        android:id="@+id/onu_list_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:visibility="gone"
+        tools:visibility="visible" />
+
+</LinearLayout>

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="8dp"
+    app:cardCornerRadius="8dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <TextView
+            android:id="@+id/tv_onu_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+            tools:text="Onu Name" />
+
+        <TextView
+            android:id="@+id/tv_onu_details"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+            tools:text="col_1: value\ncol_2: value\ncol_3: value\ncol_4: value\ncol_5: value\ncol_6: value\ncol_7: value\ncol_8: value\ncol_9: value\ncol_10: value\ncol_11: value\ncol_12: value\ncol_13: value\ncol_14: value\ncol_15: value\ncol_16: value\ncol_17: value\ncol_18: value\ncol_19: value\ncol_20: value\ncol_21: value" />
+
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView>

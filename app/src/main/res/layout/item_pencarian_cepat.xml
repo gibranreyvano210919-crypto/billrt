@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <TextView
+        android:id="@+id/tvNamaPelanggan"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Nama Pelanggan"
+        android:textSize="18sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/tvAlamat"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Alamat" />
+
+    <TextView
+        android:id="@+id/tvWilayah"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Wilayah: N/A" />
+
+    <TextView
+        android:id="@+id/tvMikrotikUsername"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Username: N/A" />
+
+    <TextView
+        android:id="@+id/tvStaticIp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="IP: N/A" />
+
+    <TextView
+        android:id="@+id/tvMacAddress"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="-" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/btnCopyMac"
+            style="?android:attr/buttonBarStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Salin MAC" />
+
+        <Button
+            android:id="@+id/btnRiwayat"
+            style="?android:attr/buttonBarStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Riwayat" />
+    </LinearLayout>
+
+</LinearLayout>

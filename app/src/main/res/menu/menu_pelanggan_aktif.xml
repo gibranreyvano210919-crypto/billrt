@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/menu_edit_pelanggan"
+        android:title="Edit Pelanggan" />
+    <item
+        android:id="@+id/menu_set_isolir_from_aktif"
+        android:title="Ubah ke Isolir" />
+</menu>
