@@ -10,7 +10,7 @@ class DetailPelangganPagerAdapter(fragment: Fragment, private val pelanggan: Pel
     override fun createFragment(position: Int): Fragment {
         return when (position) {
             0 -> PelangganDetailContentFragment.newInstance(pelanggan)
-            1 -> BulanFragment.newInstance(pelanggan)
+            1 -> BulanFragment.newInstance(pelanggan.idPelanggan)
             2 -> BayarFragment.newInstance(pelanggan)
             3 -> TeknisiFragment.newInstance(pelanggan)
             else -> throw IllegalStateException("Invalid position: $position")

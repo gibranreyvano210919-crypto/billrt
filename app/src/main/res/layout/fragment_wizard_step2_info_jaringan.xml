@@ -1,62 +1,71 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     android:padding="16dp">
 
-    <TextView
+    <LinearLayout
+        android:id="@+id/contentLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Langkah 2: Info Jaringan"
+            android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6" />
+
+        <Spinner
+            android:id="@+id/spinnerPaket"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp" />
+
+        <Spinner
+            android:id="@+id/spinnerWilayah"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp" />
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etMikrotikUsername"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Username Mikrotik" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+    </LinearLayout>
+
+    <ProgressBar
+        android:id="@+id/progressBarStep2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Langkah 2: Info Jaringan"
-        android:textSize="18sp"
-        android:textStyle="bold" />
+        android:layout_centerInParent="true"
+        android:visibility="gone" />
 
-    <Spinner
-        android:id="@+id/spinner_paket"
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp" />
+        android:layout_alignParentBottom="true">
 
-    <Spinner
-        android:id="@+id/spinner_wilayah_tambah"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp" />
-
-    <com.google.android.material.textfield.TextInputLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp">
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/et_installation_date"
-            android:layout_width="match_parent"
+        <Button
+            android:id="@+id/btnBack2"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:hint="Tanggal Instalasi"
-            android:focusable="false"
-            android:clickable="true" />
-    </com.google.android.material.textfield.TextInputLayout>
+            android:layout_alignParentStart="true"
+            android:text="Kembali" />
 
-    <com.google.android.material.textfield.TextInputLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp">
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/et_mikrotik_username"
-            android:layout_width="match_parent"
+        <Button
+            android:id="@+id/btnNext2"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:hint="Username Mikrotik" />
-    </com.google.android.material.textfield.TextInputLayout>
+            android:layout_alignParentEnd="true"
+            android:text="Berikutnya" />
+    </RelativeLayout>
 
-    <com.google.android.material.textfield.TextInputLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp">
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/et_mikrotik_password"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Password Mikrotik" />
-    </com.google.android.material.textfield.TextInputLayout>
-
-</LinearLayout>
+</RelativeLayout>

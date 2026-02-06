@@ -9,40 +9,51 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Langkah 3: Info Teknis"
-        android:textSize="18sp"
-        android:textStyle="bold" />
+        android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6" />
 
     <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp">
         <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/et_latitude"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Latitude" />
-    </com.google.android.material.textfield.TextInputLayout>
-
-    <com.google.android.material.textfield.TextInputLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp">
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/et_longitude"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Longitude" />
-    </com.google.android.material.textfield.TextInputLayout>
-
-    <com.google.android.material.textfield.TextInputLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp">
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/et_mac_address"
+            android:id="@+id/etMacAddress"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="MAC Address" />
     </com.google.android.material.textfield.TextInputLayout>
+
+    <TextView
+        android:id="@+id/tvLokasi"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Lokasi belum diatur" />
+
+    <Button
+        android:id="@+id/btnGetLokasi"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="Ambil Lokasi Saat Ini" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp">
+
+        <Button
+            android:id="@+id/btnBack3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:text="Kembali" />
+
+        <Button
+            android:id="@+id/btnSimpan"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:text="Simpan Pelanggan" />
+    </RelativeLayout>
 
 </LinearLayout>

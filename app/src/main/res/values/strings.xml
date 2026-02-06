@@ -1,5 +1,9 @@
 <resources>
     <string name="app_name">billrt</string>
-    <string name="dashboard_title">HALAMAN DASHBOARD\nSelamat Datang, %1$s!</string>
-    <string name="logout">LOGOUT</string>
+    <string name="menu_home">Home</string>
+    <string name="menu_smartolt">SmartOLT</string>
+    <string name="menu_pay">Bayar</string>
+    <string name="menu_maps">Peta</string>
+    <string name="menu_settings">Pengaturan</string>
+    <string name="mapbox_access_token">pk.eyJ1Ijoic3VkYXJ0YWtpc3dhcmEiLCJhIjoiY21rbGJwa2kxMDByZzNjcjVjOG5vcWk0ZyJ9.qJWlXuW_VL6DaMEyD3V6Lg</string>
 </resources>

@@ -1,66 +1,108 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/ll_detail_content"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     tools:context=".DetailPelangganFragment">
 
-    <!-- Header Section -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="?attr/colorPrimary"
-        android:orientation="horizontal"
+        android:orientation="vertical"
         android:padding="16dp">
 
-        <ImageView
-            android:id="@+id/iv_profile"
-            android:layout_width="64dp"
-            android:layout_height="64dp"
-            android:src="@drawable/ic_person"
-            app:tint="@android:color/white"/>
-
-        <LinearLayout
-            android:layout_width="0dp"
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:orientation="vertical"
-            android:layout_marginStart="16dp">
+            app:cardElevation="4dp">
 
-            <TextView
-                android:id="@+id/tv_header_nama"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textColor="@android:color/black"
-                android:textSize="20sp"
-                android:textStyle="bold"
-                tools:text="Adi" />
+                android:orientation="vertical"
+                android:padding="16dp">
 
-            <TextView
-                android:id="@+id/tv_header_id"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="@android:color/black"
-                android:textSize="16sp"
-                tools:text="ID pel: 63" />
-        </LinearLayout>
+                <TextView
+                    android:id="@+id/tvDetailNamaPelanggan"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="@style/TextAppearance.MaterialComponents.Headline5"
+                    tools:text="Nama Lengkap Pelanggan" />
+
+                <TextView
+                    android:id="@+id/tvDetailIdPelanggan"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
+                    tools:text="ID: PEL-001" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="Informasi Kontak"
+            android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6" />
+
+        <TextView
+            android:id="@+id/tvDetailAlamat"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            tools:text="Alamat: Jl. Pahlawan No. 123" />
+
+        <TextView
+            android:id="@+id/tvDetailTelepon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            tools:text="Telepon: 08123456789" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="Informasi Jaringan"
+            android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6" />
+
+        <TextView
+            android:id="@+id/tvDetailWilayah"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            tools:text="Wilayah: Suka Maju" />
+
+        <TextView
+            android:id="@+id/tvDetailUsernameMikrotik"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            tools:text="Username: pelanggan.satu" />
+
+        <TextView
+            android:id="@+id/tvDetailIpStatic"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            tools:text="IP Statis: 192.168.100.1" />
+
+        <TextView
+            android:id="@+id/tvDetailMacAddress"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            tools:text="MAC: AA:BB:CC:DD:EE:FF" />
+
+        <ProgressBar
+            android:id="@+id/progressBarDetail"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="16dp"
+            android:visibility="gone" />
 
     </LinearLayout>
-
-    <!-- Tabs and ViewPager -->
-    <com.google.android.material.tabs.TabLayout
-        android:id="@+id/tab_layout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:tabMode="scrollable"/>
-
-    <androidx.viewpager2.widget.ViewPager2
-        android:id="@+id/view_pager"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1" />
-
-</LinearLayout>
+</ScrollView>

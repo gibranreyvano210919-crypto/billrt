@@ -1,106 +1,65 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp"
+    tools:context=".PelangganDetailContentFragment">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="16dp">
+    <TextView
+        android:id="@+id/namaPelanggan"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
 
-        <!-- Rincian Data Pelanggan -->
-        <androidx.cardview.widget.CardView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:cardCornerRadius="8dp"
-            app:cardElevation="4dp">
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="16dp">
-                <TextView style="@style/TextAppearance.AppCompat.Title" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Rincian Data Pelanggan" />
-                <TextView style="@style/TextAppearance.AppCompat.Caption" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="16dp" android:text="Nama Pelanggan" />
-                <TextView android:id="@+id/tv_detail_nama_pelanggan" style="@style/TextAppearance.AppCompat.Body1" android:layout_width="wrap_content" android:layout_height="wrap_content" tools:text="Adi" />
-                <TextView style="@style/TextAppearance.AppCompat.Caption" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="12dp" android:text="Alamat" />
-                <TextView android:id="@+id/tv_detail_alamat" style="@style/TextAppearance.AppCompat.Body1" android:layout_width="wrap_content" android:layout_height="wrap_content" tools:text="Jl. Pahlawan No. 123" />
-                <TextView style="@style/TextAppearance.AppCompat.Caption" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="12dp" android:text="Telepon" />
-                <TextView android:id="@+id/tv_detail_telepon" style="@style/TextAppearance.AppCompat.Body1" android:layout_width="wrap_content" android:layout_height="wrap_content" tools:text="081234567890" />
-                <TextView style="@style/TextAppearance.AppCompat.Caption" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="12dp" android:text="Tanggal Daftar" />
-                <TextView android:id="@+id/tv_detail_tanggal_daftar" style="@style/TextAppearance.AppCompat.Body1" android:layout_width="wrap_content" android:layout_height="wrap_content" tools:text="13 Apr 2023" />
-                <TextView style="@style/TextAppearance.AppCompat.Caption" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="12dp" android:text="Wilayah" />
-                <TextView android:id="@+id/tv_detail_wilayah" style="@style/TextAppearance.AppCompat.Body1" android:layout_width="wrap_content" android:layout_height="wrap_content" tools:text="Ande-ande" />
-            </LinearLayout>
-        </androidx.cardview.widget.CardView>
+    <TextView
+        android:id="@+id/telepon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
 
-        <!-- Tagihan Bulan Ini -->
-        <androidx.cardview.widget.CardView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            app:cardCornerRadius="8dp"
-            app:cardElevation="4dp">
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="16dp">
-                <TextView style="@style/TextAppearance.AppCompat.Title" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Tagihan Bulan Ini" />
-                <TextView style="@style/TextAppearance.AppCompat.Caption" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="16dp" android:text="Periode"/>
-                <TextView android:id="@+id/tv_detail_periode_tagihan" style="@style/TextAppearance.AppCompat.Body1" android:layout_width="wrap_content" android:layout_height="wrap_content" tools:text="Desember 2025" />
-                <TextView style="@style/TextAppearance.AppCompat.Caption" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="12dp" android:text="Total Bayar"/>
-                <TextView android:id="@+id/tv_detail_total_bayar" style="@style/TextAppearance.AppCompat.Body1" android:layout_width="wrap_content" android:layout_height="wrap_content" tools:text="Rp. 100.000" />
-                <TextView style="@style/TextAppearance.AppCompat.Caption" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="12dp" android:text="Status"/>
-                <TextView android:id="@+id/tv_detail_status_tagihan" style="@style/TextAppearance.AppCompat.Body1" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textStyle="bold" tools:text="Lunas" />
-            </LinearLayout>
-        </androidx.cardview.widget.CardView>
+    <TextView
+        android:id="@+id/tglDaftar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
 
-        <!-- Info Jaringan (Mikrotik) -->
-        <androidx.cardview.widget.CardView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            app:cardCornerRadius="8dp"
-            app:cardElevation="4dp">
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="16dp">
-                <TextView style="@style/TextAppearance.AppCompat.Title" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Info Jaringan (Mikrotik)" />
-                <TextView style="@style/TextAppearance.AppCompat.Caption" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="16dp" android:text="Username PPPoE" />
-                <TextView android:id="@+id/tv_detail_mikrotik_username" style="@style/TextAppearance.AppCompat.Body1" android:layout_width="wrap_content" android:layout_height="wrap_content" tools:text="adi" />
-                <TextView style="@style/TextAppearance.AppCompat.Caption" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="12dp" android:text="Static IP" />
-                <TextView android:id="@+id/tv_detail_static_ip" style="@style/TextAppearance.AppCompat.Body1" android:layout_width="wrap_content" android:layout_height="wrap_content" tools:text="192.168.10.183" />
-                <TextView style="@style/TextAppearance.AppCompat.Caption" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="12dp" android:text="Status PPPoE" />
-                <TextView android:id="@+id/tv_detail_status_pppoe" style="@style/TextAppearance.AppCompat.Body1" android:layout_width="wrap_content" android:layout_height="wrap_content" tools:text="active" />
-            </LinearLayout>
-        </androidx.cardview.widget.CardView>
+    <TextView
+        android:id="@+id/namaWilayah"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
 
-        <!-- Info Teknis FTTH -->
-        <androidx.cardview.widget.CardView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            app:cardCornerRadius="8dp"
-            app:cardElevation="4dp">
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="16dp">
-                <TextView style="@style/TextAppearance.AppCompat.Title" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Info Teknis FTTH" />
-                <TextView style="@style/TextAppearance.AppCompat.Caption" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="16dp" android:text="MAC Address" />
-                <TextView android:id="@+id/tv_detail_mac_address" style="@style/TextAppearance.AppCompat.Body1" android:layout_width="wrap_content" android:layout_height="wrap_content" tools:text="18:69:DA:4C:DD:65" />
-                <TextView style="@style/TextAppearance.AppCompat.Caption" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="12dp" android:text="Signal RX/TX" />
-                <TextView android:id="@+id/tv_detail_signal" style="@style/TextAppearance.AppCompat.Body1" android:layout_width="wrap_content" android:layout_height="wrap_content" tools:text="- / -" />
-                <TextView style="@style/TextAppearance.AppCompat.Caption" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="12dp" android:text="Status FTTH" />
-                <TextView android:id="@+id/tv_detail_ftth_status" style="@style/TextAppearance.AppCompat.Body1" android:layout_width="wrap_content" android:layout_height="wrap_content" tools:text="active" />
-            </LinearLayout>
-        </androidx.cardview.widget.CardView>
+    <TextView
+        android:id="@+id/mikrotikUsername"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
 
-    </LinearLayout>
-</ScrollView>
+    <TextView
+        android:id="@+id/staticIp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <TextView
+        android:id="@+id/statusPppoe"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <TextView
+        android:id="@+id/macAddress"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <TextView
+        android:id="@+id/signalRx"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <TextView
+        android:id="@+id/signalTx"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <TextView
+        android:id="@+id/ftthStatus"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+</LinearLayout>

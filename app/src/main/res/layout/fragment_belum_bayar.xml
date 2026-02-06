@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    tools:context=".BelumBayarFragment">
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rv_belum_bayar"
+        android:id="@+id/rvBelumBayar"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
@@ -12,7 +14,7 @@
         android:id="@+id/progressBar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
+        android:layout_gravity="center"
         android:visibility="gone" />
 
-</RelativeLayout>
+</FrameLayout>

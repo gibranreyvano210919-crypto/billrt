@@ -2,26 +2,23 @@ package com.linkbit.billrt
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import androidx.fragment.app.Fragment
-import com.linkbit.billrt.databinding.ActivityDashboardBinding
 
+/**
+ * This activity is now obsolete and should be removed.
+ * The main navigation flow is handled by MainActivity and its NavHostFragment.
+ */
 class DashboardActivity : AppCompatActivity() {
-
-    private lateinit var binding: ActivityDashboardBinding
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityDashboardBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-
-        if (savedInstanceState == null) {
-            loadFragment(BerandaFragment())
-        }
+        // The content is now set by MainActivity's navigation graph.
+        // This activity can be safely removed from the project.
     }
+}
 
-    private fun loadFragment(fragment: Fragment) {
-        supportFragmentManager.beginTransaction()
-            .replace(R.id.fragment_container, fragment)
-            .commit()
-    }
+/**
+ * This interface is also obsolete as the bottom navigation visibility
+ * is now handled automatically by MainActivity's destination listener.
+ */
+interface BottomNavHandler {
+    fun setBottomNavVisibility(isVisible: Boolean)
 }

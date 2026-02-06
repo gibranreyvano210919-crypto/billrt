@@ -7,7 +7,15 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
-    <color name="green">#4CAF50</color>
+    <color name="duplicate_background">#FFEBEE</color>
+    <color name="error_red">#D32F2F</color>
+
+    <!-- Warna yang hilang ditambahkan kembali -->
+    <color name="app_background">#FFF5F5F5</color>
+    <color name="text_color">#FF000000</color>
+
+    <!-- Warna yang hilang dari resource drawable & layout -->
     <color name="red">#F44336</color>
-    <color name="colorPrimary">#FF6200EE</color>
+    <color name="green">#4CAF50</color>
+    <color name="link_blue">#2196F3</color>
 </resources>

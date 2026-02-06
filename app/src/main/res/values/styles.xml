@@ -11,14 +11,14 @@
         <item name="android:layout_width">0dp</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_columnWeight">1</item>
-        <item name="android:layout_margin">8dp</item>
-        <item name="cardCornerRadius">8dp</item>
+        <item name="android:layout_margin">12dp</item>
+        <item name="cardCornerRadius">12dp</item>
     </style>
 
     <style name="DashboardMenuLayout">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:background">@drawable/gradient_background</item>
+        <item name="android:background">@color/app_background</item>
         <item name="android:gravity">center</item>
         <item name="android:orientation">vertical</item>
         <item name="android:padding">16dp</item>
@@ -27,15 +27,22 @@
     <style name="DashboardMenuIcon">
         <item name="android:layout_width">48dp</item>
         <item name="android:layout_height">48dp</item>
-        <item name="android:tint">@android:color/white</item>
     </style>
 
     <style name="DashboardMenuTitle">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:layout_marginTop">8dp</item>
-        <item name="android:textColor">@android:color/white</item>
+        <item name="android:layout_marginTop">12dp</item>
+        <item name="android:textColor">@color/text_color</item>
         <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="MonitoringRekapText">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_columnWeight">1</item>
+        <item name="android:gravity">center_horizontal</item>
+        <item name="android:textAppearance">@style/TextAppearance.AppCompat.Medium</item>
     </style>
 
 </resources>

@@ -5,23 +5,32 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.AdapterView
-import android.widget.ArrayAdapter
+import android.widget.PopupMenu
 import android.widget.Toast
-import androidx.fragment.app.Fragment
+import androidx.appcompat.widget.SearchView
+import androidx.core.os.bundleOf
+import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.linkbit.billrt.databinding.FragmentPelangganBinding
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import java.text.NumberFormat
-import java.util.Calendar
-import java.util.Locale
 
-class PelangganFragment : Fragment() {
+class PelangganFragment : BaseFragment() {
 
     private var _binding: FragmentPelangganBinding? = null
     private val binding get() = _binding!!
-    private val apiService: ApiService by lazy { ApiConfig.getApiService() }
+
+    private lateinit var pelangganAdapter: PelangganAdapter
+    private var allPelanggan: List<PelangganData> = emptyList()
+    private var showActive: Boolean = true // Default to show active customers
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        arguments?.let {
+            showActive = it.getBoolean("show_active", true)
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -33,110 +42,125 @@ class PelangganFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setupFilterSpinners()
-        setupFilterListeners()
-        setupDashboardCardListeners()
-        binding.btnTambahPelanggan.setOnClickListener { 
-            openFragment(TambahPelangganWizardFragment())
-        }
-        fetchDashboardData()
-    }
 
-    private fun setupFilterSpinners() {
-        val monthNames = arrayOf("Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember")
-        val monthAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, monthNames)
-        monthAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        binding.spinnerMonthPelanggan.adapter = monthAdapter
+        setupRecyclerView()
+        setupSearchView()
+        fetchPelanggan()
 
-        val currentYear = Calendar.getInstance().get(Calendar.YEAR)
-        val years = (2020..currentYear).toList().map { it.toString() }
-        val yearAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, years)
-        yearAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        binding.spinnerYearPelanggan.adapter = yearAdapter
-
-        val currentMonth = Calendar.getInstance().get(Calendar.MONTH)
-        binding.spinnerMonthPelanggan.setSelection(currentMonth)
-        binding.spinnerYearPelanggan.setSelection(years.indexOf(currentYear.toString()))
-    }
-
-    private fun setupFilterListeners() {
-        val listener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                fetchDashboardData()
+        // Dynamically change the title and FAB visibility
+        if (showActive) {
+            binding.fabTambahPelanggan.visibility = View.VISIBLE
+            binding.fabTambahPelanggan.setOnClickListener {
+                 Toast.makeText(context, "Fitur tambah pelanggan dinonaktifkan sementara.", Toast.LENGTH_SHORT).show()
             }
-            override fun onNothingSelected(parent: AdapterView<*>?) {}
-        }
-        binding.spinnerMonthPelanggan.onItemSelectedListener = listener
-        binding.spinnerYearPelanggan.onItemSelectedListener = listener
-    }
-
-    private fun setupDashboardCardListeners() {
-        binding.cardTotalPelanggan.setOnClickListener { 
-            val selectedMonth = binding.spinnerMonthPelanggan.selectedItemPosition + 1
-            val selectedYear = binding.spinnerYearPelanggan.selectedItem.toString().toInt()
-            openFragment(TotalPelangganFragment.newInstance(selectedMonth, selectedYear))
-        }
-        binding.cardPelangganBaru.setOnClickListener { 
-            val selectedMonth = binding.spinnerMonthPelanggan.selectedItemPosition + 1
-            val selectedYear = binding.spinnerYearPelanggan.selectedItem.toString().toInt()
-            openFragment(PelangganBaruFragment.newInstance(selectedMonth, selectedYear))
-        }
-        binding.cardLunas.setOnClickListener { 
-            val selectedMonth = binding.spinnerMonthPelanggan.selectedItemPosition + 1
-            val selectedYear = binding.spinnerYearPelanggan.selectedItem.toString().toInt()
-            openFragment(LunasFragment.newInstance(selectedMonth, selectedYear)) 
-        }
-        binding.cardBelumBayar.setOnClickListener { 
-            val selectedMonth = binding.spinnerMonthPelanggan.selectedItemPosition + 1
-            val selectedYear = binding.spinnerYearPelanggan.selectedItem.toString().toInt()
-            openFragment(BelumBayarFragment.newInstance(selectedMonth, selectedYear)) 
+        } else {
+            binding.fabTambahPelanggan.visibility = View.GONE
         }
     }
 
-    private fun openFragment(fragment: Fragment) {
-        parentFragmentManager.beginTransaction()
-            .replace(R.id.fragment_container, fragment)
-            .addToBackStack(null)
-            .commit()
+    private fun setupRecyclerView() {
+        pelangganAdapter = PelangganAdapter(
+            emptyList(),
+            onDetailClick = { pelanggan ->
+                val bundle = bundleOf("pelangganId" to pelanggan.idPelanggan)
+                findNavController().navigate(R.id.action_global_detailPelangganFragment, bundle)
+            },
+            onMenuClick = { pelanggan, view ->
+                showPopupMenu(pelanggan, view)
+            }
+        )
+        binding.recyclerViewPelanggan.apply {
+            layoutManager = LinearLayoutManager(context)
+            adapter = pelangganAdapter
+        }
     }
 
-    private fun fetchDashboardData() {
-        binding.progressBarPelanggan.visibility = View.VISIBLE
-
-        val selectedMonth = binding.spinnerMonthPelanggan.selectedItemPosition + 1
-        val selectedYear = binding.spinnerYearPelanggan.selectedItem.toString().toInt()
-
-        apiService.getPelanggan(selectedMonth, selectedYear).enqueue(object : Callback<PelangganResponse> {
-            override fun onResponse(call: Call<PelangganResponse>, response: Response<PelangganResponse>) {
-                if (_binding == null) return
-                binding.progressBarPelanggan.visibility = View.GONE
-                if (response.isSuccessful) {
-                    response.body()?.rekap?.let { rekap ->
-                        updateDashboard(rekap)
-                    }
-                } else {
-                    Toast.makeText(context, "Gagal mengambil data: ${response.code()}", Toast.LENGTH_SHORT).show()
+    private fun showPopupMenu(pelanggan: PelangganData, view: View) {
+        val popup = PopupMenu(requireContext(), view)
+        popup.menuInflater.inflate(R.menu.menu_pelanggan_item, popup.menu)
+        popup.setOnMenuItemClickListener { item ->
+            when (item.itemId) {
+                R.id.menu_detail -> {
+                    val bundle = bundleOf("pelangganId" to pelanggan.idPelanggan)
+                    findNavController().navigate(R.id.action_global_detailPelangganFragment, bundle)
+                    true
                 }
+                R.id.menu_edit -> {
+                    Toast.makeText(context, "Edit: ${pelanggan.nama}", Toast.LENGTH_SHORT).show()
+                    true
+                }
+                R.id.menu_hapus -> {
+                    Toast.makeText(context, "Hapus: ${pelanggan.nama}", Toast.LENGTH_SHORT).show()
+                    true
+                }
+                else -> false
+            }
+        }
+        popup.show()
+    }
+
+    private fun setupSearchView() {
+        binding.searchViewPelanggan.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                return false
             }
 
-            override fun onFailure(call: Call<PelangganResponse>, t: Throwable) {
-                if (_binding == null) return
-                binding.progressBarPelanggan.visibility = View.GONE
-                Log.e("PelangganFragment", "API Call Failed", t)
-                Toast.makeText(context, "Koneksi Gagal: ${t.message}", Toast.LENGTH_LONG).show()
+            override fun onQueryTextChange(newText: String?): Boolean {
+                filterPelanggan(newText)
+                return true
             }
         })
     }
 
-    private fun updateDashboard(rekap: RekapData) {
-        binding.tvTotalPelanggan.text = rekap.totalPelanggan.toString()
-        binding.tvPelangganBaru.text = rekap.pelangganBaru.toString()
-        binding.tvPelangganLama.text = rekap.pelangganLama.toString()
-        binding.tvLunas.text = rekap.totalLunas.toString()
-        binding.tvBelumBayar.text = rekap.totalBelumBayar.toString()
+    private fun fetchPelanggan() {
+        setLoadingState(true)
+        val statusToFetch = if (showActive) "aktif" else "nonaktif"
+        apiService.getDataPelanggan(status = statusToFetch).enqueue(object : Callback<PelangganResponse> {
+            override fun onResponse(call: Call<PelangganResponse>, response: Response<PelangganResponse>) {
+                if (_binding == null || !isAdded) return
+                setLoadingState(false)
+                if (response.isSuccessful) {
+                    allPelanggan = response.body()?.data ?: emptyList()
+                    pelangganAdapter.updateData(allPelanggan)
+                    if (allPelanggan.isEmpty()) {
+                        Toast.makeText(context, "Tidak ada data pelanggan.", Toast.LENGTH_SHORT).show()
+                    }
+                } else {
+                    val errorMsg = "Gagal memuat data pelanggan (Error ${response.code()})"
+                    Toast.makeText(context, errorMsg, Toast.LENGTH_LONG).show()
+                }
+            }
 
-        val format = NumberFormat.getCurrencyInstance(Locale("in", "ID"))
-        binding.tvTotalPendapatan.text = format.format(rekap.totalPendapatan)
+            override fun onFailure(call: Call<PelangganResponse>, t: Throwable) {
+                if (_binding == null || !isAdded) return
+                setLoadingState(false)
+                val errorMsg = "Gagal memuat data. Periksa koneksi Anda."
+                Toast.makeText(context, errorMsg, Toast.LENGTH_LONG).show()
+            }
+        })
+    }
+
+    private fun setLoadingState(isLoading: Boolean) {
+        if (_binding == null) return
+        binding.progressBarPelanggan.visibility = if (isLoading) View.VISIBLE else View.GONE
+        if (isLoading) {
+            binding.fabTambahPelanggan.hide()
+        } else {
+            if (showActive) binding.fabTambahPelanggan.show()
+        }
+    }
+
+    private fun filterPelanggan(query: String?) {
+        val filteredList = if (query.isNullOrEmpty()) {
+            allPelanggan
+        } else {
+            allPelanggan.filter {
+                it.nama.contains(query, ignoreCase = true) ||
+                it.alamat?.contains(query, ignoreCase = true) == true ||
+                it.idPelanggan.contains(query, ignoreCase = true)
+            }
+        }
+        pelangganAdapter.updateData(filteredList)
     }
 
     override fun onDestroyView() {

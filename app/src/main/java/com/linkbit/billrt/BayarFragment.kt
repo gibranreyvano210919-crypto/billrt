@@ -12,12 +12,15 @@ import com.linkbit.billrt.databinding.FragmentBayarBinding
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.io.Serializable
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 class BayarFragment : Fragment() {
 
     private var _binding: FragmentBayarBinding? = null
     private val binding get() = _binding!!
-    private val apiService: ApiService by lazy { ApiConfig.getApiService() }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -30,25 +33,7 @@ class BayarFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.rvBayar.layoutManager = LinearLayoutManager(context)
-        fetchRiwayatPembayaran()
-    }
-
-    private fun fetchRiwayatPembayaran() {
-        apiService.getRiwayatPembayaran().enqueue(object : Callback<PembayaranResponse> {
-            override fun onResponse(call: Call<PembayaranResponse>, response: Response<PembayaranResponse>) {
-                if (response.isSuccessful) {
-                    val pembayaranList = response.body()?.data ?: emptyList()
-                    binding.rvBayar.adapter = BayarAdapter(pembayaranList)
-                } else {
-                    Toast.makeText(context, "Gagal mengambil riwayat pembayaran", Toast.LENGTH_SHORT).show()
-                }
-            }
-
-            override fun onFailure(call: Call<PembayaranResponse>, t: Throwable) {
-                Log.e("BayarFragment", "API Call Failed", t)
-                Toast.makeText(context, "Koneksi Gagal", Toast.LENGTH_LONG).show()
-            }
-        })
+        Toast.makeText(context, "Endpoint untuk fitur ini tidak ditemukan di API.", Toast.LENGTH_LONG).show()
     }
 
     override fun onDestroyView() {

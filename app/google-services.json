@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "532898730302",
+    "project_id": "mikrotik-alert",
+    "storage_bucket": "mikrotik-alert.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:532898730302:android:d1675a8af8038884625c6f",
+        "android_client_info": {
+          "package_name": "com.billrt"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCxjftKa70YPfRXbYwC73-O0riEF0QiDeg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:532898730302:android:e2f13ab4cd09a3d2625c6f",
+        "android_client_info": {
+          "package_name": "com.linkbit.billrt"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCxjftKa70YPfRXbYwC73-O0riEF0QiDeg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
