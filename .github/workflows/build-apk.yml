@@ -1,15 +1,13 @@
-name: Build & Release APK
+name: Build Android APK
 
 on:
   push:
-    tags:
-      - 'v*' # Workflow jalan hanya saat kamu buat tag baru (contoh: v1.0)
+    branches:
+      - master  # Workflow jalan tiap kali kamu push ke master
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write # Penting agar GitHub bisa upload file ke Release
 
     steps:
       - name: Checkout Code
@@ -25,13 +23,11 @@ jobs:
       - name: Grant Execute Permission for Gradlew
         run: chmod +x gradlew
 
-      - name: Build Release APK
-        run: ./gradlew assembleRelease
+      - name: Build Debug APK
+        run: ./gradlew assembleDebug
 
-      - name: Create GitHub Release
-        uses: softprops/action-gh-release@v1
+      - name: Upload APK Artifact
+        uses: actions/upload-artifact@v4
         with:
-          files: app/build/outputs/apk/release/*.apk # Mengambil semua APK di folder release
-          body: "Silakan download APK terbaru di bawah ini."
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          name: Aplikasi-Billrt-Debug
+          path: app/build/outputs/apk/debug/*.apk
