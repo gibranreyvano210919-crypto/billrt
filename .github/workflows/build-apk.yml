@@ -3,7 +3,7 @@ name: Build Android APK
 on:
   push:
     branches:
-      - master  # Workflow jalan tiap kali kamu push ke master
+      - main  # Sekarang sudah sesuai dengan branch 'main' kamu
 
 jobs:
   build:
