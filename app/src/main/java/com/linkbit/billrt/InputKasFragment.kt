@@ -2,6 +2,8 @@ package com.linkbit.billrt
 
 import android.app.DatePickerDialog
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -17,11 +19,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.linkbit.billrt.adapter.PelangganChecklistAdapter
 import com.linkbit.billrt.databinding.FragmentInputKasBinding
 import com.linkbit.billrt.model.CatatanTagihanResponse
-import com.linkbit.billrt.model.DashboardResponse
 import com.linkbit.billrt.model.InputCatatanRequest
 import com.linkbit.billrt.model.MasterTeknisi
 import com.linkbit.billrt.model.MasterTeknisiResponse
-import com.linkbit.billrt.model.PelangganData
 import com.linkbit.billrt.model.StandardResponse
 import com.linkbit.billrt.network.RetrofitClient
 import retrofit2.Call
@@ -40,6 +40,9 @@ class InputKasFragment : BaseFragment() {
     private lateinit var pelangganAdapter: PelangganChecklistAdapter
     private var selectedPelanggans: List<InputKasPelanggan> = emptyList()
     private val selectedDate = Calendar.getInstance()
+
+    private val searchHandler = Handler(Looper.getMainLooper())
+    private var searchRunnable: Runnable? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentInputKasBinding.inflate(inflater, container, false)
@@ -60,7 +63,7 @@ class InputKasFragment : BaseFragment() {
         setupRecyclerView()
         setupSearchView()
         fetchTeknisi()
-        fetchData()
+        fetchData() // Initial fetch without search term
 
         binding.btnSubmit.setOnClickListener {
             showConfirmationDialog()
@@ -129,7 +132,7 @@ class InputKasFragment : BaseFragment() {
 
         val listener = object: AdapterView.OnItemSelectedListener {
             override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
-                fetchData()
+                fetchData(binding.searchViewPelanggan.query.toString())
             }
             override fun onNothingSelected(p0: AdapterView<*>?) {}
         }
@@ -172,7 +175,11 @@ class InputKasFragment : BaseFragment() {
         binding.searchViewPelanggan.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean = false
             override fun onQueryTextChange(newText: String?): Boolean {
-                pelangganAdapter.filter(newText)
+                searchRunnable?.let { searchHandler.removeCallbacks(it) }
+                searchRunnable = Runnable {
+                    fetchData(newText)
+                }
+                searchHandler.postDelayed(searchRunnable!!, 300) // Debounce for 300ms
                 return true
             }
         })
@@ -193,55 +200,54 @@ class InputKasFragment : BaseFragment() {
         })
     }
 
-    private fun fetchData() {
+    private fun fetchData(searchQuery: String? = null) {
         val bulan = binding.spinnerBulanInput.selectedItemPosition + 1
         val tahun = binding.spinnerTahunInput.selectedItem.toString().toInt()
 
-        val allPelangganCall = RetrofitClient.instance.getDataPelanggan()
-        val tercatatCall = RetrofitClient.instance.getCatatanTagihan(bulan, tahun)
-
-        allPelangganCall.enqueue(object: Callback<DashboardResponse>{
-            override fun onResponse(call: Call<DashboardResponse>, response: Response<DashboardResponse>) {
+        RetrofitClient.instance.getDataPelangganList(searchQuery).enqueue(object: Callback<PelangganListResponse>{
+            override fun onResponse(call: Call<PelangganListResponse>, response: Response<PelangganListResponse>) {
                 if (!isAdded || !response.isSuccessful) return
 
-                val allPelanggan: List<PelangganData> = response.body()?.data ?: emptyList()
+                val pelangganList = response.body()?.data ?: emptyList()
 
-                tercatatCall.enqueue(object: Callback<CatatanTagihanResponse>{
+                RetrofitClient.instance.getCatatanTagihan(bulan, tahun).enqueue(object: Callback<CatatanTagihanResponse>{
                     override fun onResponse(call: Call<CatatanTagihanResponse>, response: Response<CatatanTagihanResponse>) {
                         val tercatatIds = if(response.isSuccessful) {
-                            response.body()?.data?.flatMap { it.list }?.map { it.idPelanggan }?.toSet() ?: emptySet()
+                            response.body()?.data?.flatMap { it.list }?.mapNotNull { it.idPelanggan }?.toSet() ?: emptySet()
                         } else {
                             emptySet()
                         }
 
-                        val mergedList = allPelanggan.map { 
+                        val mergedList = pelangganList.map { 
                             InputKasPelanggan(
                                 idPelanggan = it.idPelanggan,
-                                nama = it.nama,
-                                wilayah = it.wilayah,
-                                status = it.status,
+                                nama = it.namaPelanggan,
+                                wilayah = null, // Wilayah is not in PelangganListItem
+                                status = it.statusAktif,
                                 macAddress = it.macAddress,
-                                isTercatat = tercatatIds.contains(it.idPelanggan)
+                                isTercatat = tercatatIds.contains(it.idPelanggan),
+                                mikrotikUsername = it.mikrotikUsername
                             )
                         }
                         pelangganAdapter.updateData(mergedList)
                     }
                     override fun onFailure(call: Call<CatatanTagihanResponse>, t: Throwable) {
-                        val list = allPelanggan.map { 
-                            InputKasPelanggan(
+                        val list = pelangganList.map { 
+                             InputKasPelanggan(
                                 idPelanggan = it.idPelanggan,
-                                nama = it.nama,
-                                wilayah = it.wilayah,
-                                status = it.status,
+                                nama = it.namaPelanggan,
+                                wilayah = null,
+                                status = it.statusAktif,
                                 macAddress = it.macAddress,
-                                isTercatat = false
+                                isTercatat = false,
+                                mikrotikUsername = it.mikrotikUsername
                             )
                         }
-                         pelangganAdapter.updateData(list) // Tetap tampilkan walau gagal
+                         pelangganAdapter.updateData(list)
                     }
                 })
             }
-            override fun onFailure(call: Call<DashboardResponse>, t: Throwable) {}
+            override fun onFailure(call: Call<PelangganListResponse>, t: Throwable) {}
         })
     }
 
@@ -292,6 +298,7 @@ class InputKasFragment : BaseFragment() {
     }
 
     override fun onDestroyView() {
+        searchRunnable?.let { searchHandler.removeCallbacks(it) }
         super.onDestroyView()
         _binding = null
     }

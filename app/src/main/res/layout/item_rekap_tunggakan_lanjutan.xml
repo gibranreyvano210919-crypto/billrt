@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="8dp"
+    android:layout_marginTop="8dp"
+    app:cardCornerRadius="8dp"
+    app:cardElevation="4dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="12dp">
+
+        <TextView
+            android:id="@+id/tv_nama_pelanggan"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle1"
+            tools:text="Nama Pelanggan" />
+
+        <TextView
+            android:id="@+id/tv_username_mikrotik"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
+            tools:text="username@mikrotik" />
+
+        <TextView
+            android:id="@+id/tv_wilayah"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:textAppearance="@style/TextAppearance.MaterialComponents.Caption"
+            tools:text="Wilayah Pelanggan" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="8dp"
+            android:background="?android:attr/listDivider" />
+
+        <TextView
+            android:id="@+id/tv_info_sebelumnya_header"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Info Terakhir Tercatat"
+            android:textAppearance="@style/TextAppearance.MaterialComponents.Overline" />
+
+        <TextView
+            android:id="@+id/tv_tanggal_terakhir"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="Tanggal: 2024-01-15" />
+
+        <TextView
+            android:id="@+id/tv_periode_terakhir"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="Periode: 1-2024" />
+
+        <TextView
+            android:id="@+id/tv_teknisi_terakhir"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="Teknisi: Nama Teknisi" />
+
+    </LinearLayout>
+
+</com.google.android.material.card.MaterialCardView>

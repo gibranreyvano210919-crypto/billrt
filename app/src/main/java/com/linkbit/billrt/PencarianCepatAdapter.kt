@@ -10,7 +10,8 @@ import com.linkbit.billrt.databinding.ItemPencarianCepatBinding
 class PencarianCepatAdapter(
     private var items: List<PelangganData>,
     private val onCopyMacClick: (String) -> Unit,
-    private val onRiwayatClick: (String) -> Unit
+    private val onRiwayatClick: (String) -> Unit,
+    private val onRiwayatKasClick: (String) -> Unit
 ) : RecyclerView.Adapter<PencarianCepatAdapter.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -51,6 +52,10 @@ class PencarianCepatAdapter(
                 // Disable buttons if there is no MAC address
                 binding.btnCopyMac.setOnClickListener(null)
                 binding.btnRiwayat.setOnClickListener(null)
+            }
+
+            binding.btnRiwayatKas.setOnClickListener {
+                onRiwayatKasClick(item.idPelanggan)
             }
         }
     }

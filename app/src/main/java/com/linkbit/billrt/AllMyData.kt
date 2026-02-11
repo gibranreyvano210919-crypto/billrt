@@ -13,7 +13,67 @@ data class LoginResponse(val success: Boolean, val user: UserData?, val message:
 data class UserData(@SerializedName("id_user") val idUser: Int, val username: String, val nama: String, val level: String?, val at: String?) : Serializable
 // endregion
 
+// region Model untuk API wilayah_pelanggan_nested
+data class WilayahPelangganNestedResponse(
+    val status: Boolean,
+    @SerializedName("total_wilayah")
+    val totalWilayah: Int,
+    val data: List<WilayahData>,
+    val message: String? // Ditambahkan untuk pesan error
+)
+
+data class WilayahData(
+    val id: Int,
+    @SerializedName("nama_wilayah")
+    val namaWilayah: String,
+    val statistik: StatistikData,
+    @SerializedName("daftar_pelanggan")
+    val daftarPelanggan: List<PelangganItem>
+)
+
+data class StatistikData(
+    @SerializedName("total_pelanggan_aktif")
+    val totalPelangganAktif: Int
+)
+
+// Mewakili pelanggan dari daftar nested
+data class PelangganItem(
+    val id: String,
+    @SerializedName("nama_pelanggan")
+    val nama: String,
+    val lat: Double?,
+    @SerializedName("long")
+    val lng: Double?
+)
+
+// Kelas data terpadu untuk tampilan peta dan adapter.
+data class PelangganMapData(
+    val id: String,
+    val nama: String,
+    val lat: Double?,
+    val lng: Double?,
+    val namaWilayah: String,
+    val alamat: String? // Nullable karena tidak ada dalam respons API baru
+)
+// endregion
+
 // region Pelanggan (from various APIs)
+
+// Model untuk data_pelanggan_list
+data class PelangganListResponse(val status: Boolean, val message: String?, val data: List<PelangganListItem>)
+
+data class PelangganListItem(
+    @SerializedName("id_pelanggan") val idPelanggan: String,
+    @SerializedName("nama_pelanggan") val namaPelanggan: String,
+    @SerializedName("mikrotik_username") val mikrotikUsername: String?,
+    @SerializedName("status_aktif") val statusAktif: String?,
+    val latitude: Double?,
+    val longitude: Double?,
+    @SerializedName("mac_address") val macAddress: String?,
+    @SerializedName("installation_date") val installationDate: String?,
+    @SerializedName("tgl_daftar") val tglDaftar: String?
+) : Serializable
+
 data class PelangganResponse(val status: Boolean, val data: List<PelangganData>?, val rekap: RekapData?)
 data class PelangganData(
     @SerializedName("id_pelanggan") val idPelanggan: String,
@@ -34,10 +94,11 @@ data class PelangganData(
 data class InputKasPelanggan(
     @SerializedName("id_pelanggan") val idPelanggan: String,
     @SerializedName("nama_pelanggan") val nama: String,
-    @SerializedName("nama_wilayah") val wilayah: String,
+    @SerializedName("nama_wilayah") val wilayah: String?,
     val status: String?,
     @SerializedName("mac_address") val macAddress: String?,
-    var isTercatat: Boolean = false
+    var isTercatat: Boolean = false,
+    val mikrotikUsername: String?
 ) : Serializable
 
 data class GetPelangganResponse(
@@ -46,20 +107,6 @@ data class GetPelangganResponse(
     val message: String,
     val data: JsonElement, // Flexible data type
     val config: MapConfig? = null
-)
-
-data class PelangganMapData(
-    val id: Int,
-    val nama: String,
-    val alamat: String?,
-    val telp: String?,
-    val paket: String?,
-    val lat: Double?,
-    val lng: Double?,
-    val status: String?,
-    @SerializedName("tanggal_pasang") val tanggalPasang: String?,
-    val keterangan: String?,
-    val color: String?
 )
 
 // Model baru untuk response dari detail_pelanggan_map
@@ -97,7 +144,7 @@ data class RekapData(
 )
 
 data class UpdateLokasiRequest(
-    @SerializedName("id_pelanggan") val idPelanggan: Int,
+    @SerializedName("id_pelanggan") val idPelanggan: Int, 
     val latitude: Double,
     val longitude: Double
 )
@@ -260,6 +307,8 @@ data class HapusCatatanRequest(val id: Int)
 data class VerifyCatatanRequest(val id: Int)
 data class UnverifyCatatanRequest(val id: Int)
 
+data class CatatanTagihanResponse(val status: Boolean, val data: List<TanggalGroup>?)
+
 data class GroupedKasResponse(
     val status: Boolean,
     @SerializedName("total_global") val totalGlobal: Int,
@@ -410,6 +459,7 @@ data class AuditUserResponse(
     val summary: AuditSummary?,
     val data: List<AuditResult>?
 ) : Serializable
+
 
 data class AuditSummary(
     @SerializedName("total_audit_issue") val totalAuditIssue: Int,

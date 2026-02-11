@@ -1,0 +1,20 @@
+package com.linkbit.billrt
+
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
+
+object ApiClient {
+
+    private const val BASE_URL = "http://112.78.170.196:8885/billrt/api/"
+
+    val retrofit: Retrofit by lazy {
+        Retrofit.Builder()
+            .baseUrl(BASE_URL)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+    }
+
+    val apiService: ApiService by lazy {
+        retrofit.create(ApiService::class.java)
+    }
+}

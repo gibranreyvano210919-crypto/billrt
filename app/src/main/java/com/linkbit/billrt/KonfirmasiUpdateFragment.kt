@@ -74,7 +74,7 @@ class KonfirmasiUpdateFragment : Fragment() {
                 if (response.isSuccessful && response.body()?.status == true) {
                     Toast.makeText(context, response.body()?.message ?: "Data berhasil disimpan!", Toast.LENGTH_LONG).show()
                     // Kembali ke dua layar sebelumnya (ke daftar pelanggan)
-                    findNavController().popBackStack(R.id.gantiLokasiFragment, false)
+                    findNavController().popBackStack(R.id.nav_maps, false)
                 } else {
                     val errorMessage = response.body()?.message ?: "Gagal menyimpan data ke server."
                     Toast.makeText(context, errorMessage, Toast.LENGTH_LONG).show()

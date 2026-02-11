@@ -64,7 +64,7 @@ data class SaveLocationResponse(val status: Boolean, val message: String)
 
 data class SemuaPelangganResponse(
     val status: Boolean,
-    val data: List<SemuaPelanggan>?
+    val data_pelanggan_list: List<SemuaPelanggan>?
 ) : Serializable
 
 data class SemuaPelanggan(

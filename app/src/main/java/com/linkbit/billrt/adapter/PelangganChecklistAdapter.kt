@@ -44,7 +44,8 @@ class PelangganChecklistAdapter(
         } else {
             originalList.forEach { pelanggan ->
                 if (pelanggan.nama.contains(currentQuery, ignoreCase = true) || 
-                    pelanggan.idPelanggan.contains(currentQuery, ignoreCase = true)) {
+                    pelanggan.idPelanggan.contains(currentQuery, ignoreCase = true) ||
+                    pelanggan.mikrotikUsername?.contains(currentQuery, ignoreCase = true) == true) {
                     filteredList.add(pelanggan)
                 }
             }
@@ -61,7 +62,8 @@ class PelangganChecklistAdapter(
     inner class ViewHolder(private val binding: ItemPelangganChecklistBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(pelanggan: InputKasPelanggan) {
             binding.cbPelanggan.text = "${pelanggan.nama} (${pelanggan.idPelanggan})"
-            binding.tvAlamat.text = pelanggan.wilayah
+            binding.tvAlamat.text = pelanggan.wilayah ?: ""
+            binding.tvMikrotikUsername.text = "Username: ${pelanggan.mikrotikUsername ?: "-"}"
             binding.cbPelanggan.setOnCheckedChangeListener(null) 
             binding.cbPelanggan.isChecked = selectedItems.contains(pelanggan)
 

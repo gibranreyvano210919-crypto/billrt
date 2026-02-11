@@ -61,6 +61,13 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Riwayat" />
+
+        <Button
+            android:id="@+id/btnRiwayatKas"
+            style="?android:attr/buttonBarStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Riwayat Kas" />
     </LinearLayout>
 
 </LinearLayout>

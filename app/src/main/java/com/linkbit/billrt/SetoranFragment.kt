@@ -318,15 +318,17 @@ class SetoranFragment : BaseFragment(), SetoranAdapter.OnAdapterListener {
     private fun uploadToCloudinary(idTeknisi: String, nominal: Float, tanggal: String, catatan: String) {
         selectedImageUri?.let {
             MediaManager.get().upload(it)
-                .unsigned("YOUR_UNSIGNED_UPLOAD_PRESET") // TODO: Ganti dengan upload preset Anda
+                .unsigned("billrt_unsigned")
                 .callback(object : UploadCallback {
                     override fun onStart(requestId: String) { }
                     override fun onProgress(requestId: String, bytes: Long, totalBytes: Long) { }
                     override fun onSuccess(requestId: String, resultData: Map<*, *>) {
+                        if (!isAdded) return
                         val url = resultData["url"] as? String ?: ""
                         tambahSetoran(idTeknisi, nominal, tanggal, catatan, url)
                     }
                     override fun onError(requestId: String, error: ErrorInfo) {
+                        if (!isAdded) return
                         Toast.makeText(requireContext(), "Upload gagal: ${error.description}", Toast.LENGTH_SHORT).show()
                     }
                     override fun onReschedule(requestId: String, error: ErrorInfo) { }
@@ -339,16 +341,18 @@ class SetoranFragment : BaseFragment(), SetoranAdapter.OnAdapterListener {
         val request = TambahSetoranRequest(idTeknisi, nominal, imageUrl, tanggal, catatan)
         RetrofitClient.instance.tambahSetoran(request).enqueue(object : Callback<StandardResponse> {
             override fun onResponse(call: Call<StandardResponse>, response: Response<StandardResponse>) {
+                if (!isAdded) return
                 if (response.isSuccessful) {
-                    Toast.makeText(context, response.body()?.message, Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireContext(), response.body()?.message ?: "Setoran berhasil ditambahkan", Toast.LENGTH_SHORT).show()
                     fetchRiwayatSetoran()
                 } else {
-                    Toast.makeText(context, "Gagal menambah setoran", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireContext(), "Gagal menambah setoran. Kode: ${response.code()}", Toast.LENGTH_SHORT).show()
                 }
             }
 
             override fun onFailure(call: Call<StandardResponse>, t: Throwable) {
-                Toast.makeText(context, "Error: ${t.message}", Toast.LENGTH_SHORT).show()
+                if (!isAdded) return
+                Toast.makeText(requireContext(), "Gagal menambah setoran: ${t.message}", Toast.LENGTH_SHORT).show()
             }
         })
     }
@@ -371,16 +375,18 @@ class SetoranFragment : BaseFragment(), SetoranAdapter.OnAdapterListener {
                 val request = EditCatatanSetoranRequest(setoran.idSetoran, newCatatan)
                 RetrofitClient.instance.editCatatanSetoran(request).enqueue(object : Callback<StandardResponse> {
                     override fun onResponse(call: Call<StandardResponse>, response: Response<StandardResponse>) {
+                        if (!isAdded) return
                         if (response.isSuccessful) {
-                            Toast.makeText(context, response.body()?.message, Toast.LENGTH_SHORT).show()
+                            Toast.makeText(requireContext(), response.body()?.message ?: "Catatan berhasil diupdate", Toast.LENGTH_SHORT).show()
                             fetchRiwayatSetoran()
                         } else {
-                            Toast.makeText(context, "Gagal mengupdate catatan", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(requireContext(), "Gagal mengupdate catatan. Kode: ${response.code()}", Toast.LENGTH_SHORT).show()
                         }
                     }
 
                     override fun onFailure(call: Call<StandardResponse>, t: Throwable) {
-                        Toast.makeText(context, "Error: ${t.message}", Toast.LENGTH_SHORT).show()
+                        if (!isAdded) return
+                        Toast.makeText(requireContext(), "Gagal mengupdate catatan: ${t.message}", Toast.LENGTH_SHORT).show()
                     }
                 })
             }
@@ -396,16 +402,18 @@ class SetoranFragment : BaseFragment(), SetoranAdapter.OnAdapterListener {
                 val request = HapusSetoranRequest(setoran.idSetoran)
                 RetrofitClient.instance.hapusSetoran(request).enqueue(object : Callback<StandardResponse> {
                     override fun onResponse(call: Call<StandardResponse>, response: Response<StandardResponse>) {
+                        if (!isAdded) return
                         if (response.isSuccessful) {
-                            Toast.makeText(context, response.body()?.message, Toast.LENGTH_SHORT).show()
+                            Toast.makeText(requireContext(), response.body()?.message ?: "Setoran berhasil dihapus", Toast.LENGTH_SHORT).show()
                             fetchRiwayatSetoran()
                         } else {
-                            Toast.makeText(context, "Gagal menghapus setoran", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(requireContext(), "Gagal menghapus setoran. Kode: ${response.code()}", Toast.LENGTH_SHORT).show()
                         }
                     }
 
                     override fun onFailure(call: Call<StandardResponse>, t: Throwable) {
-                        Toast.makeText(context, "Error: ${t.message}", Toast.LENGTH_SHORT).show()
+                        if (!isAdded) return
+                        Toast.makeText(requireContext(), "Gagal menghapus setoran: ${t.message}", Toast.LENGTH_SHORT).show()
                     }
                 })
             }

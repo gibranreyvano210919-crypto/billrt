@@ -1,5 +1,6 @@
 package com.linkbit.billrt
 
+import com.google.gson.annotations.SerializedName
 import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.Field
@@ -8,7 +9,45 @@ import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Query
 
+// Data class for the response of the settings endpoint
+data class PengaturanResponse(
+    @SerializedName("id_pengaturan") val idPengaturan: String?,
+    @SerializedName("nama_perusahaan") val namaPerusahaan: String?,
+    @SerializedName("alamat_perusahaan") val alamatPerusahaan: String?,
+    @SerializedName("telepon_perusahaan") val teleponPerusahaan: String?,
+    @SerializedName("email_perusahaan") val emailPerusahaan: String?,
+    @SerializedName("bank_nama") val bankNama: String?,
+    @SerializedName("bank_atas_nama") val bankAtasNama: String?,
+    @SerializedName("bank_no_rekening") val bankNoRekening: String?,
+    @SerializedName("logo_perusahaan") val logoPerusahaan: String?,
+    @SerializedName("masa_tenggang") val masaTenggang: String?,
+    @SerializedName("updated_at") val updatedAt: String?
+)
+
+data class UpdatePengaturanResponse(
+    val status: Boolean,
+    val message: String,
+    val data: PengaturanResponse
+)
+
 interface ApiService {
+
+    @GET("index.php")
+    fun getPengaturan(@Query("tabel") tabel: String = "pengaturan"): Call<PengaturanResponse>
+
+    @FormUrlEncoded
+    @POST("index.php?tabel=pengaturan")
+    fun updatePengaturan(
+        @Field("id_pengaturan") id: Int,
+        @Field("nama_perusahaan") nama: String,
+        @Field("alamat_perusahaan") alamat: String,
+        @Field("telepon_perusahaan") telepon: String,
+        @Field("email_perusahaan") email: String,
+        @Field("bank_nama") bank: String,
+        @Field("bank_atas_nama") an: String,
+        @Field("bank_no_rekening") norek: String,
+        @Field("masa_tenggang") tenggang: Int
+    ): Call<UpdatePengaturanResponse>
 
     @POST("login.php")
     fun login(@Body request: LoginRequest): Call<LoginResponse>
@@ -50,6 +89,9 @@ interface ApiService {
 
     @POST("index.php?tabel=cabut_layanan_port")
     fun cabutLayananPort(@Body request: CabutLayananPortRequest): Call<StandardResponse>
+    
+    @GET("index.php?tabel=wilayah_pelanggan_nested")
+    fun getWilayahPelangganNested(): Call<WilayahPelangganNestedResponse>
 
 
     @GET("index.php?tabel=data_pelanggan")

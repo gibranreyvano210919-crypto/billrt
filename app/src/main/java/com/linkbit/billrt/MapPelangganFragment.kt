@@ -17,11 +17,13 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.google.android.gms.location.LocationServices
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
+import com.linkbit.billrt.adapter.PelangganSearchAdapter
+import com.linkbit.billrt.adapter.WilayahFilterAdapter
+import com.linkbit.billrt.databinding.BottomSheetFilterWilayahBinding
 import com.linkbit.billrt.databinding.DialogPelangganSearchBinding
 import com.linkbit.billrt.databinding.FragmentMapPelangganBinding
 import com.mapbox.geojson.Point
@@ -47,6 +49,7 @@ class MapPelangganFragment : BaseFragment() {
     private var annotationToMove: PointAnnotation? = null
 
     private var allPelangganList = listOf<PelangganMapData>()
+    private var allWilayahList = listOf<WilayahData>()
 
     private val searchHandler = android.os.Handler(android.os.Looper.getMainLooper())
     private var searchRunnable: Runnable? = null
@@ -92,16 +95,21 @@ class MapPelangganFragment : BaseFragment() {
             checkLocationPermissionAndCenter()
         }
     }
-    
+
     private fun setupBottomSheet() {
         val bottomSheetBehavior = BottomSheetBehavior.from(binding.bottomSheet)
-        
+
         binding.fabTools.setOnClickListener {
-             if (bottomSheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED) {
+            if (bottomSheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED) {
                 bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
             } else {
                 bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
             }
+        }
+
+        binding.buttonFilterWilayah.setOnClickListener {
+            showWilayahFilterBottomSheet()
+            bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
         }
 
         binding.buttonAddLocation.setOnClickListener { 
@@ -122,13 +130,54 @@ class MapPelangganFragment : BaseFragment() {
         }
     }
 
+    private fun showWilayahFilterBottomSheet() {
+        if (allWilayahList.isEmpty()) {
+            Toast.makeText(context, "Data wilayah belum dimuat.", Toast.LENGTH_SHORT).show()
+            return
+        }
+        val dialog = BottomSheetDialog(requireContext())
+        val bottomSheetBinding = BottomSheetFilterWilayahBinding.inflate(layoutInflater)
+        dialog.setContentView(bottomSheetBinding.root)
+
+        val wilayahCounts = allWilayahList.map { it.namaWilayah to it.statistik.totalPelangganAktif }
+
+        val adapter = WilayahFilterAdapter(wilayahCounts) { selectedWilayah ->
+            filterMapByWilayah(selectedWilayah)
+            dialog.dismiss()
+        }
+
+        bottomSheetBinding.rvWilayahFilter.layoutManager = LinearLayoutManager(context)
+        bottomSheetBinding.rvWilayahFilter.adapter = adapter
+
+        bottomSheetBinding.buttonShowAll.setOnClickListener {
+            filterMapByWilayah(null)
+            dialog.dismiss()
+        }
+
+        dialog.show()
+    }
+
+    private fun filterMapByWilayah(wilayah: String?) {
+        val filteredList = if (wilayah == null) {
+            allPelangganList
+        } else {
+            allPelangganList.filter { it.namaWilayah == wilayah }
+        }
+        setupMap(filteredList)
+        if (wilayah != null) {
+            Toast.makeText(context, "Menampilkan wilayah: $wilayah", Toast.LENGTH_SHORT).show()
+        } else {
+            Toast.makeText(context, "Menampilkan semua wilayah", Toast.LENGTH_SHORT).show()
+        }
+    }
+
     private fun showMapStyleDialog() {
         val styleNames = mapStyles.map { it.first }.toTypedArray()
         AlertDialog.Builder(requireContext())
             .setTitle("Pilih Gaya Peta")
             .setItems(styleNames) { _, which ->
                 currentStyleIndex = which
-                setupMap(allPelangganList) // Reload map with new style
+                setupMap(allPelangganList)
             }
             .show()
     }
@@ -182,7 +231,6 @@ class MapPelangganFragment : BaseFragment() {
         filterMapData(query)
     }
 
-
     private fun toggleManualPolylineMode() {
         if (currentMode == MapMode.MANUAL_POLYLINE) {
             currentMode = MapMode.NONE
@@ -228,20 +276,32 @@ class MapPelangganFragment : BaseFragment() {
 
     private fun fetchMapData() {
         binding.progressBar.visibility = View.VISIBLE
-        apiService.getPelangganMap().enqueue(object : Callback<GetPelangganResponse> {
-            override fun onResponse(call: Call<GetPelangganResponse>, response: Response<GetPelangganResponse>) {
+        apiService.getWilayahPelangganNested().enqueue(object : Callback<WilayahPelangganNestedResponse> {
+            override fun onResponse(call: Call<WilayahPelangganNestedResponse>, response: Response<WilayahPelangganNestedResponse>) {
                 if (!isAdded || _binding == null) return
                 binding.progressBar.visibility = View.GONE
                 val body = response.body()
                 if (response.isSuccessful && body != null && body.status) {
-                    val listType = object : TypeToken<List<PelangganMapData>>() {}.type
-                    allPelangganList = try { Gson().fromJson(body.data, listType) } catch (e: Exception) { emptyList() }
+                    allWilayahList = body.data
+                    allPelangganList = allWilayahList.flatMap { wilayah ->
+                        wilayah.daftarPelanggan.map { pelanggan ->
+                            PelangganMapData(
+                                id = pelanggan.id,
+                                nama = pelanggan.nama ?: "",
+                                lat = pelanggan.lat,
+                                lng = pelanggan.lng,
+                                namaWilayah = wilayah.namaWilayah,
+                                alamat = null
+                            )
+                        }
+                    }
                     setupMap(allPelangganList)
                 } else {
-                    Toast.makeText(context, "Gagal memuat data awal: ${body?.message}", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, "Gagal memuat data: ${body?.message}", Toast.LENGTH_SHORT).show()
                 }
             }
-            override fun onFailure(call: Call<GetPelangganResponse>, t: Throwable) {
+
+            override fun onFailure(call: Call<WilayahPelangganNestedResponse>, t: Throwable) {
                 if (isAdded) {
                     binding.progressBar.visibility = View.GONE
                     Toast.makeText(context, "Error: ${t.message}", Toast.LENGTH_SHORT).show()
@@ -249,14 +309,14 @@ class MapPelangganFragment : BaseFragment() {
             }
         })
     }
+
     private fun filterMapData(query: String?) {
         val filteredList = if (query.isNullOrBlank()) {
             allPelangganList
         } else {
             val lowerCaseQuery = query.lowercase()
             allPelangganList.filter { 
-                it.nama.lowercase().contains(lowerCaseQuery) || 
-                (it.alamat != null && it.alamat.lowercase().contains(lowerCaseQuery))
+                it.nama.lowercase().contains(lowerCaseQuery) 
             }
         }
         setupMap(filteredList)
@@ -343,39 +403,14 @@ class MapPelangganFragment : BaseFragment() {
         if (json != null && json.isJsonObject) {
             val pData = Gson().fromJson(json, PelangganMapData::class.java)
 
-            apiService.getPelangganDetailMap(pData.id.toString()).enqueue(object : Callback<PelangganDetailMapResponse> {
-                override fun onResponse(call: Call<PelangganDetailMapResponse>, response: Response<PelangganDetailMapResponse>) {
-                    if (response.isSuccessful && response.body()?.status == true) {
-                        val detail = response.body()?.data
-                        if (detail != null) {
-                            val message = "ID: ${detail.idPelanggan}\n" +
-                                        "Nama: ${detail.namaPelanggan}\n" +
-                                        "Alamat: ${detail.alamatPelanggan}\n" +
-                                        "Paket: ${detail.namaPaket}\n" +
-                                        "Wilayah: ${detail.namaWilayah}\n" +
-                                        "Status: ${detail.statusAktif}\n" +
-                                        "Koordinat: ${detail.latitude}, ${detail.longitude}"
-
-                            AlertDialog.Builder(requireContext())
-                                .setTitle("Detail Pelanggan")
-                                .setMessage(message)
-                                .setPositiveButton("OK", null)
-                                .setNeutralButton("Pindah") { _, _ ->
-                                    startMoveMode(annotation)
-                                }
-                                .show()
-                        } else {
-                            Toast.makeText(context, "Detail pelanggan tidak ditemukan", Toast.LENGTH_SHORT).show()
-                        }
-                    } else {
-                        Toast.makeText(context, "Gagal memuat detail: ${response.body()?.message}", Toast.LENGTH_SHORT).show()
-                    }
+            AlertDialog.Builder(requireContext())
+                .setTitle("Detail Pelanggan")
+                .setMessage("ID: ${pData.id}\nNama: ${pData.nama}\nWilayah: ${pData.namaWilayah}\nKoordinat: ${pData.lat}, ${pData.lng}")
+                .setPositiveButton("OK", null)
+                .setNeutralButton("Pindah") { _, _ ->
+                    startMoveMode(annotation)
                 }
-
-                override fun onFailure(call: Call<PelangganDetailMapResponse>, t: Throwable) {
-                    Toast.makeText(context, "Error: ${t.message}", Toast.LENGTH_SHORT).show()
-                }
-            })
+                .show()
         }
     }
 
@@ -445,8 +480,8 @@ class MapPelangganFragment : BaseFragment() {
         binding.distanceText.text = "Jarak: ${String.format("%.2f", totalDistance)} meter"
     }
     
-    private fun updateAnnotationAndApi(pelangganId: Int, newPoint: Point) {
-        val request = UpdateLokasiRequest(pelangganId, newPoint.latitude(), newPoint.longitude())
+    private fun updateAnnotationAndApi(pelangganId: String, newPoint: Point) {
+        val request = UpdateLokasiRequest(pelangganId.toInt(), newPoint.latitude(), newPoint.longitude())
         apiService.updateLokasi(request).enqueue(object : Callback<StandardResponse> {
             override fun onResponse(call: Call<StandardResponse>, response: Response<StandardResponse>) {
                 if (response.isSuccessful && response.body()?.status == true) {
@@ -470,9 +505,8 @@ class MapPelangganFragment : BaseFragment() {
         }
 
         val dialogBinding = DialogPelangganSearchBinding.inflate(layoutInflater)
-        val dialogRecyclerView = dialogBinding.rvPelangganDialog
         val searchView = dialogBinding.searchViewDialog
-
+        val dialogRecyclerView = dialogBinding.rvPelangganDialog
         dialogRecyclerView.layoutManager = LinearLayoutManager(context)
 
         var dialog: AlertDialog? = null
@@ -490,8 +524,7 @@ class MapPelangganFragment : BaseFragment() {
 
             override fun onQueryTextChange(newText: String?): Boolean {
                 val filteredList = allPelangganList.filter { 
-                    it.nama.contains(newText ?: "", ignoreCase = true) || 
-                    it.alamat?.contains(newText ?: "", ignoreCase = true) == true
+                    it.nama.contains(newText ?: "", ignoreCase = true)
                 }
                 adapter.updateData(filteredList)
                 return true

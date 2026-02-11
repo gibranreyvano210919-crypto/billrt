@@ -11,6 +11,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.appcompat.widget.SearchView
+import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.linkbit.billrt.databinding.FragmentPencarianCepatBinding
@@ -18,7 +19,7 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-class PencarianCepatFragment : BaseFragment() {
+class PencarianCepatFragment : Fragment() {
 
     private var _binding: FragmentPencarianCepatBinding? = null
     private val binding get() = _binding!!
@@ -41,6 +42,10 @@ class PencarianCepatFragment : BaseFragment() {
         setupRecyclerView()
         setupSearchView()
         fetchAllPelanggan()
+
+        binding.buttonRiwayatCatatan.setOnClickListener {
+            showAllPelanggan()
+        }
     }
 
     private fun setupRecyclerView() {
@@ -51,6 +56,10 @@ class PencarianCepatFragment : BaseFragment() {
             },
             onRiwayatClick = { macAddress ->
                 val action = PencarianCepatFragmentDirections.actionPencarianCepatFragmentToRiwayatRedamanFragment(macAddress)
+                findNavController().navigate(action)
+            },
+            onRiwayatKasClick = { idPelanggan ->
+                val action = PencarianCepatFragmentDirections.actionPencarianCepatFragmentToRiwayatCatatanTagihanFragment(idPelanggan)
                 findNavController().navigate(action)
             }
         )
@@ -86,7 +95,7 @@ class PencarianCepatFragment : BaseFragment() {
 
     private fun fetchAllPelanggan() {
         _binding?.progressBarPencarian?.visibility = View.VISIBLE
-        apiService.getDataPelanggan().enqueue(object : Callback<PelangganResponse> {
+        (activity as MainActivity).apiService.getDataPelanggan().enqueue(object : Callback<PelangganResponse> {
             override fun onResponse(call: Call<PelangganResponse>, response: Response<PelangganResponse>) {
                 if (_binding == null) return
                 binding.progressBarPencarian.visibility = View.GONE
@@ -125,6 +134,13 @@ class PencarianCepatFragment : BaseFragment() {
         pencarianAdapter.updateData(filteredList)
         binding.tvPencarianEmpty.visibility = if (filteredList.isEmpty()) View.VISIBLE else View.GONE
         binding.tvPencarianEmpty.text = "Tidak ada hasil untuk $query"
+    }
+
+    private fun showAllPelanggan() {
+        if (_binding == null) return
+        pencarianAdapter.updateData(allPelanggan)
+        binding.tvPencarianEmpty.visibility = if (allPelanggan.isEmpty()) View.VISIBLE else View.GONE
+        binding.tvPencarianEmpty.text = "Tidak ada pelanggan"
     }
 
     override fun onDestroyView() {

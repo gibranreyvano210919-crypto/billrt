@@ -1,5 +1,8 @@
 package com.linkbit.billrt.network
 
+import com.google.gson.annotations.SerializedName
+import com.linkbit.billrt.PelangganListResponse
+import com.linkbit.billrt.WilayahPelangganNestedResponse
 import com.linkbit.billrt.model.*
 import retrofit2.Call
 import retrofit2.http.Body
@@ -26,7 +29,7 @@ interface ApiService {
     fun saveLocation(@Body request: SaveLocationRequest): Call<SaveLocationResponse>
 
     @GET("billrt/api/index.php?tabel=semua_pelanggan_lokasi")
-    fun getSemuaPelanggan(): Call<SemuaPelangganResponse>
+    fun getSemuaPelanggan(): Call<PelangganListResponse>
 
     @GET("billrt/api/index.php?tabel=data_pelanggan")
     fun getDataPelanggan(
@@ -35,6 +38,18 @@ interface ApiService {
         @Query("filter_tipe") filterTipe: String? = "semua",
         @Query("status_aktif") statusAktif: String? = "semua"
     ): Call<DashboardResponse>
+
+    @GET("billrt/api/index.php?tabel=data_pelanggan_list")
+    fun getDataPelangganList(@Query("search") search: String? = null): Call<PelangganListResponse>
+
+    @GET("billrt/api/index.php?tabel=wilayah_pelanggan_nested")
+    fun getWilayahPelangganNested(): Call<WilayahPelangganNestedResponse>
+    
+    @GET("billrt/api/index.php?tabel=master_wilayah")
+    suspend fun getWilayah(): WilayahResponse
+
+    @GET("billrt/api/index.php?tabel=master_teknisi_list")
+    suspend fun getTeknisi(): TeknisiResponse
     // endregion
 
     // region Fitur MikroTik
@@ -64,6 +79,22 @@ interface ApiService {
         @Query("bulan") bulan: Int,
         @Query("tahun") tahun: Int
     ): Call<CatatanTagihanResponse>
+
+    @GET("billrt/api/index.php?tabel=riwayat_catat_pelanggan")
+    fun getHistoriCatat(
+        @Query("id_pelanggan") idPelanggan: String? = null,
+        @Query("id_wilayah") idWilayah: Int? = null,
+        @Query("cek_bulan") cekBulan: Int? = null,
+        @Query("cek_tahun") cekTahun: Int? = null
+    ): Call<HistoriCatatResponse>
+    
+    @GET("billrt/api/index.php?tabel=rekap_tunggakan_lanjutan")
+    suspend fun getRekapTunggakanLanjutan(
+        @Query("bulan") bulan: Int,
+        @Query("tahun") tahun: Int,
+        @Query("id_wilayah") idWilayah: Int? = 0,
+        @Query("id_teknisi") idTeknisi: Int? = 0
+    ): RekapTunggakanLanjutanResponse
     // endregion
 
     // region Setoran
@@ -84,3 +115,21 @@ interface ApiService {
     fun hapusSetoran(@Body request: HapusSetoranRequest): Call<StandardResponse>
     // endregion
 }
+
+data class RekapTunggakanLanjutanResponse(
+    val status: Boolean,
+    val total: Int,
+    @SerializedName("periode_target")
+    val periodeTarget: String,
+    val data: List<RekapTunggakanLanjutan>
+)
+
+data class WilayahResponse(
+    val status: Boolean,
+    val data: List<Wilayah>
+)
+
+data class TeknisiResponse(
+    val status: Boolean,
+    val data: List<Teknisi>
+) 

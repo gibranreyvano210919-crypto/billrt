@@ -55,6 +55,12 @@
         <action
             android:id="@+id/action_berandaFragment_to_setoranFragment"
             app:destination="@id/setoranFragment" />
+        <action
+            android:id="@+id/action_berandaFragment_to_historiCatatFragment"
+            app:destination="@id/historiCatatFragment" />
+        <action
+            android:id="@+id/action_berandaFragment_to_validasiPeriodeFragment"
+            app:destination="@id/validasiPeriodeFragment" />
     </fragment>
 
     <fragment
@@ -137,6 +143,9 @@
         <action
             android:id="@+id/action_pencarianCepatFragment_to_riwayatRedamanFragment"
             app:destination="@id/riwayatRedamanFragment" />
+        <action
+            android:id="@+id/action_pencarianCepatFragment_to_riwayatCatatanTagihanFragment"
+            app:destination="@id/riwayatCatatanTagihanFragment" />
     </fragment>
 
     <fragment
@@ -159,6 +168,9 @@
         <action
             android:id="@+id/action_settingFragment_to_informasiAkunFragment"
             app:destination="@id/informasiAkunFragment" />
+        <action
+            android:id="@+id/action_settingFragment_to_pengaturanFragment"
+            app:destination="@id/pengaturanFragment" />
     </fragment>
 
     <fragment
@@ -298,7 +310,7 @@
         tools:layout="@layout/fragment_map_pelanggan" />
 
     <fragment
-        android:id="@id/nav_maps"
+        android:id="@+id/nav_maps"
         android:name="com.linkbit.billrt.PencarianPelangganFragment"
         android:label="Pencarian Pelanggan"
         tools:layout="@layout/fragment_pencarian_pelanggan">
@@ -314,7 +326,7 @@
         tools:layout="@layout/fragment_ganti_lokasi">
         <action
             android:id="@+id/action_gantiLokasiFragment_to_updateFotoLokasiFragment"
-            app:destination="@+id/updateFotoLokasiFragment" />
+            app:destination="@id/updateFotoLokasiFragment" />
     </fragment>
 
     <fragment
@@ -374,7 +386,7 @@
     <fragment
         android:id="@+id/riwayatRedamanFragment"
         android:name="com.linkbit.billrt.RiwayatRedamanFragment"
-        android:label="Riwayat Redaman"
+        android.label="Riwayat Redaman"
         tools:layout="@layout/fragment_riwayat_redaman">
         <argument
             android:name="macAddress"
@@ -428,5 +440,27 @@
         android:name="com.linkbit.billrt.OdpMapFragment"
         android:label="Peta ODP"
         tools:layout="@layout/fragment_odp_map" />
+
+    <fragment
+        android:id="@+id/riwayatCatatanTagihanFragment"
+        android:name="com.linkbit.billrt.RiwayatKasFragment"
+        android:label="Riwayat Kas"
+        tools:layout="@layout/fragment_riwayat_kas" >
+        <argument
+            android:name="id_pelanggan"
+            app:argType="string" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/historiCatatFragment"
+        android:name="com.linkbit.billrt.HistoriCatatFragment"
+        android:label="Histori Catat"
+        tools:layout="@layout/fragment_histori_catat" />
+
+    <fragment
+        android:id="@+id/validasiPeriodeFragment"
+        android:name="com.linkbit.billrt.ValidasiPeriodeFragment"
+        android:label="Validasi Periode"
+        tools:layout="@layout/fragment_validasi_periode" />
 
 </navigation>

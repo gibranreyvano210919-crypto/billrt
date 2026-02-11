@@ -81,6 +81,12 @@
             android:layout_marginBottom="16dp"/>
 
         <Button
+            android:id="@+id/button_filter_wilayah"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Filter Wilayah" />
+
+        <Button
             android:id="@+id/button_add_location"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

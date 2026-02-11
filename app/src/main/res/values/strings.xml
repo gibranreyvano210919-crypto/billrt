@@ -6,4 +6,19 @@
     <string name="menu_maps">Peta</string>
     <string name="menu_settings">Pengaturan</string>
     <string name="mapbox_access_token">pk.eyJ1Ijoic3VkYXJ0YWtpc3dhcmEiLCJhIjoiY21rbGJwa2kxMDByZzNjcjVjOG5vcWk0ZyJ9.qJWlXuW_VL6DaMEyD3V6Lg</string>
+
+    <string-array name="months">
+        <item>Januari</item>
+        <item>Februari</item>
+        <item>Maret</item>
+        <item>April</item>
+        <item>Mei</item>
+        <item>Juni</item>
+        <item>Juli</item>
+        <item>Agustus</item>
+        <item>September</item>
+        <item>Oktober</item>
+        <item>November</item>
+        <item>Desember</item>
+    </string-array>
 </resources>

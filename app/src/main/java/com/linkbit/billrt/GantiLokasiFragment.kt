@@ -1,7 +1,5 @@
 package com.linkbit.billrt
 
-
-
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -13,10 +11,11 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.linkbit.billrt.adapter.SemuaPelangganAdapter
+import com.linkbit.billrt.adapter.PelangganListAdapter
 import com.linkbit.billrt.databinding.FragmentGantiLokasiBinding
-import com.linkbit.billrt.model.SemuaPelangganResponse
 import com.linkbit.billrt.network.RetrofitClient
+import com.linkbit.billrt.PelangganListItem
+import com.linkbit.billrt.PelangganListResponse
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -26,7 +25,7 @@ class GantiLokasiFragment : Fragment() {
     private var _binding: FragmentGantiLokasiBinding? = null
     private val binding get() = _binding!!
 
-    private lateinit var semuaPelangganAdapter: SemuaPelangganAdapter
+    private lateinit var pelangganListAdapter: PelangganListAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -39,7 +38,7 @@ class GantiLokasiFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        
+
         binding.titleTextView.text = "Data Semua Pelanggan"
         setupRecyclerView()
         setupSearchView()
@@ -47,25 +46,21 @@ class GantiLokasiFragment : Fragment() {
     }
 
     private fun setupRecyclerView() {
-        semuaPelangganAdapter = SemuaPelangganAdapter(emptyList()) { pelanggan ->
+        pelangganListAdapter = PelangganListAdapter(emptyList()) { pelanggan: PelangganListItem ->
             val id = pelanggan.idPelanggan
-            val nama = pelanggan.nama
-            if (id != null && nama != null) {
-                MaterialAlertDialogBuilder(requireContext())
-                    .setTitle("Konfirmasi Tindakan")
-                    .setMessage("Anda yakin ingin mengubah lokasi untuk pelanggan: \n$nama?")
-                    .setNegativeButton("Batal", null)
-                    .setPositiveButton("Ya, Lanjutkan") { _, _ ->
-                        val action = GantiLokasiFragmentDirections.actionGantiLokasiFragmentToUpdateFotoLokasiFragment(id, nama)
-                        findNavController().navigate(action)
-                    }
-                    .show()
-            } else {
-                Toast.makeText(context, "ID atau Nama Pelanggan tidak valid", Toast.LENGTH_SHORT).show()
-            }
+            val nama = pelanggan.namaPelanggan
+            MaterialAlertDialogBuilder(requireContext())
+                .setTitle("Konfirmasi Tindakan")
+                .setMessage("Anda yakin ingin mengubah lokasi untuk pelanggan: \n$nama?")
+                .setNegativeButton("Batal", null)
+                .setPositiveButton("Ya, Lanjutkan") { _, _ ->
+                    val action = GantiLokasiFragmentDirections.actionGantiLokasiFragmentToUpdateFotoLokasiFragment(id, nama)
+                    findNavController().navigate(action)
+                }
+                .show()
         }
         binding.recyclerView.apply {
-            adapter = semuaPelangganAdapter
+            adapter = pelangganListAdapter
             layoutManager = LinearLayoutManager(context)
         }
     }
@@ -77,19 +72,22 @@ class GantiLokasiFragment : Fragment() {
             }
 
             override fun onQueryTextChange(newText: String?): Boolean {
-                semuaPelangganAdapter.filter(newText.orEmpty())
+                pelangganListAdapter.filter(newText.orEmpty())
                 return true
             }
         })
     }
 
     private fun fetchSemuaPelanggan() {
-        binding.progressBar.isVisible = true
-        binding.recyclerView.isVisible = false
-        binding.emptyTextView.isVisible = false
+        _binding?.apply {
+            progressBar.isVisible = true
+            recyclerView.isVisible = false
+            emptyTextView.isVisible = false
+        }
 
-        RetrofitClient.instance.getSemuaPelanggan().enqueue(object : Callback<SemuaPelangganResponse> {
-            override fun onResponse(call: Call<SemuaPelangganResponse>, response: Response<SemuaPelangganResponse>) {
+        RetrofitClient.instance.getDataPelangganList().enqueue(object : Callback<PelangganListResponse> {
+            override fun onResponse(call: Call<PelangganListResponse>, response: Response<PelangganListResponse>) {
+                if (_binding == null) return
                 binding.progressBar.isVisible = false
                 if (response.isSuccessful) {
                     val pelangganList = response.body()?.data ?: emptyList()
@@ -101,7 +99,7 @@ class GantiLokasiFragment : Fragment() {
                         binding.recyclerView.isVisible = true
                         binding.emptyTextView.isVisible = false
                     }
-                    semuaPelangganAdapter.updateList(pelangganList)
+                    pelangganListAdapter.updateList(pelangganList)
                 } else {
                     binding.emptyTextView.isVisible = true
                     binding.emptyTextView.text = "Gagal mengambil data dari server."
@@ -109,7 +107,8 @@ class GantiLokasiFragment : Fragment() {
                 }
             }
 
-            override fun onFailure(call: Call<SemuaPelangganResponse>, t: Throwable) {
+            override fun onFailure(call: Call<PelangganListResponse>, t: Throwable) {
+                if (_binding == null) return
                 binding.progressBar.isVisible = false
                 binding.recyclerView.isVisible = false
                 binding.emptyTextView.isVisible = true

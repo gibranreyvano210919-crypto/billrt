@@ -27,6 +27,7 @@ class SettingFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         val settingItems = listOf(
+            SettingItem("pengaturan_perusahaan", "Pengaturan Perusahaan", android.R.drawable.ic_menu_manage),
             SettingItem("master_wilayah", "Master Wilayah", android.R.drawable.ic_menu_mapmode),
             SettingItem("master_paket", "Master Paket Internet", android.R.drawable.ic_menu_sort_by_size),
             SettingItem("setting_lokasi", "Pengaturan Lokasi", android.R.drawable.ic_menu_edit),
@@ -38,6 +39,9 @@ class SettingFragment : Fragment() {
 
         val settingAdapter = SettingAdapter(settingItems) { selectedItem ->
             when (selectedItem.id) {
+                "pengaturan_perusahaan" -> {
+                    findNavController().navigate(R.id.action_settingFragment_to_pengaturanFragment)
+                }
                 "master_wilayah" -> {
                     findNavController().navigate(R.id.action_settingFragment_to_masterWilayahFragment)
                 }

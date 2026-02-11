@@ -82,6 +82,8 @@ class BerandaFragment : BaseFragment() {
             cardOlt.setOnClickListener { navController.navigate(R.id.action_berandaFragment_to_topRedamanFragment) }
             btnLihatSemuaNotifikasi.setOnClickListener { navController.navigate(R.id.action_berandaFragment_to_riwayatNotifikasiFragment) }
             cardSetoran.setOnClickListener { navController.navigate(R.id.action_berandaFragment_to_setoranFragment) }
+            cardHistoriCatat.setOnClickListener { navController.navigate(R.id.action_berandaFragment_to_historiCatatFragment) }
+            cardValidasiPeriode.setOnClickListener { navController.navigate(R.id.action_berandaFragment_to_validasiPeriodeFragment) }
         }
     }
 
