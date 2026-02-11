@@ -4,13 +4,9 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.PopupMenu
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.SearchView
 import androidx.core.os.bundleOf
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.linkbit.billrt.databinding.FragmentPelangganAktifBinding
@@ -34,21 +30,11 @@ class PelangganAktifFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        ViewCompat.setOnApplyWindowInsetsListener(view) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            val params = binding.fabTambahPelanggan.layoutParams as ViewGroup.MarginLayoutParams
-            params.bottomMargin = systemBars.bottom + resources.getDimensionPixelSize(R.dimen.fab_margin)
-            binding.fabTambahPelanggan.layoutParams = params
-            v.setPadding(0, 0, 0, systemBars.bottom)
-            insets
-        }
-
         setupRecyclerView()
         setupSearchView()
         fetchPelangganAktif()
 
         binding.fabTambahPelanggan.setOnClickListener {
-            // Menggunakan ID navigasi yang baru dan benar
             findNavController().navigate(R.id.action_pelangganAktifFragment_to_tambahPelangganFragment)
         }
     }
@@ -59,33 +45,25 @@ class PelangganAktifFragment : BaseFragment() {
                 val bundle = bundleOf("pelangganId" to pelanggan.idPelanggan)
                 findNavController().navigate(R.id.action_global_detailPelangganFragment, bundle)
             },
-            onMenuClick = { pelanggan, view ->
-                showStatusMenu(pelanggan, view)
+            onItemLongClick = { pelanggan ->
+                showBottomSheetMenu(pelanggan)
             }
         )
         binding.rvPelangganAktif.layoutManager = LinearLayoutManager(context)
         binding.rvPelangganAktif.adapter = pelangganAdapter
     }
 
-    private fun showStatusMenu(pelanggan: PelangganData, view: View) {
-        val popup = PopupMenu(requireContext(), view)
-        popup.menuInflater.inflate(R.menu.menu_pelanggan_aktif, popup.menu)
-        popup.setOnMenuItemClickListener { item ->
-            when (item.itemId) {
-                R.id.menu_edit_pelanggan -> {
-                    // Arahkan juga menu edit ke halaman form yang baru
-                    val bundle = bundleOf("pelangganIdToEdit" to pelanggan.idPelanggan)
-                    findNavController().navigate(R.id.action_pelangganAktifFragment_to_tambahPelangganFragment, bundle)
-                    true
-                }
-                R.id.menu_set_isolir_from_aktif -> {
-                    updateStatus(pelanggan, "isolir")
-                    true
-                }
-                else -> false
+    private fun showBottomSheetMenu(pelanggan: PelangganData) {
+        val bottomSheet = PelangganBottomSheetFragment.newInstance(pelanggan.nama).apply {
+            setOnEditClickListener {
+                val action = PelangganAktifFragmentDirections.actionPelangganAktifFragmentToEditPelangganFragment(pelanggan.idPelanggan)
+                findNavController().navigate(action)
+            }
+            setOnIsolirClickListener {
+                updateStatus(pelanggan, "isolir")
             }
         }
-        popup.show()
+        bottomSheet.show(childFragmentManager, "PelangganBottomSheet")
     }
 
     private fun updateStatus(pelanggan: PelangganData, newStatus: String) {

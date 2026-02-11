@@ -88,7 +88,11 @@ data class PelangganData(
     val latitude: Double?,
     val longitude: Double?,
     val status: String?,
-    var isTercatat: Boolean = false // Properti baru untuk menandai
+    var isTercatat: Boolean = false, // Properti baru untuk menandai
+    @SerializedName("id_paket") val idPaket: Int?,
+    @SerializedName("id_wilayah") val idWilayah: Int?,
+    @SerializedName("installation_date") val installationDate: String?,
+    @SerializedName("tgl_expired") val tglExpired: String?
 ) : Serializable
 
 data class InputKasPelanggan(

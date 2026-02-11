@@ -10,7 +10,8 @@ class PelangganAdapter(
     private var pelangganList: List<PelangganData>,
     private val onDetailClick: ((PelangganData) -> Unit)? = null,
     private val onMenuClick: ((PelangganData, View) -> Unit)? = null,
-    private val onEditClick: ((PelangganData) -> Unit)? = null
+    private val onEditClick: ((PelangganData) -> Unit)? = null,
+    private val onItemLongClick: ((PelangganData) -> Unit)? = null // New
 ) : RecyclerView.Adapter<PelangganAdapter.PelangganViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PelangganViewHolder {
@@ -52,12 +53,17 @@ class PelangganAdapter(
             } else {
                 binding.btnMenuPelanggan.visibility = View.GONE
             }
-            
+
             if (onEditClick != null) {
                 binding.btnEdit.visibility = View.VISIBLE
                 binding.btnEdit.setOnClickListener { onEditClick.invoke(pelanggan) }
             } else {
                 binding.btnEdit.visibility = View.GONE
+            }
+
+            itemView.setOnLongClickListener {
+                onItemLongClick?.invoke(pelanggan)
+                true
             }
         }
     }

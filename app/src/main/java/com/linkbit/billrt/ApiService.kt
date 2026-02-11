@@ -113,6 +113,9 @@ interface ApiService {
     @POST("index.php?tabel=simpan_pelanggan")
     fun simpanPelanggan(@Body request: SimpanPelangganRequest): Call<StandardResponse>
 
+    @POST("index.php")
+    fun updatePelanggan(@Query("tabel") tabel: String, @Body request: UpdatePelangganRequest): Call<StandardResponse>
+
     @GET("index.php?tabel=paket_internet")
     fun getPaket(): Call<PaketResponse>
 
@@ -190,4 +193,7 @@ interface ApiService {
 
     @GET("get_pelanggan_detail.php")
     fun getPelangganDetail(@Query("id") id: Int): Call<PelangganDetailResponse>
+    
+    @GET("index.php?tabel=data_pelanggan")
+    fun getPelangganDetail(@Query("id_pelanggan") idPelanggan: String): Call<PelangganDetailResponse>
 }
