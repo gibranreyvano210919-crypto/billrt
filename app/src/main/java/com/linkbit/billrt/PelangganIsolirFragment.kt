@@ -4,12 +4,13 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.PopupMenu
+import android.widget.FrameLayout
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.widget.SearchView
-import androidx.core.os.bundleOf
-import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.linkbit.billrt.databinding.FragmentPelangganIsolirBinding
 import retrofit2.Call
 import retrofit2.Callback
@@ -20,8 +21,8 @@ class PelangganIsolirFragment : BaseFragment() {
     private var _binding: FragmentPelangganIsolirBinding? = null
     private val binding get() = _binding!!
 
-    private lateinit var pelangganAdapter: PelangganAdapter
-    private var pelangganList: List<PelangganData> = emptyList()
+    private lateinit var pelangganAdapter: PelangganIsolirAdapter
+    private var pelangganList: List<PelangganIsolir> = emptyList()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentPelangganIsolirBinding.inflate(inflater, container, false)
@@ -37,45 +38,58 @@ class PelangganIsolirFragment : BaseFragment() {
     }
 
     private fun setupRecyclerView() {
-        pelangganAdapter = PelangganAdapter(emptyList(),
+        pelangganAdapter = PelangganIsolirAdapter(emptyList(),
             onDetailClick = { pelanggan ->
-                val bundle = bundleOf("pelangganId" to pelanggan.idPelanggan)
-                findNavController().navigate(R.id.action_global_detailPelangganFragment, bundle)
+                Toast.makeText(context, "Clicked on ${pelanggan.namaPelanggan}", Toast.LENGTH_SHORT).show()
             },
-            onMenuClick = { pelanggan, view ->
-                showStatusMenu(pelanggan, view)
+            onLongClick = { pelanggan ->
+                showStatusBottomSheet(pelanggan)
             }
         )
         binding.rvPelangganIsolir.layoutManager = LinearLayoutManager(context)
         binding.rvPelangganIsolir.adapter = pelangganAdapter
     }
 
-    private fun showStatusMenu(pelanggan: PelangganData, view: View) {
-        val popup = PopupMenu(requireContext(), view)
-        popup.menuInflater.inflate(R.menu.menu_pelanggan_isolir, popup.menu)
-        popup.setOnMenuItemClickListener { item ->
-            when (item.itemId) {
-                R.id.menu_set_aktif_from_isolir -> {
-                    updateStatus(pelanggan, "aktif")
-                    true
-                }
-                R.id.menu_set_nonaktif_from_isolir -> {
-                    updateStatus(pelanggan, "nonaktif")
-                    true
-                }
-                else -> false
-            }
+    private fun showStatusBottomSheet(pelanggan: PelangganIsolir) {
+        val bottomSheetDialog = BottomSheetDialog(requireContext())
+        val bottomSheetView = layoutInflater.inflate(R.layout.bottom_sheet_pelanggan_isolir_menu, null)
+        bottomSheetDialog.setContentView(bottomSheetView)
+
+        // Prevent accidental dismissal
+        bottomSheetDialog.setCanceledOnTouchOutside(false)
+
+        // Disable drag and swipe to dismiss
+        bottomSheetDialog.setOnShowListener { dialog ->
+            val d = dialog as BottomSheetDialog
+            val bottomSheet = d.findViewById<View>(com.google.android.material.R.id.design_bottom_sheet) as FrameLayout
+            val behavior = BottomSheetBehavior.from(bottomSheet)
+            behavior.isHideable = false
+            behavior.isDraggable = false
         }
-        popup.show()
+
+        val customerName = bottomSheetView.findViewById<TextView>(R.id.tv_customer_name)
+        val mikrotikUsername = bottomSheetView.findViewById<TextView>(R.id.tv_mikrotik_username)
+        val batalkanIsolir = bottomSheetView.findViewById<TextView>(R.id.option_batalkan_isolir)
+
+        customerName.text = pelanggan.namaPelanggan
+        mikrotikUsername.text = "Username: ${pelanggan.mikrotikUsername ?: "-"}"
+
+        batalkanIsolir.setOnClickListener {
+            updateStatus(pelanggan.idPelanggan, "aktif", bottomSheetDialog)
+        }
+
+        bottomSheetDialog.show()
     }
 
-    private fun updateStatus(pelanggan: PelangganData, newStatus: String) {
-        val request = UpdateStatusRequest(idPelanggan = pelanggan.idPelanggan, statusAktif = newStatus)
+
+    private fun updateStatus(idPelanggan: String, newStatus: String, dialog: BottomSheetDialog) {
+        val request = UpdateStatusRequest(idPelanggan, newStatus)
         apiService.updateStatusPelanggan(request).enqueue(object : Callback<StandardResponse> {
             override fun onResponse(call: Call<StandardResponse>, response: Response<StandardResponse>) {
                 if (response.isSuccessful && response.body()?.status == true) {
-                    Toast.makeText(context, "Status berhasil diubah ke $newStatus", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, "Status berhasil diubah", Toast.LENGTH_SHORT).show()
                     fetchPelangganIsolir() // Refresh the list
+                    dialog.dismiss()
                 } else {
                     Toast.makeText(context, "Gagal mengubah status", Toast.LENGTH_SHORT).show()
                 }
@@ -99,19 +113,21 @@ class PelangganIsolirFragment : BaseFragment() {
 
     private fun fetchPelangganIsolir() {
         binding.progressBar.visibility = View.VISIBLE
-        apiService.getDataPelanggan(status = "isolir").enqueue(object : Callback<PelangganResponse> {
-            override fun onResponse(call: Call<PelangganResponse>, response: Response<PelangganResponse>) {
+        apiService.getPelangganIsolir(null, null).enqueue(object : Callback<PelangganIsolirResponse> {
+            override fun onResponse(call: Call<PelangganIsolirResponse>, response: Response<PelangganIsolirResponse>) {
                 if (!isAdded) return
                 binding.progressBar.visibility = View.GONE
                 if (response.isSuccessful) {
-                    pelangganList = response.body()?.data ?: emptyList()
+                    val responseBody = response.body()
+                    pelangganList = responseBody?.data ?: emptyList()
                     pelangganAdapter.updateData(pelangganList)
+                    binding.tvTotalPelanggan.text = "Total: ${responseBody?.total ?: 0}"
                 } else {
                     Toast.makeText(context, "Gagal memuat data", Toast.LENGTH_SHORT).show()
                 }
             }
 
-            override fun onFailure(call: Call<PelangganResponse>, t: Throwable) {
+            override fun onFailure(call: Call<PelangganIsolirResponse>, t: Throwable) {
                 if (!isAdded) return
                 binding.progressBar.visibility = View.GONE
                 Toast.makeText(context, "Error: ${t.message}", Toast.LENGTH_SHORT).show()
@@ -124,7 +140,8 @@ class PelangganIsolirFragment : BaseFragment() {
             pelangganList
         } else {
             pelangganList.filter {
-                it.nama.contains(query, ignoreCase = true) || it.idPelanggan.contains(query, ignoreCase = true)
+                it.namaPelanggan?.contains(query, ignoreCase = true) == true || 
+                it.idPelanggan.contains(query, ignoreCase = true)
             }
         }
         pelangganAdapter.updateData(filtered)

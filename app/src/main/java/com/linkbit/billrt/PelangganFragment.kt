@@ -62,8 +62,12 @@ class PelangganFragment : BaseFragment() {
         pelangganAdapter = PelangganAdapter(
             emptyList(),
             onDetailClick = { pelanggan ->
-                val bundle = bundleOf("pelangganId" to pelanggan.idPelanggan)
-                findNavController().navigate(R.id.action_global_detailPelangganFragment, bundle)
+                val action = if (showActive) {
+                    PelangganFragmentDirections.actionPelangganFragmentToPelangganAktifDetailFragment(pelanggan.idPelanggan)
+                } else {
+                    PelangganFragmentDirections.actionPelangganFragmentToPelangganNonaktifDetailFragment(pelanggan.idPelanggan)
+                }
+                findNavController().navigate(action)
             },
             onMenuClick = { pelanggan, view ->
                 showPopupMenu(pelanggan, view)
@@ -81,8 +85,12 @@ class PelangganFragment : BaseFragment() {
         popup.setOnMenuItemClickListener { item ->
             when (item.itemId) {
                 R.id.menu_detail -> {
-                    val bundle = bundleOf("pelangganId" to pelanggan.idPelanggan)
-                    findNavController().navigate(R.id.action_global_detailPelangganFragment, bundle)
+                    val action = if (showActive) {
+                        PelangganFragmentDirections.actionPelangganFragmentToPelangganAktifDetailFragment(pelanggan.idPelanggan)
+                    } else {
+                        PelangganFragmentDirections.actionPelangganFragmentToPelangganNonaktifDetailFragment(pelanggan.idPelanggan)
+                    }
+                    findNavController().navigate(action)
                     true
                 }
                 R.id.menu_edit -> {

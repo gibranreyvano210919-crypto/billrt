@@ -39,6 +39,12 @@ interface ApiService {
         @Query("status_aktif") statusAktif: String? = "semua"
     ): Call<DashboardResponse>
 
+    @GET("billrt/api/index.php?tabel=pelanggan_baru")
+    fun getPelangganBaru(
+        @Query("bulan") bulan: Int? = null,
+        @Query("tahun") tahun: Int? = null
+    ): Call<PelangganBaruResponse>
+
     @GET("billrt/api/index.php?tabel=data_pelanggan_list")
     fun getDataPelangganList(@Query("search") search: String? = null): Call<PelangganListResponse>
 

@@ -1,6 +1,7 @@
 package com.linkbit.billrt
 
 import com.google.gson.annotations.SerializedName
+import com.linkbit.billrt.network.PelangganBaruResponse
 import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.Field
@@ -8,6 +9,7 @@ import retrofit2.http.FormUrlEncoded
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Query
+
 
 // Data class for the response of the settings endpoint
 data class PengaturanResponse(
@@ -30,7 +32,44 @@ data class UpdatePengaturanResponse(
     val data: PengaturanResponse
 )
 
+data class GetPelangganByIdRequest(val id_pelanggan: String)
+
+// Data class baru untuk response get_pelanggan_by_id
+data class GetPelangganByIdResponse(
+    val status: Boolean,
+    val message: String?,
+    val data: PelangganData?
+)
+
+data class RekapStatusPelanggan(
+    val aktif: Int,
+    val isolir: Int,
+    val nonaktif: Int,
+    val total: Int
+)
+
+data class RekapStatusPelangganResponse(
+    val status: Boolean,
+    val message: String,
+    val data: RekapStatusPelanggan
+)
+
 interface ApiService {
+
+    @GET("index.php?tabel=rekap_status_pelanggan")
+    fun getRekapStatusPelanggan(): Call<RekapStatusPelangganResponse>
+
+    @GET("index.php?tabel=pelanggan_nonaktif")
+    fun getPelangganNonaktif(
+        @Query("bulan") bulan: Int?,
+        @Query("tahun") tahun: Int?
+    ): Call<PelangganNonaktifResponse>
+
+    @GET("index.php?tabel=pelanggan_isolir")
+    fun getPelangganIsolir(
+        @Query("bulan") bulan: Int?,
+        @Query("tahun") tahun: Int?
+    ): Call<PelangganIsolirResponse>
 
     @GET("index.php")
     fun getPengaturan(@Query("tabel") tabel: String = "pengaturan"): Call<PengaturanResponse>
@@ -55,11 +94,9 @@ interface ApiService {
     @GET("api_maps.php") // Tetap untuk mengambil semua data pelanggan di peta
     fun getPelangganMap(@Query("q") q: String? = null): Call<GetPelangganResponse>
 
-    // Endpoint telah diperbarui sesuai dengan skrip PHP Anda
     @POST("index.php?tabel=update_koordinat_map")
     fun updateLokasi(@Body request: UpdateLokasiRequest): Call<StandardResponse>
 
-    // Endpoint baru untuk mengambil detail pelanggan di peta
     @GET("index.php?tabel=detail_pelanggan_map")
     fun getPelangganDetailMap(@Query("id_pelanggan") idPelanggan: String): Call<PelangganDetailMapResponse>
 
@@ -89,7 +126,7 @@ interface ApiService {
 
     @POST("index.php?tabel=cabut_layanan_port")
     fun cabutLayananPort(@Body request: CabutLayananPortRequest): Call<StandardResponse>
-    
+
     @GET("index.php?tabel=wilayah_pelanggan_nested")
     fun getWilayahPelangganNested(): Call<WilayahPelangganNestedResponse>
 
@@ -104,6 +141,16 @@ interface ApiService {
         @Query("status_aktif") status: String? = null // Added for filtering
     ): Call<PelangganResponse>
 
+    // Endpoint baru yang spesifik untuk mengambil 1 data pelanggan
+    @POST("index.php?tabel=get_pelanggan_by_id")
+    fun getPelangganById(@Body request: GetPelangganByIdRequest): Call<GetPelangganByIdResponse>
+
+    @GET("index.php?tabel=pelanggan_baru")
+    fun getPelangganBaru(
+        @Query("bulan") bulan: Int? = null,
+        @Query("tahun") tahun: Int? = null
+    ): Call<PelangganBaruResponse>
+
     @POST("index.php?tabel=update_status_aktif")
     fun updateStatusPelanggan(@Body request: UpdateStatusRequest): Call<StandardResponse>
 
@@ -112,6 +159,9 @@ interface ApiService {
 
     @POST("index.php?tabel=simpan_pelanggan")
     fun simpanPelanggan(@Body request: SimpanPelangganRequest): Call<StandardResponse>
+
+    @POST("index.php?tabel=tambah_pelanggan")
+    fun tambahPelanggan(@Body request: SimpanPelangganRequest): Call<StandardResponse>
 
     @POST("index.php")
     fun updatePelanggan(@Query("tabel") tabel: String, @Body request: UpdatePelangganRequest): Call<StandardResponse>
@@ -193,7 +243,7 @@ interface ApiService {
 
     @GET("get_pelanggan_detail.php")
     fun getPelangganDetail(@Query("id") id: Int): Call<PelangganDetailResponse>
-    
+
     @GET("index.php?tabel=data_pelanggan")
     fun getPelangganDetail(@Query("id_pelanggan") idPelanggan: String): Call<PelangganDetailResponse>
 }

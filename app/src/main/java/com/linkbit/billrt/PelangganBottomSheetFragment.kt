@@ -12,8 +12,8 @@ class PelangganBottomSheetFragment : BottomSheetDialogFragment() {
     private var _binding: BottomSheetPelangganBinding? = null
     private val binding get() = _binding!!
 
-    private var onEditClickListener: (() -> Unit)? = null
-    private var onIsolirClickListener: (() -> Unit)? = null
+    private var onEditClickListener: ((String) -> Unit)? = null
+    private var onIsolirClickListener: ((String) -> Unit)? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = BottomSheetPelangganBinding.inflate(inflater, container, false)
@@ -26,21 +26,27 @@ class PelangganBottomSheetFragment : BottomSheetDialogFragment() {
         binding.tvPelangganName.text = arguments?.getString(ARG_PELANGGAN_NAME)
 
         binding.optionEditPelanggan.setOnClickListener {
-            onEditClickListener?.invoke()
+            // Selalu ambil ID dari arguments untuk memastikan data tidak usang
+            arguments?.getString(ARG_PELANGGAN_ID)?.let { id ->
+                onEditClickListener?.invoke(id)
+            }
             dismiss()
         }
 
         binding.optionUbahKeIsolir.setOnClickListener {
-            onIsolirClickListener?.invoke()
+            // Selalu ambil ID dari arguments untuk memastikan data tidak usang
+            arguments?.getString(ARG_PELANGGAN_ID)?.let { id ->
+                onIsolirClickListener?.invoke(id)
+            }
             dismiss()
         }
     }
 
-    fun setOnEditClickListener(listener: () -> Unit) {
+    fun setOnEditClickListener(listener: (String) -> Unit) {
         onEditClickListener = listener
     }
 
-    fun setOnIsolirClickListener(listener: () -> Unit) {
+    fun setOnIsolirClickListener(listener: (String) -> Unit) {
         onIsolirClickListener = listener
     }
 
@@ -51,10 +57,12 @@ class PelangganBottomSheetFragment : BottomSheetDialogFragment() {
 
     companion object {
         private const val ARG_PELANGGAN_NAME = "pelanggan_name"
+        private const val ARG_PELANGGAN_ID = "pelanggan_id"
 
-        fun newInstance(pelangganName: String): PelangganBottomSheetFragment {
+        fun newInstance(pelangganId: String, pelangganName: String): PelangganBottomSheetFragment {
             return PelangganBottomSheetFragment().apply {
                 arguments = Bundle().apply {
+                    putString(ARG_PELANGGAN_ID, pelangganId)
                     putString(ARG_PELANGGAN_NAME, pelangganName)
                 }
             }

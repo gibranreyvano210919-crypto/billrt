@@ -85,14 +85,15 @@ data class PelangganData(
     @SerializedName("mikrotik_username") val mikrotikUsername: String?,
     @SerializedName("static_ip") val staticIp: String?,
     @SerializedName("mac_address") val macAddress: String?,
-    val latitude: Double?,
-    val longitude: Double?,
-    val status: String?,
+    @SerializedName("lat") val latitude: Double?,
+    @SerializedName("lng") val longitude: Double?,
+    @SerializedName("status_aktif") val statusAktif: String?,
     var isTercatat: Boolean = false, // Properti baru untuk menandai
     @SerializedName("id_paket") val idPaket: Int?,
     @SerializedName("id_wilayah") val idWilayah: Int?,
     @SerializedName("installation_date") val installationDate: String?,
-    @SerializedName("tgl_expired") val tglExpired: String?
+    @SerializedName("tgl_expired") val tglExpired: String?,
+    @SerializedName("tgl_bayar_terakhir") val tglBayarTerakhir: String?
 ) : Serializable
 
 data class InputKasPelanggan(
@@ -141,6 +142,9 @@ data class MapConfig(
 
 data class RekapData(
     @SerializedName("total_pelanggan") val totalPelanggan: Int,
+    @SerializedName("aktif") val aktif: Int,
+    @SerializedName("isolir") val isolir: Int,
+    @SerializedName("nonaktif") val nonaktif: Int,
     @SerializedName("pelanggan_baru") val pelangganBaru: Int,
     @SerializedName("total_lunas") val totalLunas: Int,
     @SerializedName("total_belum_bayar") val totalBelumBayar: Int,

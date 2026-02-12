@@ -4,11 +4,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.PopupMenu
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.SearchView
-import androidx.core.os.bundleOf
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.linkbit.billrt.databinding.FragmentPelangganNonaktifBinding
@@ -21,8 +18,8 @@ class PelangganNonaktifFragment : BaseFragment() {
     private var _binding: FragmentPelangganNonaktifBinding? = null
     private val binding get() = _binding!!
 
-    private lateinit var pelangganAdapter: PelangganAdapter
-    private var pelangganList: List<PelangganData> = emptyList()
+    private lateinit var pelangganAdapter: PelangganNonaktifAdapter
+    private var pelangganList: List<PelangganNonaktif> = emptyList()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentPelangganNonaktifBinding.inflate(inflater, container, false)
@@ -34,61 +31,21 @@ class PelangganNonaktifFragment : BaseFragment() {
 
         setupRecyclerView()
         setupSearchView()
-        fetchPelangganNonaktif()
+        fetchData(null, null) // Load all non-active customers initially
     }
 
     private fun setupRecyclerView() {
-        pelangganAdapter = PelangganAdapter(emptyList(),
+        pelangganAdapter = PelangganNonaktifAdapter(
+            emptyList(),
             onDetailClick = { pelanggan ->
-                val bundle = bundleOf("pelangganId" to pelanggan.idPelanggan)
-                findNavController().navigate(R.id.action_global_detailPelangganFragment, bundle)
+                // Navigate to detail, you might need a new detail fragment for this data model
+                // For now, I'll just show a Toast
+                Toast.makeText(context, "Clicked on ${pelanggan.namaPelanggan}", Toast.LENGTH_SHORT).show()
             },
-            onMenuClick = { pelanggan, view ->
-                showDeleteMenu(pelanggan, view)
-            }
+            onMenuClick = null
         )
         binding.rvPelangganNonaktif.layoutManager = LinearLayoutManager(context)
         binding.rvPelangganNonaktif.adapter = pelangganAdapter
-    }
-
-    private fun showDeleteMenu(pelanggan: PelangganData, view: View) {
-        val popup = PopupMenu(requireContext(), view)
-        popup.menuInflater.inflate(R.menu.menu_pelanggan_nonaktif, popup.menu)
-        popup.setOnMenuItemClickListener { item ->
-            when (item.itemId) {
-                R.id.menu_delete_pelanggan -> {
-                    AlertDialog.Builder(requireContext())
-                        .setTitle("Hapus Pelanggan")
-                        .setMessage("Apakah Anda yakin ingin menghapus ${pelanggan.nama} secara permanen?")
-                        .setPositiveButton("Hapus") { _, _ ->
-                            deletePelanggan(pelanggan)
-                        }
-                        .setNegativeButton("Batal", null)
-                        .show()
-                    true
-                }
-                else -> false
-            }
-        }
-        popup.show()
-    }
-
-    private fun deletePelanggan(pelanggan: PelangganData) {
-        val request = PelangganIdRequest(id_pelanggan = pelanggan.idPelanggan)
-        apiService.hapusPelanggan(request).enqueue(object : Callback<StandardResponse> {
-            override fun onResponse(call: Call<StandardResponse>, response: Response<StandardResponse>) {
-                if (response.isSuccessful && response.body()?.status == true) {
-                    Toast.makeText(context, "Pelanggan berhasil dihapus", Toast.LENGTH_SHORT).show()
-                    fetchPelangganNonaktif() // Refresh the list
-                } else {
-                    Toast.makeText(context, "Gagal menghapus pelanggan", Toast.LENGTH_SHORT).show()
-                }
-            }
-
-            override fun onFailure(call: Call<StandardResponse>, t: Throwable) {
-                Toast.makeText(context, "Error: ${t.message}", Toast.LENGTH_SHORT).show()
-            }
-        })
     }
 
     private fun setupSearchView() {
@@ -101,21 +58,23 @@ class PelangganNonaktifFragment : BaseFragment() {
         })
     }
 
-    private fun fetchPelangganNonaktif() {
+    private fun fetchData(bulan: Int?, tahun: Int?) {
         binding.progressBar.visibility = View.VISIBLE
-        apiService.getDataPelanggan(status = "nonaktif").enqueue(object : Callback<PelangganResponse> {
-            override fun onResponse(call: Call<PelangganResponse>, response: Response<PelangganResponse>) {
+        apiService.getPelangganNonaktif(bulan, tahun).enqueue(object : Callback<PelangganNonaktifResponse> {
+            override fun onResponse(call: Call<PelangganNonaktifResponse>, response: Response<PelangganNonaktifResponse>) {
                 if (!isAdded) return
                 binding.progressBar.visibility = View.GONE
                 if (response.isSuccessful) {
-                    pelangganList = response.body()?.data ?: emptyList()
+                    val responseBody = response.body()
+                    pelangganList = responseBody?.data ?: emptyList()
                     pelangganAdapter.updateData(pelangganList)
+                    binding.tvTotalPelanggan.text = "Total: ${responseBody?.total ?: 0}"
                 } else {
                     Toast.makeText(context, "Gagal memuat data", Toast.LENGTH_SHORT).show()
                 }
             }
 
-            override fun onFailure(call: Call<PelangganResponse>, t: Throwable) {
+            override fun onFailure(call: Call<PelangganNonaktifResponse>, t: Throwable) {
                 if (!isAdded) return
                 binding.progressBar.visibility = View.GONE
                 Toast.makeText(context, "Error: ${t.message}", Toast.LENGTH_SHORT).show()
@@ -128,7 +87,8 @@ class PelangganNonaktifFragment : BaseFragment() {
             pelangganList
         } else {
             pelangganList.filter {
-                it.nama.contains(query, ignoreCase = true) || it.idPelanggan.contains(query, ignoreCase = true)
+                it.namaPelanggan?.contains(query, ignoreCase = true) == true || 
+                it.idPelanggan.contains(query, ignoreCase = true)
             }
         }
         pelangganAdapter.updateData(filtered)

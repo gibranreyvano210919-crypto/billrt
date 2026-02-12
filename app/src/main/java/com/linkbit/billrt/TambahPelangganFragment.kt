@@ -53,25 +53,38 @@ class TambahPelangganFragment : BaseFragment() {
     }
 
     private fun setupListeners() {
-        binding.btnPilihInstallationDate.setOnClickListener { showDatePickerDialog(isInstallationDate = true) }
-        binding.btnPilihTglDaftar.setOnClickListener { showDatePickerDialog(isInstallationDate = false) }
+        binding.btnPilihInstallationDate.setOnClickListener { showDatePickerDialog(dateType = DateType.INSTALLATION) }
+        binding.btnPilihTglDaftar.setOnClickListener { showDatePickerDialog(dateType = DateType.REGISTER) }
+        binding.btnPilihTglExpired.setOnClickListener { showDatePickerDialog(dateType = DateType.EXPIRED) }
         binding.btnSimpan.setOnClickListener { attemptSave() }
     }
 
-    private fun showDatePickerDialog(isInstallationDate: Boolean) {
+    private enum class DateType {
+        INSTALLATION,
+        REGISTER,
+        EXPIRED
+    }
+
+    private fun showDatePickerDialog(dateType: DateType) {
         val calendar = Calendar.getInstance()
         DatePickerDialog(
             requireContext(),
             { _, year, month, day ->
-                // PERBAIKAN: Format tanggal dengan leading zero (YYYY-MM-DD)
                 val correctedMonth = month + 1
                 val selectedDate = String.format("%d-%02d-%02d", year, correctedMonth, day)
-                if (isInstallationDate) {
-                    binding.tvInstallationDate.text = selectedDate
-                    viewModel.installationDate.value = selectedDate
-                } else {
-                    binding.tvTglDaftar.text = selectedDate
-                    viewModel.tglDaftar.value = selectedDate
+                when (dateType) {
+                    DateType.INSTALLATION -> {
+                        binding.tvInstallationDate.text = selectedDate
+                        viewModel.installationDate.value = selectedDate
+                    }
+                    DateType.REGISTER -> {
+                        binding.tvTglDaftar.text = selectedDate
+                        viewModel.tglDaftar.value = selectedDate
+                    }
+                    DateType.EXPIRED -> {
+                        binding.tvTglExpired.text = selectedDate
+                        viewModel.tglExpired.value = selectedDate
+                    }
                 }
             },
             calendar.get(Calendar.YEAR),
@@ -192,18 +205,18 @@ class TambahPelangganFragment : BaseFragment() {
             macAddress = null,
             latitude = null,
             longitude = null,
-            tglExpired = null
+            tglExpired = viewModel.tglExpired.value
         )
 
-        apiService.simpanPelanggan(request).enqueue(object : Callback<StandardResponse> {
+        apiService.tambahPelanggan(request).enqueue(object : Callback<StandardResponse> {
             override fun onResponse(call: Call<StandardResponse>, response: Response<StandardResponse>) {
                 setLoading(false)
                 if (response.isSuccessful && response.body()?.status == true) {
-                    Toast.makeText(context, "Pelanggan baru berhasil disimpan!", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, "Pelanggan baru berhasil ditambahkan!", Toast.LENGTH_SHORT).show()
                     findNavController().popBackStack()
                 } else {
                     val errorMsg = response.body()?.message ?: "Terjadi kesalahan yang tidak diketahui."
-                    Toast.makeText(context, "Gagal menyimpan: $errorMsg", Toast.LENGTH_LONG).show()
+                    Toast.makeText(context, "Gagal menambahkan: $errorMsg", Toast.LENGTH_LONG).show()
                 }
             }
 

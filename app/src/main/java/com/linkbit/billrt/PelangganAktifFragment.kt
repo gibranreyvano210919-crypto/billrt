@@ -7,7 +7,9 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.appcompat.widget.SearchView
 import androidx.core.os.bundleOf
+import androidx.fragment.app.setFragmentResultListener
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.linkbit.billrt.databinding.FragmentPelangganAktifBinding
 import retrofit2.Call
@@ -21,6 +23,17 @@ class PelangganAktifFragment : BaseFragment() {
 
     private lateinit var pelangganAdapter: PelangganAdapter
     private var pelangganList: List<PelangganData> = emptyList()
+    private val args: PelangganAktifFragmentArgs by navArgs()
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setFragmentResultListener("edit_result") { _, bundle ->
+            val updated = bundle.getBoolean("updated")
+            if (updated) {
+                fetchPelangganAktif()
+            }
+        }
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentPelangganAktifBinding.inflate(inflater, container, false)
@@ -32,18 +45,15 @@ class PelangganAktifFragment : BaseFragment() {
 
         setupRecyclerView()
         setupSearchView()
+        setupSwipeRefresh()
         fetchPelangganAktif()
-
-        binding.fabTambahPelanggan.setOnClickListener {
-            findNavController().navigate(R.id.action_pelangganAktifFragment_to_tambahPelangganFragment)
-        }
     }
 
     private fun setupRecyclerView() {
         pelangganAdapter = PelangganAdapter(emptyList(),
             onDetailClick = { pelanggan ->
-                val bundle = bundleOf("pelangganId" to pelanggan.idPelanggan)
-                findNavController().navigate(R.id.action_global_detailPelangganFragment, bundle)
+                val action = PelangganAktifFragmentDirections.actionPelangganAktifFragmentToPelangganAktifDetailFragment(pelanggan.idPelanggan)
+                findNavController().navigate(action)
             },
             onItemLongClick = { pelanggan ->
                 showBottomSheetMenu(pelanggan)
@@ -53,14 +63,23 @@ class PelangganAktifFragment : BaseFragment() {
         binding.rvPelangganAktif.adapter = pelangganAdapter
     }
 
+    private fun setupSwipeRefresh() {
+        binding.swipeRefreshLayout.setOnRefreshListener {
+            fetchPelangganAktif()
+        }
+    }
+
     private fun showBottomSheetMenu(pelanggan: PelangganData) {
-        val bottomSheet = PelangganBottomSheetFragment.newInstance(pelanggan.nama).apply {
-            setOnEditClickListener {
-                val action = PelangganAktifFragmentDirections.actionPelangganAktifFragmentToEditPelangganFragment(pelanggan.idPelanggan)
+        val bottomSheet = PelangganBottomSheetFragment.newInstance(pelanggan.idPelanggan, pelanggan.nama).apply {
+            setOnEditClickListener { pelangganId ->
+                val action = PelangganAktifFragmentDirections.actionPelangganAktifFragmentToEditPelangganFragment(pelangganId)
                 findNavController().navigate(action)
             }
-            setOnIsolirClickListener {
-                updateStatus(pelanggan, "isolir")
+            setOnIsolirClickListener { pelangganId ->
+                val pelangganToUpdate = pelangganList.find { it.idPelanggan == pelangganId }
+                pelangganToUpdate?.let { 
+                    updateStatus(it, "isolir") 
+                }
             }
         }
         bottomSheet.show(childFragmentManager, "PelangganBottomSheet")
@@ -95,11 +114,14 @@ class PelangganAktifFragment : BaseFragment() {
     }
 
     private fun fetchPelangganAktif() {
-        binding.progressBar.visibility = View.VISIBLE
+        if (!binding.swipeRefreshLayout.isRefreshing) {
+            binding.progressBar.visibility = View.VISIBLE
+        }
         apiService.getDataPelanggan(status = "aktif").enqueue(object : Callback<PelangganResponse> {
             override fun onResponse(call: Call<PelangganResponse>, response: Response<PelangganResponse>) {
                 if (!isAdded) return
                 binding.progressBar.visibility = View.GONE
+                binding.swipeRefreshLayout.isRefreshing = false
                 if (response.isSuccessful) {
                     pelangganList = response.body()?.data ?: emptyList()
                     pelangganAdapter.updateData(pelangganList)
@@ -111,6 +133,7 @@ class PelangganAktifFragment : BaseFragment() {
             override fun onFailure(call: Call<PelangganResponse>, t: Throwable) {
                 if (!isAdded) return
                 binding.progressBar.visibility = View.GONE
+                binding.swipeRefreshLayout.isRefreshing = false
                 Toast.makeText(context, "Error: ${t.message}", Toast.LENGTH_SHORT).show()
             }
         })

@@ -21,112 +21,269 @@
 
     </com.google.android.material.appbar.AppBarLayout>
 
-    <!-- Pelanggan Aktif -->
-    <com.google.android.material.card.MaterialCardView
-        android:id="@+id/card_pelanggan_aktif"
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swipe_refresh_layout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
-        android:clickable="true"
-        android:focusable="true">
+        android:layout_height="match_parent">
 
-        <RelativeLayout
+        <androidx.core.widget.NestedScrollView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="16dp">
+            android:layout_height="match_parent">
 
-            <TextView
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Pelanggan Aktif"
-                android:textAppearance="@style/TextAppearance.AppCompat.Large"
-                android:layout_centerVertical="true"
-                android:layout_alignParentStart="true" />
+                android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/tv_count_aktif"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="@style/TextAppearance.AppCompat.Display1"
-                android:textStyle="bold"
-                android:layout_centerVertical="true"
-                android:layout_alignParentEnd="true"
-                tools:text="0" />
-        </RelativeLayout>
-    </com.google.android.material.card.MaterialCardView>
+                <LinearLayout
+                    android:id="@+id/filter_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingStart="16dp"
+                    android:paddingTop="8dp"
+                    android:paddingEnd="16dp"
+                    android:paddingBottom="8dp">
 
-    <!-- Pelanggan Nonaktif -->
-    <com.google.android.material.card.MaterialCardView
-        android:id="@+id/card_pelanggan_nonaktif"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
-        android:clickable="true"
-        android:focusable="true">
+                    <Spinner
+                        android:id="@+id/spinner_bulan"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="8dp"
+                        android:layout_weight="1" />
 
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="16dp">
+                    <Spinner
+                        android:id="@+id/spinner_tahun"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1" />
+                </LinearLayout>
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Pelanggan Nonaktif"
-                android:textAppearance="@style/TextAppearance.AppCompat.Large"
-                android:layout_centerVertical="true"
-                android:layout_alignParentStart="true" />
+                <GridLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:columnCount="2"
+                    android:padding="8dp"
+                    android:alignmentMode="alignMargins">
 
-            <TextView
-                android:id="@+id/tv_count_nonaktif"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="@style/TextAppearance.AppCompat.Display1"
-                android:textStyle="bold"
-                android:layout_centerVertical="true"
-                android:layout_alignParentEnd="true"
-                tools:text="0" />
-        </RelativeLayout>
-    </com.google.android.material.card.MaterialCardView>
+                    <androidx.cardview.widget.CardView
+                        android:id="@+id/card_pelanggan_aktif"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_columnWeight="1"
+                        android:layout_margin="8dp"
+                        app:cardCornerRadius="12dp"
+                        app:cardElevation="4dp">
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:padding="16dp"
+                            android:background="#E8F5E9">
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="AKTIF"
+                                android:textColor="#2E7D32"
+                                android:textStyle="bold"
+                                android:textSize="12sp" />
+                            <TextView
+                                android:id="@+id/tv_count_aktif"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="0"
+                                android:textColor="#000000"
+                                android:textSize="24sp"
+                                android:textStyle="bold" />
+                        </LinearLayout>
+                    </androidx.cardview.widget.CardView>
 
-    <!-- Pelanggan Isolir -->
-    <com.google.android.material.card.MaterialCardView
-        android:id="@+id/card_pelanggan_isolir"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
-        android:clickable="true"
-        android:focusable="true">
+                    <androidx.cardview.widget.CardView
+                        android:id="@+id/card_pelanggan_nonaktif"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_columnWeight="1"
+                        android:layout_margin="8dp"
+                        app:cardCornerRadius="12dp"
+                        app:cardElevation="4dp">
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:padding="16dp"
+                            android:background="#FFEBEE">
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="NONAKTIF"
+                                android:textColor="#C62828"
+                                android:textStyle="bold"
+                                android:textSize="12sp" />
+                            <TextView
+                                android:id="@+id/tv_count_nonaktif"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="0"
+                                android:textColor="#000000"
+                                android:textSize="24sp"
+                                android:textStyle="bold" />
+                        </LinearLayout>
+                    </androidx.cardview.widget.CardView>
 
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="16dp">
+                    <androidx.cardview.widget.CardView
+                        android:id="@+id/card_pelanggan_isolir"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_columnWeight="1"
+                        android:layout_margin="8dp"
+                        app:cardCornerRadius="12dp"
+                        app:cardElevation="4dp">
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:padding="16dp"
+                            android:background="#FFF3E0">
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="ISOLIR"
+                                android:textColor="#EF6C00"
+                                android:textStyle="bold"
+                                android:textSize="12sp" />
+                            <TextView
+                                android:id="@+id/tv_count_isolir"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="0"
+                                android:textColor="#000000"
+                                android:textSize="24sp"
+                                android:textStyle="bold" />
+                        </LinearLayout>
+                    </androidx.cardview.widget.CardView>
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Pelanggan Isolir"
-                android:textAppearance="@style/TextAppearance.AppCompat.Large"
-                android:layout_centerVertical="true"
-                android:layout_alignParentStart="true" />
+                    <androidx.cardview.widget.CardView
+                        android:id="@+id/card_pelanggan_baru"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_columnWeight="1"
+                        android:layout_margin="8dp"
+                        app:cardCornerRadius="12dp"
+                        app:cardElevation="4dp">
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:padding="16dp"
+                            android:background="#E3F2FD">
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="BARU"
+                                android:textColor="#1565C0"
+                                android:textStyle="bold"
+                                android:textSize="12sp" />
+                            <TextView
+                                android:id="@+id/tv_count_baru"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="0"
+                                android:textColor="#000000"
+                                android:textSize="24sp"
+                                android:textStyle="bold" />
+                        </LinearLayout>
+                    </androidx.cardview.widget.CardView>
 
-            <TextView
-                android:id="@+id/tv_count_isolir"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="@style/TextAppearance.AppCompat.Display1"
-                android:textStyle="bold"
-                android:layout_centerVertical="true"
-                android:layout_alignParentEnd="true"
-                tools:text="0" />
-        </RelativeLayout>
-    </com.google.android.material.card.MaterialCardView>
+                </GridLayout>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_tambah_pelanggan"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginEnd="16dp"
+                    android:layout_marginTop="16dp"
+                    android:text="Tambah Pelanggan"
+                    app:icon="@android:drawable/ic_input_add" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:paddingStart="8dp"
+                    android:paddingEnd="8dp">
+
+                    <androidx.cardview.widget.CardView
+                        android:id="@+id/card_belum_bayar"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_margin="8dp"
+                        app:cardCornerRadius="12dp"
+                        app:cardElevation="4dp">
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:padding="16dp"
+                            android:background="#FFF8E1">
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="BELUM BAYAR"
+                                android:textColor="#FF8F00"
+                                android:textStyle="bold"
+                                android:textSize="12sp" />
+                            <TextView
+                                android:id="@+id/tv_count_belum_bayar"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="0"
+                                android:textColor="#000000"
+                                android:textSize="24sp"
+                                android:textStyle="bold" />
+                        </LinearLayout>
+                    </androidx.cardview.widget.CardView>
+
+                    <androidx.cardview.widget.CardView
+                        android:id="@+id/card_lunas_bayar"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_margin="8dp"
+                        app:cardCornerRadius="12dp"
+                        app:cardElevation="4dp">
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:padding="16dp"
+                            android:background="#E0F7FA">
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="LUNAS BAYAR"
+                                android:textColor="#00838F"
+                                android:textStyle="bold"
+                                android:textSize="12sp" />
+                            <TextView
+                                android:id="@+id/tv_count_lunas_bayar"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="0"
+                                android:textColor="#000000"
+                                android:textSize="24sp"
+                                android:textStyle="bold" />
+                        </LinearLayout>
+                    </androidx.cardview.widget.CardView>
+
+                </LinearLayout>
+
+            </LinearLayout>
+        </androidx.core.widget.NestedScrollView>
+
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
 </LinearLayout>

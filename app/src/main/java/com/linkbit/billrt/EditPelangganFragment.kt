@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.Toast
+import androidx.core.os.bundleOf
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.linkbit.billrt.databinding.FragmentEditPelangganBinding
@@ -144,18 +145,20 @@ class EditPelangganFragment : BaseFragment() {
     }
 
     private fun fetchPelangganDetails() {
-        apiService.getDataPelanggan(idPelanggan = args.pelangganIdToEdit).enqueue(object : Callback<PelangganResponse> {
-            override fun onResponse(call: Call<PelangganResponse>, response: Response<PelangganResponse>) {
+        val request = GetPelangganByIdRequest(id_pelanggan = args.pelangganIdToEdit)
+        apiService.getPelangganById(request).enqueue(object : Callback<GetPelangganByIdResponse> {
+            override fun onResponse(call: Call<GetPelangganByIdResponse>, response: Response<GetPelangganByIdResponse>) {
                 if (!isAdded) return
-                if (response.isSuccessful && response.body()?.data?.isNotEmpty() == true) {
-                    currentPelanggan = response.body()!!.data!![0]
+                if (response.isSuccessful && response.body()?.data != null) {
+                    currentPelanggan = response.body()!!.data!!
                 } else {
-                    Toast.makeText(context, "Gagal memuat detail pelanggan", Toast.LENGTH_SHORT).show()
+                    val errorMsg = response.body()?.message ?: "Gagal memuat detail pelanggan"
+                    Toast.makeText(context, errorMsg, Toast.LENGTH_SHORT).show()
                 }
                 checkIfDataReady()
             }
 
-            override fun onFailure(call: Call<PelangganResponse>, t: Throwable) {
+            override fun onFailure(call: Call<GetPelangganByIdResponse>, t: Throwable) {
                 if (!isAdded) return
                 Toast.makeText(context, "Error: ${t.message}", Toast.LENGTH_SHORT).show()
                 checkIfDataReady()
@@ -227,6 +230,7 @@ class EditPelangganFragment : BaseFragment() {
                 setLoading(false)
                 if (response.isSuccessful && response.body()?.status == true) {
                     Toast.makeText(context, "Data pelanggan berhasil diperbarui", Toast.LENGTH_SHORT).show()
+                    parentFragmentManager.setFragmentResult("edit_result", bundleOf("updated" to true))
                     findNavController().popBackStack()
                 } else {
                     val errorMsg = response.body()?.message ?: "Gagal memperbarui data"

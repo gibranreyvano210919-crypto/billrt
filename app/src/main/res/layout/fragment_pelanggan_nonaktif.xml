@@ -17,13 +17,23 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
 
+    <TextView
+        android:id="@+id/tvTotalPelanggan"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
+        app:layout_constraintTop_toBottomOf="@+id/searchViewPelangganNonaktif"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:text="Total: 100" />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvPelangganNonaktif"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:padding="4dp"
         android:clipToPadding="false"
-        app:layout_constraintTop_toBottomOf="@+id/searchViewPelangganNonaktif"
+        app:layout_constraintTop_toBottomOf="@+id/tvTotalPelanggan"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

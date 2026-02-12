@@ -209,6 +209,7 @@ class InputKasFragment : BaseFragment() {
                 if (!isAdded || !response.isSuccessful) return
 
                 val pelangganList = response.body()?.data ?: emptyList()
+                val activePelangganList = pelangganList.filter { it.statusAktif == "aktif" }
 
                 RetrofitClient.instance.getCatatanTagihan(bulan, tahun).enqueue(object: Callback<CatatanTagihanResponse>{
                     override fun onResponse(call: Call<CatatanTagihanResponse>, response: Response<CatatanTagihanResponse>) {
@@ -218,7 +219,7 @@ class InputKasFragment : BaseFragment() {
                             emptySet()
                         }
 
-                        val mergedList = pelangganList.map { 
+                        val mergedList = activePelangganList.map { 
                             InputKasPelanggan(
                                 idPelanggan = it.idPelanggan,
                                 nama = it.namaPelanggan,
@@ -232,7 +233,7 @@ class InputKasFragment : BaseFragment() {
                         pelangganAdapter.updateData(mergedList)
                     }
                     override fun onFailure(call: Call<CatatanTagihanResponse>, t: Throwable) {
-                        val list = pelangganList.map { 
+                        val list = activePelangganList.map { 
                              InputKasPelanggan(
                                 idPelanggan = it.idPelanggan,
                                 nama = it.namaPelanggan,
@@ -274,31 +275,20 @@ class InputKasFragment : BaseFragment() {
 
         RetrofitClient.instance.tambahCatatan(bulan, tahun, request).enqueue(object : Callback<StandardResponse> {
             override fun onResponse(call: Call<StandardResponse>, response: Response<StandardResponse>) {
-                if (!isAdded || _binding == null) return
-                
-                val responseBody = response.body()
-                if (response.isSuccessful && responseBody?.status == true) {
-                    Toast.makeText(context, responseBody.message, Toast.LENGTH_LONG).show()
-                    
-                    binding.namaTeknisi.text.clear()
-                    pelangganAdapter.clearSelection()
-                    binding.tvPelangganTerpilih.text = "Pelanggan Belum Dipilih"
-                    parentFragmentManager.setFragmentResult("kas_updated", Bundle.EMPTY)
-                    fetchData() // Refresh list
+                if (response.isSuccessful) {
+                    Toast.makeText(context, "Data berhasil disimpan", Toast.LENGTH_SHORT).show()
                 } else {
-                    Toast.makeText(context, "Gagal: ${responseBody?.message ?: "Unknown error"}", Toast.LENGTH_LONG).show()
+                    Toast.makeText(context, "Gagal menyimpan data", Toast.LENGTH_SHORT).show()
                 }
             }
 
             override fun onFailure(call: Call<StandardResponse>, t: Throwable) {
-                if (!isAdded || _binding == null) return
-                Toast.makeText(context, "Error: ${t.message}", Toast.LENGTH_LONG).show()
+                Toast.makeText(context, "Error: ${t.message}", Toast.LENGTH_SHORT).show()
             }
         })
     }
 
     override fun onDestroyView() {
-        searchRunnable?.let { searchHandler.removeCallbacks(it) }
         super.onDestroyView()
         _binding = null
     }

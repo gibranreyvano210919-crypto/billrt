@@ -36,6 +36,7 @@ class PelangganAdapter(
             binding.tvNamaPelanggan.text = pelanggan.nama
             binding.tvIdPelanggan.text = "ID: ${pelanggan.idPelanggan}"
             binding.tvAlamat.text = pelanggan.alamat
+            binding.tvWilayah.text = "Wilayah: ${pelanggan.namaWilayah}"
             binding.tvStatusBerlangganan.text = "Status: ${pelanggan.tglDaftar}"
 
             if (onDetailClick != null) {
