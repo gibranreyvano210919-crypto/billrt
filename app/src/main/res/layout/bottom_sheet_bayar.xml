@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <TextView
+        android:id="@+id/tv_bottom_sheet_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Opsi Pelanggan"
+        android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6" />
+
+    <TextView
+        android:id="@+id/tv_nama_pelanggan"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle1"/>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_ingatkan"
+        style="@style/Widget.MaterialComponents.Button.TextButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Ingatkan Pembayaran" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_cetak"
+        style="@style/Widget.MaterialComponents.Button.TextButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Cetak Invoice" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_bayar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="BAYAR" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_isolir"
+        style="@style/Widget.MaterialComponents.Button.TextButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Isolir"
+        android:textColor="@android:color/holo_red_dark" />
+
+</LinearLayout>

@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.linkbit.billrt.databinding.FragmentPelangganIsolirBinding
+import com.linkbit.billrt.model.StandardResponse
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response

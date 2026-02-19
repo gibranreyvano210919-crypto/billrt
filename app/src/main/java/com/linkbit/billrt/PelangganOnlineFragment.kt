@@ -10,6 +10,7 @@ import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.linkbit.billrt.adapter.PelangganOnlineAdapter
 import com.linkbit.billrt.databinding.FragmentPelangganOnlineBinding
+import com.linkbit.billrt.model.StandardResponse
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response

@@ -56,6 +56,12 @@
         <action
             android:id="@+id/action_berandaFragment_to_validasiPeriodeFragment"
             app:destination="@id/validasiPeriodeFragment" />
+        <action
+            android:id="@+id/action_berandaFragment_to_periodeTagihanFragment"
+            app:destination="@id/periodeTagihanFragment" />
+        <action
+            android:id="@+id/action_berandaFragment_to_customerFragment"
+            app:destination="@id/customerFragment" />
     </fragment>
 
     <fragment
@@ -563,5 +569,66 @@
         android:name="com.linkbit.billrt.ValidasiPeriodeFragment"
         android:label="Validasi Periode"
         tools:layout="@layout/fragment_validasi_periode" />
+
+    <fragment
+        android:id="@+id/periodeTagihanFragment"
+        android:name="com.linkbit.billrt.PeriodeTagihanFragment"
+        android:label="Periode Tagihan"
+        tools:layout="@layout/fragment_periode_tagihan">
+        <action
+            android:id="@+id/action_periodeTagihanFragment_to_dashboardTagihanFragment"
+            app:destination="@id/dashboardTagihanFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/dashboardTagihanFragment"
+        android:name="com.linkbit.billrt.DashboardTagihanFragment"
+        android:label="Rekap Tagihan"
+        tools:layout="@layout/fragment_dashboard_tagihan">
+        <argument
+            android:name="bulan"
+            app:argType="integer" />
+        <argument
+            android:name="tahun"
+            app:argType="integer" />
+        <action
+            android:id="@+id/action_dashboardTagihanFragment_to_pelangganBelumBayarFragment"
+            app:destination="@id/pelangganBelumBayarFragment" />
+        <action
+            android:id="@+id/action_dashboardTagihanFragment_to_pelangganLunasFragment"
+            app:destination="@id/pelangganLunasFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/pelangganBelumBayarFragment"
+        android:name="com.linkbit.billrt.PelangganBelumBayarFragment"
+        android:label="Pelanggan Belum Bayar"
+        tools:layout="@layout/fragment_pelanggan_belum_bayar">
+        <argument
+            android:name="bulan"
+            app:argType="integer" />
+        <argument
+            android:name="tahun"
+            app:argType="integer" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/pelangganLunasFragment"
+        android:name="com.linkbit.billrt.PelangganLunasFragment"
+        android:label="Pelanggan Lunas"
+        tools:layout="@layout/fragment_pelanggan_lunas">
+        <argument
+            android:name="bulan"
+            app:argType="integer" />
+        <argument
+            android:name="tahun"
+            app:argType="integer" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/customerFragment"
+        android:name="com.linkbit.billrt.CustomerFragment"
+        android:label="Customer"
+        tools:layout="@layout/fragment_customer" />
 
 </navigation>

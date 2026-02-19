@@ -8,25 +8,30 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 object ApiClient {
-    private const val BASE_URL = "http://112.78.170.196:8885/billrt/api/"
+    private const val BASE_URL = "http://112.78.170.196:8890/billrt/api/"
 
-    val instance: ApiService by lazy {
-        // Interceptor untuk logging, sangat berguna untuk debug
+    private val retrofit: Retrofit by lazy {
         val loggingInterceptor = HttpLoggingInterceptor().apply {
             level = HttpLoggingInterceptor.Level.BODY
         }
 
-        // Konfigurasi OkHttpClient untuk menonaktifkan cache
         val okHttpClient = OkHttpClient.Builder()
             .addInterceptor(loggingInterceptor)
-            .cache(null) // Eksplisit menonaktifkan cache
+            .cache(null)
             .build()
 
-        val retrofit = Retrofit.Builder()
+        Retrofit.Builder()
             .baseUrl(BASE_URL)
             .addConverterFactory(GsonConverterFactory.create())
-            .client(okHttpClient) // Gunakan OkHttpClient yang sudah dikonfigurasi
+            .client(okHttpClient)
             .build()
+    }
+
+    val instance: ApiService by lazy {
         retrofit.create(ApiService::class.java)
+    }
+
+    val tagihanApiService: TagihanApiService by lazy {
+        retrofit.create(TagihanApiService::class.java)
     }
 }

@@ -10,14 +10,14 @@
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="?attr/colorSurface">
+        android:background="?attr/colorPrimary">
 
         <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/toolbar_menu_pelanggan"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             app:title="Data Pelanggan"
-            app:navigationIcon="@android:drawable/ic_menu_revert" />
+            app:titleTextColor="@android:color/white" />
 
     </com.google.android.material.appbar.AppBarLayout>
 
@@ -195,31 +195,11 @@
                         </LinearLayout>
                     </androidx.cardview.widget.CardView>
 
-                </GridLayout>
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btn_tambah_pelanggan"
-                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
-                    android:layout_marginEnd="16dp"
-                    android:layout_marginTop="16dp"
-                    android:text="Tambah Pelanggan"
-                    app:icon="@android:drawable/ic_input_add" />
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:paddingStart="8dp"
-                    android:paddingEnd="8dp">
-
                     <androidx.cardview.widget.CardView
-                        android:id="@+id/card_belum_bayar"
+                        android:id="@+id/card_lunas"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
+                        android:layout_columnWeight="1"
                         android:layout_margin="8dp"
                         app:cardCornerRadius="12dp"
                         app:cardElevation="4dp">
@@ -228,12 +208,44 @@
                             android:layout_height="wrap_content"
                             android:orientation="vertical"
                             android:padding="16dp"
-                            android:background="#FFF8E1">
+                            android:background="#E0F2F1">
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="LUNAS"
+                                android:textColor="#00796B"
+                                android:textStyle="bold"
+                                android:textSize="12sp" />
+                            <TextView
+                                android:id="@+id/tv_count_lunas"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="0"
+                                android:textColor="#000000"
+                                android:textSize="24sp"
+                                android:textStyle="bold" />
+                        </LinearLayout>
+                    </androidx.cardview.widget.CardView>
+
+                    <androidx.cardview.widget.CardView
+                        android:id="@+id/card_belum_bayar"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_columnWeight="1"
+                        android:layout_margin="8dp"
+                        app:cardCornerRadius="12dp"
+                        app:cardElevation="4dp">
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:padding="16dp"
+                            android:background="#FFFDE7">
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="BELUM BAYAR"
-                                android:textColor="#FF8F00"
+                                android:textColor="#FBC02D"
                                 android:textStyle="bold"
                                 android:textSize="12sp" />
                             <TextView
@@ -247,39 +259,18 @@
                         </LinearLayout>
                     </androidx.cardview.widget.CardView>
 
-                    <androidx.cardview.widget.CardView
-                        android:id="@+id/card_lunas_bayar"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:layout_margin="8dp"
-                        app:cardCornerRadius="12dp"
-                        app:cardElevation="4dp">
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="vertical"
-                            android:padding="16dp"
-                            android:background="#E0F7FA">
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="LUNAS BAYAR"
-                                android:textColor="#00838F"
-                                android:textStyle="bold"
-                                android:textSize="12sp" />
-                            <TextView
-                                android:id="@+id/tv_count_lunas_bayar"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="0"
-                                android:textColor="#000000"
-                                android:textSize="24sp"
-                                android:textStyle="bold" />
-                        </LinearLayout>
-                    </androidx.cardview.widget.CardView>
+                </GridLayout>
 
-                </LinearLayout>
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_tambah_pelanggan"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginEnd="16dp"
+                    android:layout_marginTop="16dp"
+                    android:text="Tambah Pelanggan"
+                    app:icon="@android:drawable/ic_input_add" />
 
             </LinearLayout>
         </androidx.core.widget.NestedScrollView>

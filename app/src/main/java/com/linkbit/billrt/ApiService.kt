@@ -1,6 +1,8 @@
 package com.linkbit.billrt
 
+import com.google.gson.JsonElement
 import com.google.gson.annotations.SerializedName
+import com.linkbit.billrt.model.StandardResponse
 import com.linkbit.billrt.network.PelangganBaruResponse
 import retrofit2.Call
 import retrofit2.http.Body
@@ -10,8 +12,9 @@ import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Query
 
+// region Data Classes
 
-// Data class for the response of the settings endpoint
+// Pengaturan
 data class PengaturanResponse(
     @SerializedName("id_pengaturan") val idPengaturan: String?,
     @SerializedName("nama_perusahaan") val namaPerusahaan: String?,
@@ -32,20 +35,23 @@ data class UpdatePengaturanResponse(
     val data: PengaturanResponse
 )
 
+// Pelanggan
 data class GetPelangganByIdRequest(val id_pelanggan: String)
 
-// Data class baru untuk response get_pelanggan_by_id
 data class GetPelangganByIdResponse(
     val status: Boolean,
     val message: String?,
     val data: PelangganData?
 )
 
+// Rekap
 data class RekapStatusPelanggan(
     val aktif: Int,
     val isolir: Int,
     val nonaktif: Int,
-    val total: Int
+    val total: Int,
+    val lunas: Int,
+    @SerializedName("belum_bayar") val belumBayar: Int
 )
 
 data class RekapStatusPelangganResponse(
@@ -54,25 +60,64 @@ data class RekapStatusPelangganResponse(
     val data: RekapStatusPelanggan
 )
 
+// Periode
+data class PeriodeTagihan(
+    @SerializedName("bulan_tagihan") val bulanTagihan: Int,
+    @SerializedName("tahun_tagihan") val tahunTagihan: Int
+)
+
+data class ListPeriodeResponse(
+    val status: Boolean,
+    val message: String?,
+    val data: List<PeriodeTagihan>?
+)
+
+// Detail Tagihan
+data class DetailBayarResponse(
+    val status: Boolean,
+    @SerializedName("is_lunas") val isLunas: Boolean,
+    val message: String,
+    val data: JsonElement
+)
+
+data class DetailBayarLunasData(
+    @SerializedName("no_invoice") val noInvoice: String,
+    @SerializedName("pelanggan") val pelanggan: String,
+    @SerializedName("username") val username: String,
+    @SerializedName("telepon") val telepon: String,
+    @SerializedName("wilayah") val wilayah: String,
+    @SerializedName("tgl_instalasi") val tglInstalasi: String,
+    @SerializedName("periode") val periode: String,
+    @SerializedName("nominal") val nominal: Float,
+    @SerializedName("tgl_bayar") val tglBayar: String,
+    @SerializedName("metode") val metode: String,
+    @SerializedName("admin_penerima") val adminPenerima: String,
+    @SerializedName("catatan") val catatan: String
+)
+
+data class DetailBayarBelumLunasData(
+    @SerializedName("no_invoice") val noInvoice: String,
+    @SerializedName("pelanggan") val pelanggan: String,
+    @SerializedName("username") val username: String,
+    @SerializedName("telepon") val telepon: String,
+    @SerializedName("wilayah") val wilayah: String,
+    @SerializedName("tgl_instalasi") val tglInstalasi: String,
+    @SerializedName("periode") val periode: String,
+    @SerializedName("nominal") val nominal: Float,
+    @SerializedName("jatuh_tempo") val jatuhTempo: String,
+    @SerializedName("instruksi") val instruksi: String
+)
+
+// endregion
+
 interface ApiService {
 
-    @GET("index.php?tabel=rekap_status_pelanggan")
-    fun getRekapStatusPelanggan(): Call<RekapStatusPelangganResponse>
+    @POST("login.php")
+    fun login(@Body request: LoginRequest): Call<LoginResponse>
 
-    @GET("index.php?tabel=pelanggan_nonaktif")
-    fun getPelangganNonaktif(
-        @Query("bulan") bulan: Int?,
-        @Query("tahun") tahun: Int?
-    ): Call<PelangganNonaktifResponse>
-
-    @GET("index.php?tabel=pelanggan_isolir")
-    fun getPelangganIsolir(
-        @Query("bulan") bulan: Int?,
-        @Query("tahun") tahun: Int?
-    ): Call<PelangganIsolirResponse>
-
-    @GET("index.php")
-    fun getPengaturan(@Query("tabel") tabel: String = "pengaturan"): Call<PengaturanResponse>
+    // region Pengaturan
+    @GET("index.php?tabel=pengaturan")
+    fun getPengaturan(): Call<PengaturanResponse>
 
     @FormUrlEncoded
     @POST("index.php?tabel=pengaturan")
@@ -87,11 +132,58 @@ interface ApiService {
         @Field("bank_no_rekening") norek: String,
         @Field("masa_tenggang") tenggang: Int
     ): Call<UpdatePengaturanResponse>
+    // endregion
 
-    @POST("login.php")
-    fun login(@Body request: LoginRequest): Call<LoginResponse>
+    // region Pelanggan
+    @GET("index.php?tabel=data_pelanggan")
+    fun getDataPelanggan(
+        @Query("search") search: String? = null,
+        @Query("filter_tipe") filterTipe: String? = null,
+        @Query("bulan") bulan: Int? = null,
+        @Query("tahun") tahun: Int? = null,
+        @Query("id_pelanggan") idPelanggan: String? = null,
+        @Query("status_aktif") status: String? = null
+    ): Call<PelangganResponse>
 
-    @GET("api_maps.php") // Tetap untuk mengambil semua data pelanggan di peta
+    @POST("index.php?tabel=get_pelanggan_by_id")
+    fun getPelangganById(@Body request: GetPelangganByIdRequest): Call<GetPelangganByIdResponse>
+
+    @GET("index.php?tabel=pelanggan_baru")
+    fun getPelangganBaru(
+        @Query("bulan") bulan: Int? = null,
+        @Query("tahun") tahun: Int? = null
+    ): Call<PelangganBaruResponse>
+    
+    @GET("index.php?tabel=pelanggan_nonaktif")
+    fun getPelangganNonaktif(
+        @Query("bulan") bulan: Int?,
+        @Query("tahun") tahun: Int?
+    ): Call<PelangganNonaktifResponse>
+
+    @GET("index.php?tabel=pelanggan_isolir")
+    fun getPelangganIsolir(
+        @Query("bulan") bulan: Int?,
+        @Query("tahun") tahun: Int?
+    ): Call<PelangganIsolirResponse>
+
+    @POST("index.php?tabel=update_status_aktif")
+    fun updateStatusPelanggan(@Body request: UpdateStatusRequest): Call<StandardResponse>
+
+    @POST("index.php?tabel=hapus_pelanggan")
+    fun hapusPelanggan(@Body request: PelangganIdRequest): Call<StandardResponse>
+
+    @POST("index.php?tabel=simpan_pelanggan")
+    fun simpanPelanggan(@Body request: SimpanPelangganRequest): Call<StandardResponse>
+
+    @POST("index.php?tabel=tambah_pelanggan")
+    fun tambahPelanggan(@Body request: SimpanPelangganRequest): Call<StandardResponse>
+
+    @POST("index.php")
+    fun updatePelanggan(@Query("tabel") tabel: String, @Body request: UpdatePelangganRequest): Call<StandardResponse>
+    // endregion
+
+    // region Maps & ODP
+    @GET("api_maps.php")
     fun getPelangganMap(@Query("q") q: String? = null): Call<GetPelangganResponse>
 
     @POST("index.php?tabel=update_koordinat_map")
@@ -126,46 +218,9 @@ interface ApiService {
 
     @POST("index.php?tabel=cabut_layanan_port")
     fun cabutLayananPort(@Body request: CabutLayananPortRequest): Call<StandardResponse>
+    // endregion
 
-    @GET("index.php?tabel=wilayah_pelanggan_nested")
-    fun getWilayahPelangganNested(): Call<WilayahPelangganNestedResponse>
-
-
-    @GET("index.php?tabel=data_pelanggan")
-    fun getDataPelanggan(
-        @Query("search") search: String? = null,
-        @Query("filter_tipe") filterTipe: String? = null,
-        @Query("bulan") bulan: Int? = null,
-        @Query("tahun") tahun: Int? = null,
-        @Query("id_pelanggan") idPelanggan: String? = null,
-        @Query("status_aktif") status: String? = null // Added for filtering
-    ): Call<PelangganResponse>
-
-    // Endpoint baru yang spesifik untuk mengambil 1 data pelanggan
-    @POST("index.php?tabel=get_pelanggan_by_id")
-    fun getPelangganById(@Body request: GetPelangganByIdRequest): Call<GetPelangganByIdResponse>
-
-    @GET("index.php?tabel=pelanggan_baru")
-    fun getPelangganBaru(
-        @Query("bulan") bulan: Int? = null,
-        @Query("tahun") tahun: Int? = null
-    ): Call<PelangganBaruResponse>
-
-    @POST("index.php?tabel=update_status_aktif")
-    fun updateStatusPelanggan(@Body request: UpdateStatusRequest): Call<StandardResponse>
-
-    @POST("index.php?tabel=hapus_pelanggan")
-    fun hapusPelanggan(@Body request: PelangganIdRequest): Call<StandardResponse>
-
-    @POST("index.php?tabel=simpan_pelanggan")
-    fun simpanPelanggan(@Body request: SimpanPelangganRequest): Call<StandardResponse>
-
-    @POST("index.php?tabel=tambah_pelanggan")
-    fun tambahPelanggan(@Body request: SimpanPelangganRequest): Call<StandardResponse>
-
-    @POST("index.php")
-    fun updatePelanggan(@Query("tabel") tabel: String, @Body request: UpdatePelangganRequest): Call<StandardResponse>
-
+    // region Master Data (Paket, Wilayah)
     @GET("index.php?tabel=paket_internet")
     fun getPaket(): Call<PaketResponse>
 
@@ -178,11 +233,19 @@ interface ApiService {
     @GET("index.php?tabel=wilayah")
     fun getWilayah(): Call<WilayahResponse>
 
+    @GET("index.php?tabel=wilayah_pelanggan_nested")
+    fun getWilayahPelangganNested(): Call<WilayahPelangganNestedResponse>
+
     @POST("index.php?tabel=simpan_wilayah")
     fun simpanWilayah(@Body request: SimpanWilayahRequest): Call<StandardResponse>
 
     @POST("index.php?tabel=hapus_wilayah")
     fun hapusWilayah(@Body request: HapusWilayahRequest): Call<StandardResponse>
+    // endregion
+
+    // region Laporan & Tagihan
+    @GET("http://112.78.170.196:8890/billrt/api/api_tagihan.php?tabel=rekap_status_pelanggan")
+    fun getRekapStatusPelanggan(@Query("bulan") bulan: Int, @Query("tahun") tahun: Int): Call<RekapStatusPelangganResponse>
 
     @GET("index.php?tabel=laporan_wilayah")
     fun getLaporanWilayah(@Query("bulan") bulan: Int, @Query("tahun") tahun: Int): Call<List<DetailWilayah>>
@@ -210,14 +273,28 @@ interface ApiService {
 
     @POST("index.php?tabel=unverify_catatan")
     fun unverifyCatatan(@Body request: UnverifyCatatanRequest): Call<StandardResponse>
+    
+    // Endpoint baru untuk detail pembayaran
+    @GET("api_tagihan.php?tabel=detail_bayar_v2")
+    suspend fun getDetailBayar(@Query("invoice") invoiceId: String): DetailBayarResponse
+    
+    @FormUrlEncoded
+    @POST("api_tagihan.php?tabel=confirm_payment")
+    suspend fun confirmPayment(
+        @Field("id_tagihan") id_tagihan: String,
+        @Field("metode_bayar") metode_bayar: String,
+        @Field("tanggal_bayar") tanggal_bayar: String,
+        @Field("keterangan") keterangan: String,
+        @Field("admin_id") admin_id: Int
+    ): StandardResponse
+    // endregion
 
+    // region Mikrotik & OLT
     @GET("index.php?tabel=master_teknisi")
     fun getMasterTeknisi(): Call<MasterTeknisiResponse>
 
-    @GET("apimikrotik.php")
-    fun getMikrotikAccounts(
-        @Query("tabel") tabel: String = "mikrotik_accounts"
-    ): Call<MikrotikAccountsResponse>
+    @GET("apimikrotik.php?tabel=mikrotik_accounts")
+    fun getMikrotikAccounts(): Call<MikrotikAccountsResponse>
 
     @GET("apimikrotik.php")
     fun getPelangganStatus(
@@ -240,10 +317,5 @@ interface ApiService {
 
     @GET("smartolt.php")
     fun getOltData(): Call<OltApiResponse>
-
-    @GET("get_pelanggan_detail.php")
-    fun getPelangganDetail(@Query("id") id: Int): Call<PelangganDetailResponse>
-
-    @GET("index.php?tabel=data_pelanggan")
-    fun getPelangganDetail(@Query("id_pelanggan") idPelanggan: String): Call<PelangganDetailResponse>
+    // endregion
 }

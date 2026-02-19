@@ -2,16 +2,22 @@ package com.linkbit.billrt
 
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.appcompat.widget.SearchView
-import androidx.core.os.bundleOf
+import androidx.core.view.MenuHost
+import androidx.core.view.MenuProvider
 import androidx.fragment.app.setFragmentResultListener
+import androidx.lifecycle.Lifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.linkbit.billrt.databinding.FragmentPelangganAktifBinding
+import com.linkbit.billrt.model.StandardResponse
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -43,10 +49,36 @@ class PelangganAktifFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        setupToolbar()
         setupRecyclerView()
-        setupSearchView()
         setupSwipeRefresh()
         fetchPelangganAktif()
+    }
+
+    private fun setupToolbar() {
+        binding.toolbar.setNavigationOnClickListener {
+            findNavController().navigateUp()
+        }
+        val menuHost: MenuHost = requireActivity()
+        menuHost.addMenuProvider(object : MenuProvider {
+            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+                menuInflater.inflate(R.menu.menu_search, menu)
+                val searchItem = menu.findItem(R.id.action_search)
+                val searchView = searchItem.actionView as SearchView
+                searchView.queryHint = "Cari pelanggan aktif..."
+                searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+                    override fun onQueryTextSubmit(query: String?): Boolean = false
+                    override fun onQueryTextChange(newText: String?): Boolean {
+                        filter(newText)
+                        return true
+                    }
+                })
+            }
+
+            override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+                return false
+            }
+        }, viewLifecycleOwner, Lifecycle.State.RESUMED)
     }
 
     private fun setupRecyclerView() {
@@ -99,16 +131,6 @@ class PelangganAktifFragment : BaseFragment() {
 
             override fun onFailure(call: Call<StandardResponse>, t: Throwable) {
                 Toast.makeText(context, "Error: ${t.message}", Toast.LENGTH_SHORT).show()
-            }
-        })
-    }
-
-    private fun setupSearchView() {
-        binding.searchViewPelangganAktif.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-            override fun onQueryTextSubmit(query: String?): Boolean = false
-            override fun onQueryTextChange(newText: String?): Boolean {
-                filter(newText)
-                return true
             }
         })
     }

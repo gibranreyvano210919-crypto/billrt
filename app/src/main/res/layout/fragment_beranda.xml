@@ -12,7 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:visibility="gone"
-        tools:visibility="visible"> 
+        tools:visibility="visible">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -104,6 +104,40 @@
                             </LinearLayout>
                         </com.google.android.material.card.MaterialCardView>
 
+                        <!-- Card Pelanggan Baru -->
+                        <com.google.android.material.card.MaterialCardView
+                            android:id="@+id/card_pelanggan_new"
+                            android:layout_width="0dp"
+                            android:layout_height="90dp"
+                            android:layout_columnWeight="1"
+                            android:layout_margin="4dp"
+                            app:cardCornerRadius="8dp"
+                            app:cardElevation="4dp"
+                            app:cardBackgroundColor="@color/card_pelanggan_baru"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:foreground="?android:attr/selectableItemBackground">
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:orientation="vertical"
+                                android:layout_gravity="center"
+                                android:gravity="center">
+                                <ImageView
+                                    android:layout_width="32dp"
+                                    android:layout_height="32dp"
+                                    android:src="@drawable/ic_user"
+                                    app:tint="@android:color/white"
+                                    android:layout_marginBottom="8dp"/>
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Pelanggan Baru"
+                                    android:textColor="@android:color/white"
+                                    android:textAppearance="@style/TextAppearance.MaterialComponents.Caption" />
+                            </LinearLayout>
+                        </com.google.android.material.card.MaterialCardView>
+
                         <!-- Card Smart OLT -->
                         <com.google.android.material.card.MaterialCardView
                             android:id="@+id/card_olt"
@@ -140,7 +174,7 @@
 
                         <!-- Card Tagihan -->
                         <com.google.android.material.card.MaterialCardView
-                            android:id="@+id/card_laporan"
+                            android:id="@+id/card_tagihan"
                             android:layout_width="0dp"
                             android:layout_height="90dp"
                             android:layout_columnWeight="1"
@@ -375,7 +409,7 @@
                                     android:textAppearance="@style/TextAppearance.MaterialComponents.Caption" />
                             </LinearLayout>
                         </com.google.android.material.card.MaterialCardView>
-                        
+
                         <!-- Card Histori Catat -->
                         <com.google.android.material.card.MaterialCardView
                             android:id="@+id/card_histori_catat"
@@ -473,11 +507,11 @@
                     <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/rv_notifikasi_beranda"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
+                        android:layout_height="200dp"
                         android:padding="8dp"
                         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                         tools:listitem="@layout/item_notifikasi"
-                        tools:itemCount="3" />
+                        tools:itemCount="10" />
 
                     <Button
                         android:id="@+id/btn_lihat_semua_notifikasi"
@@ -490,6 +524,41 @@
 
                 </LinearLayout>
 
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                android.layout.marginBottom="16dp"
+                app:cardElevation="4dp"
+                app:cardCornerRadius="8dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingStart="16dp"
+                        android:paddingTop="16dp"
+                        android:paddingEnd="16dp"
+                        android:text="Pembayaran Hari Ini"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Headline" />
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/rv_pembayaran_hari_ini"
+                        android:layout_width="match_parent"
+                        android:layout_height="200dp"
+                        android:padding="8dp"
+                        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                        tools:listitem="@layout/item_pembayaran_hari_ini"
+                        tools:itemCount="10" />
+
+                </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
         </LinearLayout>

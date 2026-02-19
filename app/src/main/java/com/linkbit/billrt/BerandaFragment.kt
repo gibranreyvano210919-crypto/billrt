@@ -6,6 +6,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.firebase.database.DataSnapshot
@@ -13,7 +14,15 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.linkbit.billrt.adapter.NotificationAdapter
+import com.linkbit.billrt.adapter.PembayaranHariIniAdapter
+import com.linkbit.billrt.api.RetrofitClient
 import com.linkbit.billrt.databinding.FragmentBerandaBinding
+import com.linkbit.billrt.NotificationItem
+import com.linkbit.billrt.model.PembayaranHariIni
+import com.linkbit.billrt.model.PembayaranHariIniResponse
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -25,6 +34,9 @@ class BerandaFragment : BaseFragment() {
 
     private lateinit var notificationAdapter: NotificationAdapter
     private val notificationList = mutableListOf<NotificationItem>()
+
+    private lateinit var pembayaranHariIniAdapter: PembayaranHariIniAdapter
+    private val pembayaranHariIniList = mutableListOf<PembayaranHariIni>()
 
     private val notificationsRef = FirebaseDatabase.getInstance("https://mikrotik-alert-default-rtdb.asia-southeast1.firebasedatabase.app/")
         .getReference("logs/notifications")
@@ -49,7 +61,9 @@ class BerandaFragment : BaseFragment() {
         setupDateTime()
         setupCardListeners()
         setupNotificationRecyclerView()
+        setupPembayaranHariIniRecyclerView()
         listenForLatestNotifications()
+        fetchPembayaranHariIni()
     }
 
     private fun setupWelcomeMessage() {
@@ -73,7 +87,8 @@ class BerandaFragment : BaseFragment() {
         val navController = findNavController()
         binding.apply {
             cardUser.setOnClickListener { navController.navigate(R.id.action_berandaFragment_to_menuPelangganFragment) }
-            cardLaporan.setOnClickListener { navController.navigate(R.id.action_berandaFragment_to_riwayatTagihanFragment) }
+            cardPelangganNew.setOnClickListener { navController.navigate(R.id.action_berandaFragment_to_customerFragment) }
+            cardTagihan.setOnClickListener { navController.navigate(R.id.action_berandaFragment_to_periodeTagihanFragment) }
             cardMikrotik.setOnClickListener { navController.navigate(R.id.action_berandaFragment_to_mikrotikAccountsFragment) }
             cardKas.setOnClickListener { navController.navigate(R.id.action_berandaFragment_to_kasFragment) }
             cardMap.setOnClickListener { navController.navigate(R.id.action_berandaFragment_to_mapMenuFragment) }
@@ -92,7 +107,16 @@ class BerandaFragment : BaseFragment() {
         binding.rvNotifikasiBeranda.apply {
             layoutManager = LinearLayoutManager(context)
             adapter = notificationAdapter
-            isNestedScrollingEnabled = false
+            isNestedScrollingEnabled = true
+        }
+    }
+
+    private fun setupPembayaranHariIniRecyclerView() {
+        pembayaranHariIniAdapter = PembayaranHariIniAdapter(pembayaranHariIniList)
+        binding.rvPembayaranHariIni.apply {
+            layoutManager = LinearLayoutManager(context)
+            adapter = pembayaranHariIniAdapter
+            isNestedScrollingEnabled = true
         }
     }
 
@@ -121,6 +145,35 @@ class BerandaFragment : BaseFragment() {
                     binding.loadingProgressBar.visibility = View.GONE
                     binding.mainContentScrollview.visibility = View.VISIBLE
                 }
+            }
+        })
+    }
+
+    private fun fetchPembayaranHariIni() {
+        RetrofitClient.instance.getPembayaranHariIni().enqueue(object : Callback<PembayaranHariIniResponse> {
+            override fun onResponse(call: Call<PembayaranHariIniResponse>, response: Response<PembayaranHariIniResponse>) {
+                if (response.isSuccessful) {
+                    response.body()?.let {
+                        if (it.status) {
+                            pembayaranHariIniList.clear()
+                            pembayaranHariIniList.addAll(it.data)
+                            pembayaranHariIniAdapter.notifyDataSetChanged()
+                        } else {
+                            if(isAdded && _binding != null) {
+                                Toast.makeText(context, "Gagal memuat data pembayaran", Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                    }
+                } else {
+                    if(isAdded && _binding != null) {
+                        Toast.makeText(context, "Gagal memuat data pembayaran", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+
+            override fun onFailure(call: Call<PembayaranHariIniResponse>, t: Throwable) {
+                if (!isAdded || _binding == null) return
+                Toast.makeText(context, "Error: ${t.message}", Toast.LENGTH_SHORT).show()
             }
         })
     }

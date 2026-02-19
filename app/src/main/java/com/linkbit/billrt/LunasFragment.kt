@@ -1,30 +1,38 @@
 package com.linkbit.billrt
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.appcompat.widget.SearchView
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.linkbit.billrt.adapter.LunasAdapter
 import com.linkbit.billrt.databinding.FragmentLunasBinding
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+import com.linkbit.billrt.model.PelangganLunasItem
+import com.linkbit.billrt.viewmodel.LunasViewModel
 
-class LunasFragment : BaseFragment() {
+class LunasFragment : Fragment(), LunasBottomSheetFragment.ItemClickListener {
 
     private var _binding: FragmentLunasBinding? = null
     private val binding get() = _binding!!
 
+    private lateinit var viewModel: LunasViewModel
+    private lateinit var lunasAdapter: LunasAdapter
+
     private var bulan: Int = 0
     private var tahun: Int = 0
+
+    private var selectedPelanggan: PelangganLunasItem? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
-            bulan = it.getInt(ARG_BULAN)
-            tahun = it.getInt(ARG_TAHUN)
+            bulan = it.getInt("bulan")
+            tahun = it.getInt("tahun")
         }
     }
 
@@ -38,31 +46,55 @@ class LunasFragment : BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding.rvLunas.layoutManager = LinearLayoutManager(context)
-        fetchData()
+
+        viewModel = ViewModelProvider(this).get(LunasViewModel::class.java)
+
+        setupRecyclerView()
+        observeViewModel()
+        setupSearchView()
+
+        viewModel.fetchPelangganLunas(bulan, tahun)
     }
 
-    private fun fetchData() {
-        binding.progressBar.visibility = View.VISIBLE
-        apiService.getDataPelanggan().enqueue(object : Callback<PelangganResponse> {
-            override fun onResponse(call: Call<PelangganResponse>, response: Response<PelangganResponse>) {
-                if (_binding == null) return // Safety check
-                binding.progressBar.visibility = View.GONE
-                if (response.isSuccessful) {
-                    val pelangganList = response.body()?.data ?: emptyList()
-                    binding.rvLunas.adapter = PelangganAdapter(pelangganList)
-                } else {
-                    Toast.makeText(context, "Gagal mengambil data", Toast.LENGTH_SHORT).show()
-                }
+    private fun setupSearchView() {
+        binding.searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                return false
             }
 
-            override fun onFailure(call: Call<PelangganResponse>, t: Throwable) {
-                if (_binding == null) return // Safety check
-                binding.progressBar.visibility = View.GONE
-                Log.e("LunasFragment", "API Call Failed", t)
-                Toast.makeText(context, "Koneksi Gagal", Toast.LENGTH_LONG).show()
+            override fun onQueryTextChange(newText: String?): Boolean {
+                viewModel.fetchPelangganLunas(bulan, tahun, newText.orEmpty())
+                return true
             }
         })
+    }
+
+    private fun setupRecyclerView() {
+        lunasAdapter = LunasAdapter { pelanggan ->
+            selectedPelanggan = pelanggan
+            val bottomSheet = LunasBottomSheetFragment.newInstance()
+            bottomSheet.show(childFragmentManager, LunasBottomSheetFragment.TAG)
+        }
+        binding.rvLunas.apply {
+            layoutManager = LinearLayoutManager(context)
+            adapter = lunasAdapter
+        }
+    }
+
+    private fun observeViewModel() {
+        viewModel.pelangganList.observe(viewLifecycleOwner) { pelangganList ->
+            lunasAdapter.submitList(pelangganList)
+        }
+
+        viewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
+            binding.progressBar.visibility = if(isLoading) View.VISIBLE else View.GONE
+        }
+
+        viewModel.toastMessage.observe(viewLifecycleOwner) { message ->
+            if (message.isNotBlank()) {
+                Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 
     override fun onDestroyView() {
@@ -71,16 +103,43 @@ class LunasFragment : BaseFragment() {
     }
 
     companion object {
-        private const val ARG_BULAN = "bulan"
-        private const val ARG_TAHUN = "tahun"
+        fun newInstance(bulan: Int, tahun: Int): LunasFragment {
+            val fragment = LunasFragment()
+            val args = Bundle()
+            args.putInt("bulan", bulan)
+            args.putInt("tahun", tahun)
+            fragment.arguments = args
+            return fragment
+        }
+    }
 
-        @JvmStatic
-        fun newInstance(bulan: Int, tahun: Int) =
-            LunasFragment().apply {
-                arguments = Bundle().apply {
-                    putInt(ARG_BULAN, bulan)
-                    putInt(ARG_TAHUN, tahun)
+    override fun onItemClick(item: String) {
+        val bottomSheet = childFragmentManager.findFragmentByTag(LunasBottomSheetFragment.TAG) as? LunasBottomSheetFragment
+
+        when (item) {
+            "batalkan" -> {
+                selectedPelanggan?.let { pelanggan ->
+                    context?.let { ctx ->
+                        MaterialAlertDialogBuilder(ctx)
+                            .setTitle("Konfirmasi Pembatalan")
+                            .setMessage("Anda yakin ingin membatalkan pembayaran untuk ${pelanggan.namaPelanggan}?")
+                            .setNegativeButton("Tidak") { _, _ ->
+                                bottomSheet?.dismiss()
+                            }
+                            .setPositiveButton("Ya, Batalkan") { _, _ ->
+                                viewModel.batalPembayaran(pelanggan.idTagihan, bulan, tahun)
+                                bottomSheet?.dismiss()
+                            }
+                            .show()
+                    }
+                } ?: run {
+                    Toast.makeText(context, "Silakan pilih pelanggan terlebih dahulu", Toast.LENGTH_SHORT).show()
+                    bottomSheet?.dismiss()
                 }
             }
+            "cetak" -> {
+                Toast.makeText(context, "Cetak pembayaran untuk ${selectedPelanggan?.namaPelanggan}", Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 }

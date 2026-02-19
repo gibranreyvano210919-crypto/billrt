@@ -17,6 +17,7 @@ import com.google.gson.Gson
 import com.google.gson.JsonObject
 import com.google.gson.reflect.TypeToken
 import com.linkbit.billrt.databinding.FragmentOdpMapBinding
+import com.linkbit.billrt.model.StandardResponse
 import com.mapbox.geojson.Point
 import com.mapbox.maps.MapView
 import com.mapbox.maps.Style

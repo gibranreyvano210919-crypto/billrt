@@ -21,6 +21,7 @@ import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.linkbit.billrt.databinding.FragmentRiwayatKasBinding
+import com.linkbit.billrt.model.StandardResponse
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response

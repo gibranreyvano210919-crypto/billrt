@@ -21,4 +21,23 @@
         <item>November</item>
         <item>Desember</item>
     </string-array>
+
+    <string-array name="bulan">
+        <item>Januari</item>
+        <item>Februari</item>
+        <item>Maret</item>
+        <item>April</item>
+        <item>Mei</item>
+        <item>Juni</item>
+        <item>Juli</item>
+        <item>Agustus</item>
+        <item>September</item>
+        <item>Oktober</item>
+        <item>November</item>
+        <item>Desember</item>
+    </string-array>
+
+    <string name="total_tagihan_format">Total: %d tagihan</string>
+    <string name="periode_icon_desc">Ikon Kalender</string>
+    <string name="arrow_icon_desc">Ikon Panah</string>
 </resources>

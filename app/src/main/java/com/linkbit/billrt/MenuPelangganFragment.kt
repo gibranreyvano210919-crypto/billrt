@@ -64,6 +64,14 @@ class MenuPelangganFragment : BaseFragment() {
             findNavController().navigate(action)
         }
 
+        binding.cardLunas.setOnClickListener {
+            // TODO: Implement action
+        }
+
+        binding.cardBelumBayar.setOnClickListener {
+            // TODO: Implement action
+        }
+
         binding.btnTambahPelanggan.setOnClickListener {
             findNavController().navigate(R.id.action_menuPelangganFragment_to_tambahPelangganFragment)
         }
@@ -105,7 +113,7 @@ class MenuPelangganFragment : BaseFragment() {
         loadCount = 0
 
         // Fetch Rekap Status
-        apiService.getRekapStatusPelanggan().enqueue(object : Callback<RekapStatusPelangganResponse> {
+        apiService.getRekapStatusPelanggan(selectedMonth, selectedYear).enqueue(object : Callback<RekapStatusPelangganResponse> {
             override fun onResponse(call: Call<RekapStatusPelangganResponse>, response: Response<RekapStatusPelangganResponse>) {
                 if (_binding == null || !isAdded) return
                 if (response.isSuccessful) {
@@ -113,6 +121,8 @@ class MenuPelangganFragment : BaseFragment() {
                     binding.tvCountAktif.text = rekap?.aktif?.toString() ?: "0"
                     binding.tvCountIsolir.text = rekap?.isolir?.toString() ?: "0"
                     binding.tvCountNonaktif.text = rekap?.nonaktif?.toString() ?: "0"
+                    binding.tvCountLunas.text = rekap?.lunas?.toString() ?: "0"
+                    binding.tvCountBelumBayar.text = rekap?.belumBayar?.toString() ?: "0"
                 }
                 checkIfAllCountsLoaded()
             }

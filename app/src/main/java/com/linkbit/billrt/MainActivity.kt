@@ -16,6 +16,7 @@ import androidx.navigation.ui.NavigationUI
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.firebase.database.FirebaseDatabase
 import com.linkbit.billrt.databinding.ActivityMainBinding
+import com.linkbit.billrt.network.ApiClient
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -25,7 +26,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var navController: NavController
 
     val apiService: ApiService by lazy {
-        ApiClient.apiService
+        ApiClient.instance
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

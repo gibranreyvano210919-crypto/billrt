@@ -475,6 +475,7 @@ data class AuditSummary(
     @SerializedName("total_database") val totalDatabase: Int
 ) : Serializable
 
+
 data class AuditResult(
     val username: String,
     val info: String,

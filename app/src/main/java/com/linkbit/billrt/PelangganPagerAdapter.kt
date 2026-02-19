@@ -3,6 +3,9 @@ package com.linkbit.billrt
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import java.util.Calendar
+import com.linkbit.billrt.DaftarPelangganFragment
+import com.linkbit.billrt.LunasFragment
+import com.linkbit.billrt.BelumBayarFragment
 
 class PelangganPagerAdapter(fragment: Fragment) : FragmentStateAdapter(fragment) {
 

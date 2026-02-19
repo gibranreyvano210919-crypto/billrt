@@ -1,6 +1,7 @@
 package com.linkbit.billrt.network
 
 import com.google.gson.annotations.SerializedName
+import com.linkbit.billrt.DetailBayarResponse
 import com.linkbit.billrt.PelangganListResponse
 import com.linkbit.billrt.WilayahPelangganNestedResponse
 import com.linkbit.billrt.model.*
@@ -50,12 +51,13 @@ interface ApiService {
 
     @GET("billrt/api/index.php?tabel=wilayah_pelanggan_nested")
     fun getWilayahPelangganNested(): Call<WilayahPelangganNestedResponse>
-    
+
     @GET("billrt/api/index.php?tabel=master_wilayah")
     suspend fun getWilayah(): WilayahResponse
 
     @GET("billrt/api/index.php?tabel=master_teknisi_list")
     suspend fun getTeknisi(): TeknisiResponse
+
     // endregion
 
     // region Fitur MikroTik
@@ -93,7 +95,7 @@ interface ApiService {
         @Query("cek_bulan") cekBulan: Int? = null,
         @Query("cek_tahun") cekTahun: Int? = null
     ): Call<HistoriCatatResponse>
-    
+
     @GET("billrt/api/index.php?tabel=rekap_tunggakan_lanjutan")
     suspend fun getRekapTunggakanLanjutan(
         @Query("bulan") bulan: Int,
@@ -119,6 +121,11 @@ interface ApiService {
 
     @POST("billrt/api/index.php?tabel=hapus_setoran")
     fun hapusSetoran(@Body request: HapusSetoranRequest): Call<StandardResponse>
+    // endregion
+
+    // region Pembayaran
+    @GET("billrt/api/api_tagihan.php?tabel=detail_bayar_v2")
+    suspend fun getDetailBayar(@Query("invoice") invoiceId: String): DetailBayarResponse
     // endregion
 }
 

@@ -12,6 +12,10 @@
         <item name="colorOnSecondary">@color/black</item>
         <!-- Status bar color. -->
         <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
+        <item name="android:navigationBarColor">?attr/colorPrimaryVariant</item>
+
+        <!-- Add this line to control icon color -->
+        <item name="colorControlNormal">@color/white</item>
     </style>
 
     <!-- Style untuk Card, hanya berisi atribut non-layout -->
@@ -33,6 +37,11 @@
     <style name="DashboardCardText">
         <item name="android:textAppearance">@style/TextAppearance.MaterialComponents.Body2</item>
         <item name="android:gravity">center</item>
+    </style>
+    
+    <style name="SearchViewStyle" parent="Widget.AppCompat.SearchView">
+        <item name="android:textColorHint">@android:color/white</item>
+        <item name="android:editTextColor">@android:color/white</item>
     </style>
 
 </resources>

@@ -21,6 +21,7 @@
 
     <!-- Warna untuk card di BerandaFragment -->
     <color name="card_pelanggan">#4CAF50</color> <!-- Hijau -->
+    <color name="card_pelanggan_baru">#673AB7</color> <!-- Ungu Tua -->
     <color name="card_olt">#2196F3</color>      <!-- Biru -->
     <color name="card_tagihan">#FFC107</color>    <!-- Kuning -->
     <color name="card_mikrotik">#FF5722</color>   <!-- Oranye -->
@@ -31,5 +32,16 @@
     <color name="card_setoran">#8BC34A</color>    <!-- Hijau Muda -->
     <color name="card_histori_catat">#607D8B</color>    <!-- Abu-abu Biru -->
     <color name="card_validasi">#795548</color>      <!-- Coklat -->
+
+    <!-- Warna untuk status pembayaran -->
+    <color name="success">#4CAF50</color>
+    <color name="error">#F44336</color>
+    <color name="colorError">@color/error</color>
+
+    <!-- Warna Material Design untuk tunggakan -->
+    <color name="md_red_A700">#D50000</color>
+    <color name="md_pink_A700">#C51162</color>
+    <color name="md_purple_A700">#AA00FF</color>
+    <color name="md_green_500">#4CAF50</color>
 
 </resources>

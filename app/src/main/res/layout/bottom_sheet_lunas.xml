@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <!-- Initial Actions View -->
+    <LinearLayout
+        android:id="@+id/layout_actions"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/action_batalkan_pembayaran"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true"
+            android:padding="16dp"
+            android:text="Batalkan Pembayaran"
+            android:textAppearance="?attr/textAppearanceSubtitle1"
+            android:textColor="?attr/colorError" />
+
+        <TextView
+            android:id="@+id/action_cetak_pembayaran"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true"
+            android:padding="16dp"
+            android:text="Cetak Pembayaran"
+            android:textAppearance="?attr/textAppearanceSubtitle1" />
+    </LinearLayout>
+
+    <!-- Confirmation View -->
+    <LinearLayout
+        android:id="@+id/layout_confirmation"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Anda yakin ingin membatalkan pembayaran ini?"
+            android:textAppearance="?attr/textAppearanceBody1"
+            android:padding="16dp"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="end">
+
+            <Button
+                android:id="@+id/btn_cancel"
+                style="?attr/materialButtonOutlinedStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:text="Tidak" />
+
+            <Button
+                android:id="@+id/btn_confirm_cancel"
+                style="?attr/materialButtonStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Ya, Batalkan" />
+        </LinearLayout>
+    </LinearLayout>
+
+</LinearLayout>

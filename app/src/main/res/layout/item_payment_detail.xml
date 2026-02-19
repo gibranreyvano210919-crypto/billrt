@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="4dp"
+    android:layout_marginVertical="4dp"
+    app:cardCornerRadius="8dp"
+    app:cardElevation="2dp">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="12dp">
+
+        <ImageView
+            android:id="@+id/iv_status_icon"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:src="@drawable/ic_check_circle" />
+
+        <TextView
+            android:id="@+id/tv_bulan_tahun"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:textAppearance="?attr/textAppearanceBody1"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toStartOf="@+id/tv_jumlah_tagihan"
+            app:layout_constraintStart_toEndOf="@+id/iv_status_icon"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="Januari 2026" />
+
+        <TextView
+            android:id="@+id/tv_jumlah_tagihan"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?attr/textAppearanceBody1"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="Rp 100.000" />
+
+        <TextView
+            android:id="@+id/tv_id_tagihan"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:textAppearance="?attr/textAppearanceCaption"
+            app:layout_constraintStart_toStartOf="@+id/tv_bulan_tahun"
+            app:layout_constraintTop_toBottomOf="@+id/tv_bulan_tahun"
+            tools:text="INV26011995" />
+
+        <TextView
+            android:id="@+id/tv_nama_paket"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:textAppearance="?attr/textAppearanceCaption"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="@+id/tv_id_tagihan"
+            app:layout_constraintTop_toBottomOf="@+id/tv_id_tagihan"
+            tools:text="Paket Gamer" />
+
+        <TextView
+            android:id="@+id/tv_tanggal_bayar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:textAppearance="?attr/textAppearanceCaption"
+            app:layout_constraintStart_toStartOf="@+id/tv_nama_paket"
+            app:layout_constraintTop_toBottomOf="@+id/tv_nama_paket"
+            tools:text="Bayar: 15/01/2026 (Cash)" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</com.google.android.material.card.MaterialCardView>
