@@ -4,7 +4,10 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
+import androidx.navigation.fragment.findNavController
+import androidx.navigation.ui.setupWithNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.linkbit.billrt.databinding.FragmentSmartoltBinding
 import retrofit2.Call
@@ -30,10 +33,16 @@ class SmartOltMonitorFragment : BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        setupToolbar()
         setupRecyclerView()
         setupSearchView()
         setupSwipeRefresh()
         fetchOltData()
+    }
+
+    private fun setupToolbar() {
+        (activity as? AppCompatActivity)?.setSupportActionBar(binding.toolbarSmartolt)
+        binding.toolbarSmartolt.setupWithNavController(findNavController())
     }
 
     private fun setupRecyclerView() {

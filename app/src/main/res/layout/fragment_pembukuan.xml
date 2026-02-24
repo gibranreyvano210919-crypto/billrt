@@ -1,0 +1,261 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".PembukuanFragment">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <!-- Pemasukkan -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            app:cardCornerRadius="8dp"
+            app:cardElevation="4dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
+                    android:text="Pemasukkan"
+                    android:textAppearance="?attr/textAppearanceHeadline6" />
+
+                <GridLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:columnCount="2">
+
+                    <TextView
+                        android:id="@+id/tv_transaksi_cash"
+                        style="@style/PembukuanItem"
+                        android:text="Transaksi Cash" />
+
+                    <TextView
+                        android:id="@+id/tv_transaksi_online"
+                        style="@style/PembukuanItem"
+                        android:text="Transaksi Online" />
+
+                    <TextView
+                        android:id="@+id/tv_total_pemasukkan_lain"
+                        style="@style/PembukuanItem"
+                        android:text="Total Pemasukkan Lain2" />
+                </GridLayout>
+
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Pengeluaran -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            app:cardCornerRadius="8dp"
+            app:cardElevation="4dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
+                    android:text="Pengeluaran"
+                    android:textAppearance="?attr/textAppearanceHeadline6" />
+
+                <GridLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:columnCount="2">
+
+                    <TextView
+                        android:id="@+id/tv_gaji_karyawan"
+                        style="@style/PembukuanItem"
+                        android:text="Gaji Karyawan" />
+
+                    <TextView
+                        android:id="@+id/tv_pasang_baru"
+                        style="@style/PembukuanItem"
+                        android:text="Pasang Baru" />
+
+                    <TextView
+                        android:id="@+id/tv_perbaikan_alat"
+                        style="@style/PembukuanItem"
+                        android:text="Perbaikan Alat" />
+
+                    <TextView
+                        android:id="@+id/tv_bayar_bandwidth"
+                        style="@style/PembukuanItem"
+                        android:text="Bayar Bandwith" />
+
+                    <TextView
+                        android:id="@+id/tv_bayar_kang_tagih"
+                        style="@style/PembukuanItem"
+                        android:text="Bayar Kang Tagih" />
+
+                    <TextView
+                        android:id="@+id/tv_listrik_pdam_pulsa"
+                        style="@style/PembukuanItem"
+                        android:text="Listrik / PDAM / Pulsa" />
+
+                    <TextView
+                        android:id="@+id/tv_bayar_marketing"
+                        style="@style/PembukuanItem"
+                        android:text="Bayar Marketing" />
+
+                    <TextView
+                        android:id="@+id/tv_lain_lain"
+                        style="@style/PembukuanItem"
+                        android:text="Lain lain" />
+                </GridLayout>
+
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Total Pendapatan -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            app:cardCornerRadius="8dp"
+            app:cardElevation="4dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
+                    android:text="Total Pendapatan"
+                    android:textAppearance="?attr/textAppearanceHeadline6" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:text="Total Pemasukkan" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:layout_marginEnd="8dp"
+                        android:gravity="center"
+                        android:text="-" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:text="Total Pengeluaran" />
+                </LinearLayout>
+
+                <com.google.android.material.chip.Chip
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="8dp"
+                    android:text="Pendapatan" />
+
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Menu Lain -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:text="Menu Lain"
+            android:textAppearance="?attr/textAppearanceHeadline6" />
+
+        <GridLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:columnCount="4">
+
+            <LinearLayout
+                android:id="@+id/menu_uang_di_admin"
+                style="@style/MenuLainLayout"
+                android:layout_columnWeight="1">
+
+                <ImageView
+                    style="@style/MenuLainIcon"
+                    android:src="@drawable/ic_uang_admin" />
+
+                <TextView
+                    style="@style/MenuLainText"
+                    android:text="Uang di Admin" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/menu_semua_pembukuan"
+                style="@style/MenuLainLayout"
+                android:layout_columnWeight="1">
+
+                <ImageView
+                    style="@style/MenuLainIcon"
+                    android:src="@drawable/ic_semua_pembukuan" />
+
+                <TextView
+                    style="@style/MenuLainText"
+                    android:text="Semua Pembukuan" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/menu_pembayaran_rv_admin"
+                style="@style/MenuLainLayout"
+                android:layout_columnWeight="1">
+
+                <ImageView
+                    style="@style/MenuLainIcon"
+                    android:src="@drawable/ic_pembayaran_rv_admin" />
+
+                <TextView
+                    style="@style/MenuLainText"
+                    android:text="Pemb. Rv Admin" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/menu_rangkuman_keuangan"
+                style="@style/MenuLainLayout"
+                android:layout_columnWeight="1">
+
+                <ImageView
+                    style="@style/MenuLainIcon"
+                    android:src="@drawable/ic_rangkuman_keuangan" />
+
+                <TextView
+                    style="@style/MenuLainText"
+                    android:text="Rangkuman Keuangan" />
+            </LinearLayout>
+
+        </GridLayout>
+    </LinearLayout>
+</androidx.core.widget.NestedScrollView>

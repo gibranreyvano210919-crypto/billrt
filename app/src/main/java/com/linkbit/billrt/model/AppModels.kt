@@ -122,42 +122,6 @@ data class MikrotikAccount(
     @SerializedName("created_at") val createdAt: String
 ) : Serializable
 
-data class PelangganStatusResponse(
-    val status: Boolean,
-    val message: String? = null,
-    val info: RouterInfo?,
-    val summary: PelangganSummary?,
-    val data: PelangganStatusData?
-) : Serializable
-
-data class RouterInfo(
-    @SerializedName("router_name") val routerName: String,
-    @SerializedName("uptime") val uptimeRouter: String
-) : Serializable
-
-data class PelangganSummary(
-    @SerializedName("total_secret") val totalPelanggan: Int,
-    val online: Int,
-    val offline: Int,
-    val disabled: Int
-) : Serializable
-
-data class PelangganStatusData(
-    val online: List<PelangganOnline>,
-    val offline: List<PelangganOffline>,
-    val disabled: List<PelangganOffline>
-) : Serializable
-
-data class PelangganOnline(
-    val name: String, val profile: String, val comment: String, 
-    val address: String, val uptime: String, @SerializedName("caller_id") val callerId: String
-) : Serializable
-
-data class PelangganOffline(
-    val name: String, val profile: String, val comment: String, 
-    @SerializedName("last_logged_out") val lastLoggedOut: String
-) : Serializable
-
 data class AuditUserResponse(
     val status: Boolean,
     val summary: AuditSummary?,
@@ -177,6 +141,34 @@ data class StandardResponse(val status: Boolean, val message: String)
 data class MasterTeknisiResponse(val status: Boolean, val data: List<MasterTeknisi>)
 
 data class MasterTeknisi(@SerializedName("id_teknisi") val id: Int, @SerializedName("nama_teknisi") val namaTeknisi: String, val status: String)
+
+data class PppoeOfflineResponse(
+    val status: Boolean,
+    val data: List<PppoeOfflineUser>,
+    val message: String?
+) : Serializable
+
+data class PppoeOfflineUser(
+    @SerializedName(".id") val id: String,
+    val name: String,
+    val profile: String,
+    val disabled: String
+) : Serializable
+
+data class PppoeOnlineResponse(
+    val status: Boolean,
+    val data: List<PppoeOnlineUser>,
+    val message: String?
+) : Serializable
+
+data class PppoeOnlineUser(
+    @SerializedName(".id") val id: String,
+    val name: String,
+    val address: String,
+    val uptime: String,
+    @SerializedName("caller_id") val callerId: String
+) : Serializable
+
 // endregion
 
 // region Setoran

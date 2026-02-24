@@ -4,16 +4,18 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.SearchView
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.SearchView
+import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.linkbit.billrt.adapter.PelangganOnlineAdapter
 import com.linkbit.billrt.databinding.FragmentPelangganOnlineBinding
-import com.linkbit.billrt.model.StandardResponse
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+import com.linkbit.billrt.model.PppoeOnlineUser
+import com.linkbit.billrt.viewmodel.PelangganOnlineViewModel
 
 class PelangganOnlineFragment : BaseFragment() {
 
@@ -21,8 +23,8 @@ class PelangganOnlineFragment : BaseFragment() {
     private val binding get() = _binding!!
 
     private val args: PelangganOnlineFragmentArgs by navArgs()
+    private val viewModel: PelangganOnlineViewModel by viewModels()
     private lateinit var adapter: PelangganOnlineAdapter
-    private var allPelanggan = listOf<PelangganOnline>()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -35,101 +37,74 @@ class PelangganOnlineFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        adapter = PelangganOnlineAdapter(emptyList()) { pelanggan ->
-            kickUser(pelanggan)
+        setupToolbar()
+        setupRecyclerView()
+        setupSearchView()
+        observeViewModel()
+
+        viewModel.fetchOnlineUsers(args.routerId)
+    }
+
+    private fun setupToolbar() {
+        (activity as? AppCompatActivity)?.setSupportActionBar(binding.toolbar)
+        (activity as? AppCompatActivity)?.supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        binding.toolbar.setNavigationOnClickListener {
+            findNavController().navigateUp()
+        }
+    }
+
+    private fun setupRecyclerView() {
+        adapter = PelangganOnlineAdapter(emptyList()) { user ->
+            showKickConfirmationDialog(user)
         }
         binding.rvPelangganOnline.layoutManager = LinearLayoutManager(context)
         binding.rvPelangganOnline.adapter = adapter
+    }
 
-        binding.swipeRefreshLayout.setOnRefreshListener {
-            fetchData()
-        }
-
+    private fun setupSearchView() {
         binding.searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-            override fun onQueryTextSubmit(query: String?): Boolean {
-                return false
-            }
-
+            override fun onQueryTextSubmit(query: String?): Boolean = false
             override fun onQueryTextChange(newText: String?): Boolean {
-                filter(newText)
+                adapter.filter(newText)
                 return true
             }
         })
-
-        fetchData()
     }
 
-    private fun filter(query: String?) {
-        val filteredList = if (query.isNullOrEmpty()) {
-            allPelanggan
-        } else {
-            allPelanggan.filter { it.name.contains(query, ignoreCase = true) }
+    private fun observeViewModel() {
+        viewModel.users.observe(viewLifecycleOwner) { users ->
+            adapter.updateData(users)
+            binding.tvEmpty.visibility = if (users.isEmpty()) View.VISIBLE else View.GONE
         }
-        adapter.updateData(filteredList)
+
+        viewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
+            binding.progressBar.visibility = if (isLoading) View.VISIBLE else View.GONE
+        }
+
+        viewModel.errorMessage.observe(viewLifecycleOwner) { errorMessage ->
+            if (errorMessage != null) {
+                binding.tvEmpty.text = errorMessage
+                binding.tvEmpty.visibility = View.VISIBLE
+            }
+        }
+
+        viewModel.toastMessage.observe(viewLifecycleOwner) { message ->
+            if (message != null) {
+                Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+                viewModel.onToastShown()
+            }
+        }
     }
 
-    private fun fetchData() {
-        binding.swipeRefreshLayout.isRefreshing = true
-
-        // Menggunakan ApiConfig agar konsisten
-        ApiConfig.apiService.getPelangganStatus(routerId = args.routerId).enqueue(object : Callback<PelangganStatusResponse> {
-            override fun onResponse(call: Call<PelangganStatusResponse>, response: Response<PelangganStatusResponse>) {
-                if (!isAdded || _binding == null) return
-                binding.swipeRefreshLayout.isRefreshing = false
-
-                if (response.isSuccessful && response.body()?.status == true) {
-                    val body = response.body()
-                    val summary = body?.summary
-                    val data = body?.data
-
-                    // Update summary TextViews
-                    binding.tvSummaryTotal.text = "Total\n${summary?.totalSecret ?: 0}"
-                    binding.tvSummaryOnline.text = "Online\n${summary?.online ?: 0}"
-                    binding.tvSummaryOffline.text = "Offline\n${summary?.offline ?: 0}"
-                    binding.tvSummaryDisabled.text = "Disabled\n${summary?.disabled ?: 0}"
-
-                    allPelanggan = data?.online ?: emptyList()
-                    adapter.updateData(allPelanggan)
-
-                    if (allPelanggan.isEmpty()) {
-                        binding.tvEmpty.visibility = View.VISIBLE
-                    } else {
-                        binding.tvEmpty.visibility = View.GONE
-                    }
-                } else {
-                    handleFailure("Gagal memuat data: ${response.message()}")
-                }
+    private fun showKickConfirmationDialog(user: PppoeOnlineUser) {
+        AlertDialog.Builder(requireContext())
+            .setTitle("Kick User")
+            .setMessage("Anda yakin ingin kick ${user.name}?")
+            .setPositiveButton("Kick") { _, _ ->
+                viewModel.kickUser(args.routerId, user.id)
             }
-
-            override fun onFailure(call: Call<PelangganStatusResponse>, t: Throwable) {
-                handleFailure("Error: ${t.message}")
-            }
-        })
-    }
-
-    private fun kickUser(pelanggan: PelangganOnline) {
-        ApiConfig.apiService.removeActive(args.routerId, pelanggan.name).enqueue(object : Callback<StandardResponse> {
-            override fun onResponse(call: Call<StandardResponse>, response: Response<StandardResponse>) {
-                if (response.isSuccessful) {
-                    Toast.makeText(context, "User ${pelanggan.name} kicked", Toast.LENGTH_SHORT).show()
-                    fetchData() // Refresh the list
-                } else {
-                    Toast.makeText(context, "Failed to kick user", Toast.LENGTH_SHORT).show()
-                }
-            }
-
-            override fun onFailure(call: Call<StandardResponse>, t: Throwable) {
-                Toast.makeText(context, "Error: ${t.message}", Toast.LENGTH_SHORT).show()
-            }
-        })
-    }
-
-    private fun handleFailure(message: String) {
-        if (!isAdded || _binding == null) return
-        binding.swipeRefreshLayout.isRefreshing = false
-        binding.tvEmpty.text = message
-        binding.tvEmpty.visibility = View.VISIBLE
-        Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+            .setNegativeButton("Batal", null)
+            .show()
     }
 
     override fun onDestroyView() {

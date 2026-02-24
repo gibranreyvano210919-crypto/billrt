@@ -1,5 +1,6 @@
 package com.linkbit.billrt
 
+import android.graphics.Color
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -9,6 +10,7 @@ import android.view.Menu
 import android.view.MenuInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.EditText
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
@@ -119,6 +121,10 @@ class PelangganBelumBayarFragment : Fragment() {
         inflater.inflate(R.menu.search_menu, menu)
         val searchItem = menu.findItem(R.id.action_search)
         val searchView = searchItem.actionView as SearchView
+
+        val searchText = searchView.findViewById<EditText>(androidx.appcompat.R.id.search_src_text)
+        searchText.setTextColor(Color.WHITE)
+        searchText.setHintTextColor(Color.LTGRAY)
 
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {

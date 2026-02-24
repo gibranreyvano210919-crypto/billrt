@@ -55,6 +55,12 @@ class BayarBottomSheetFragment : BottomSheetDialogFragment() {
             Toast.makeText(context, "Isolir pelanggan: ${item.namaPelanggan}", Toast.LENGTH_SHORT).show()
             dismiss()
         }
+
+        binding.btnTagout.setOnClickListener {
+            val tagoutSheet = KonfirmasiTagoutBottomSheetFragment.newInstance(item)
+            tagoutSheet.show(parentFragmentManager, "KonfirmasiTagoutBottomSheet")
+            dismiss()
+        }
     }
 
     override fun onDestroyView() {

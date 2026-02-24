@@ -21,8 +21,7 @@ class RiwayatNotifikasiFragment : Fragment() {
     private val binding get() = _binding!!
 
     private lateinit var notificationAdapter: NotificationAdapter
-    private val notificationList = mutableListOf<NotificationItem>()
-    
+
     // Path yang benar sesuai dengan script Node.js
     private val notificationsRef = FirebaseDatabase.getInstance("https://mikrotik-alert-default-rtdb.asia-southeast1.firebasedatabase.app/")
         .getReference("logs/notifications")
@@ -38,10 +37,14 @@ class RiwayatNotifikasiFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         setupRecyclerView()
         listenForNotifications()
+
+        binding.swipeRefreshLayout.setOnRefreshListener {
+            listenForNotifications()
+        }
     }
 
     private fun setupRecyclerView() {
-        notificationAdapter = NotificationAdapter(notificationList)
+        notificationAdapter = NotificationAdapter()
         binding.rvNotifikasi.apply {
             layoutManager = LinearLayoutManager(context)
             adapter = notificationAdapter
@@ -49,14 +52,19 @@ class RiwayatNotifikasiFragment : Fragment() {
     }
 
     private fun listenForNotifications() {
-        binding.progressBar.isVisible = true
+        if (!binding.swipeRefreshLayout.isRefreshing) {
+            binding.progressBar.isVisible = true
+        }
         binding.tvEmptyNotifikasi.isVisible = false
+
+        listener?.let { notificationsRef.removeEventListener(it) }
 
         listener = object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 if (!isAdded || _binding == null) return
 
                 binding.progressBar.isVisible = false
+                binding.swipeRefreshLayout.isRefreshing = false
                 val tempList = mutableListOf<NotificationItem>()
                 for (child in snapshot.children) {
                     try {
@@ -69,24 +77,24 @@ class RiwayatNotifikasiFragment : Fragment() {
                     }
                 }
 
-                notificationList.clear()
-                notificationList.addAll(tempList.reversed()) 
-                notificationAdapter.updateData(notificationList)
+                val reversedList = tempList.reversed()
+                notificationAdapter.submitList(reversedList)
 
-                binding.tvEmptyNotifikasi.isVisible = notificationList.isEmpty()
-                binding.rvNotifikasi.isVisible = notificationList.isNotEmpty()
+                binding.tvEmptyNotifikasi.isVisible = reversedList.isEmpty()
+                binding.rvNotifikasi.isVisible = reversedList.isNotEmpty()
             }
 
             override fun onCancelled(error: DatabaseError) {
                 if (_binding != null) {
                     binding.progressBar.isVisible = false
+                    binding.swipeRefreshLayout.isRefreshing = false
                     binding.tvEmptyNotifikasi.isVisible = true
                     binding.tvEmptyNotifikasi.text = "Error: ${error.message}"
                     Log.w("RiwayatNotifikasi", "onCancelled", error.toException())
                 }
             }
         }
-        
+
         // Mengambil 100 log terakhir
         notificationsRef.limitToLast(100).addValueEventListener(listener!!)
     }

@@ -60,6 +60,7 @@ class BelumBayarFragment : Fragment() {
 
         setupRecyclerView()
         observeViewModel()
+        setupFragmentResultListeners()
 
         binding.swipeRefreshLayout.setOnRefreshListener {
             viewModel.fetchPelangganBelumBayar(bulan, tahun, idWilayah)
@@ -90,6 +91,19 @@ class BelumBayarFragment : Fragment() {
         viewModel.pelangganList.observe(viewLifecycleOwner) { list ->
             adapter.submitList(list)
             binding.swipeRefreshLayout.isRefreshing = false
+        }
+    }
+
+    private fun setupFragmentResultListeners() {
+        parentFragmentManager.setFragmentResultListener("payment_successful", viewLifecycleOwner) { _, bundle ->
+            if (bundle.getBoolean("refresh")) {
+                viewModel.fetchPelangganBelumBayar(bulan, tahun, idWilayah)
+            }
+        }
+        parentFragmentManager.setFragmentResultListener("tagout_successful", viewLifecycleOwner) { _, bundle ->
+            if (bundle.getBoolean("refresh")) {
+                viewModel.fetchPelangganBelumBayar(bulan, tahun, idWilayah)
+            }
         }
     }
 

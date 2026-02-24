@@ -30,6 +30,7 @@ class SettingFragment : Fragment() {
             SettingItem("pengaturan_perusahaan", "Pengaturan Perusahaan", android.R.drawable.ic_menu_manage),
             SettingItem("master_wilayah", "Master Wilayah", android.R.drawable.ic_menu_mapmode),
             SettingItem("master_paket", "Master Paket Internet", android.R.drawable.ic_menu_sort_by_size),
+            SettingItem("generate_tagihan", "Generate Tagihan", android.R.drawable.ic_menu_add),
             SettingItem("setting_lokasi", "Pengaturan Lokasi", android.R.drawable.ic_menu_edit),
             SettingItem("pilih_printer", "Pilih Printer Bluetooth", android.R.drawable.ic_menu_save),
             SettingItem("info_akun", "Informasi Akun", android.R.drawable.ic_menu_myplaces),
@@ -47,6 +48,9 @@ class SettingFragment : Fragment() {
                 }
                 "master_paket" -> {
                     findNavController().navigate(R.id.action_settingFragment_to_masterPaketFragment)
+                }
+                "generate_tagihan" -> {
+                    findNavController().navigate(R.id.action_settingFragment_to_periodeTagihanFragment)
                 }
                 "pilih_printer" -> {
                     findNavController().navigate(R.id.action_settingFragment_to_printerSettingFragment)

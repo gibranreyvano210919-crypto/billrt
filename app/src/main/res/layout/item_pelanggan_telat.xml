@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="8dp"
+    app:cardCornerRadius="8dp"
+    app:cardElevation="4dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <TextView
+            android:id="@+id/tv_nama_pelanggan"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Nama Pelanggan"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tv_wilayah"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Wilayah" />
+
+        <TextView
+            android:id="@+id/tv_periode_tagihan"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Periode Tagihan" />
+
+        <TextView
+            android:id="@+id/tv_username"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Username" />
+
+        <TextView
+            android:id="@+id/tv_nominal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Nominal" />
+
+        <TextView
+            android:id="@+id/tv_tgl_tagih"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Tgl Tagih" />
+
+        <TextView
+            android:id="@+id/tv_tgl_bayar_terakhir"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Tgl Bayar Terakhir" />
+
+        <TextView
+            android:id="@+id/tv_periode_bayar_terakhir"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Periode Bayar Terakhir" />
+
+        <TextView
+            android:id="@+id/tv_keterangan"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Keterangan" />
+
+        <TextView
+            android:id="@+id/tv_keterangan2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Keterangan 2" />
+
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView>

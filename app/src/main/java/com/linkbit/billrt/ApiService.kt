@@ -11,6 +11,7 @@ import retrofit2.http.FormUrlEncoded
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Query
+import java.io.Serializable
 
 // region Data Classes
 
@@ -51,13 +52,35 @@ data class RekapStatusPelanggan(
     val nonaktif: Int,
     val total: Int,
     val lunas: Int,
-    @SerializedName("belum_bayar") val belumBayar: Int
+    @SerializedName("belum_bayar") val belumBayar: Int,
+    val tagout: Int,
+    val telat: Int,
+    @SerializedName("total_nunggak") val totalNunggak: Int
 )
 
 data class RekapStatusPelangganResponse(
     val status: Boolean,
     val message: String,
     val data: RekapStatusPelanggan
+)
+
+// Tagout
+data class TagoutItem(
+    @SerializedName("id_tagihan") val idTagihan: String,
+    @SerializedName("id_pelanggan") val idPelanggan: String,
+    @SerializedName("nama_pelanggan") val namaPelanggan: String,
+    @SerializedName("bulan_tagihan") val bulanTagihan: Int,
+    @SerializedName("tahun_tagihan") val tahunTagihan: Int,
+    @SerializedName("status_tagihan") val statusTagihan: String,
+    @SerializedName("catatan_tagout") val catatanTagout: String?,
+    @SerializedName("updated_at") val updatedAt: String
+) : Serializable
+
+data class TagoutResponse(
+    val status: Boolean,
+    val message: String,
+    val total: Int,
+    val data: List<TagoutItem>
 )
 
 // Periode
@@ -135,7 +158,7 @@ interface ApiService {
     // endregion
 
     // region Pelanggan
-    @GET("index.php?tabel=data_pelanggan")
+    @GET("http://112.78.170.196:8890/billrt/api/api_tagihan.php?tabel=data_pelanggan")
     fun getDataPelanggan(
         @Query("search") search: String? = null,
         @Query("filter_tipe") filterTipe: String? = null,
@@ -246,6 +269,12 @@ interface ApiService {
     // region Laporan & Tagihan
     @GET("http://112.78.170.196:8890/billrt/api/api_tagihan.php?tabel=rekap_status_pelanggan")
     fun getRekapStatusPelanggan(@Query("bulan") bulan: Int, @Query("tahun") tahun: Int): Call<RekapStatusPelangganResponse>
+
+    @GET("http://112.78.170.196:8890/billrt/api/api_tagihan.php?tabel=get_tagout")
+    fun getTagout(
+        @Query("bulan") bulan: Int? = null,
+        @Query("tahun") tahun: Int? = null
+    ): Call<TagoutResponse>
 
     @GET("index.php?tabel=laporan_wilayah")
     fun getLaporanWilayah(@Query("bulan") bulan: Int, @Query("tahun") tahun: Int): Call<List<DetailWilayah>>

@@ -12,12 +12,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import com.linkbit.billrt.adapter.PaymentDetailAdapter
-import com.linkbit.billrt.adapter.PaymentSummaryAdapter
+import com.linkbit.billrt.adapter.TimelineAdapter
 import com.linkbit.billrt.databinding.BottomSheetHistoryPembayaranBinding
-import com.linkbit.billrt.model.PaymentDetail
-import com.linkbit.billrt.model.PaymentSummary
-import com.linkbit.billrt.model.Tagihan
+import com.linkbit.billrt.model.TimelineItem
 import com.linkbit.billrt.network.ApiClient
 import kotlinx.coroutines.launch
 
@@ -26,10 +23,8 @@ class HistoryPembayaranBottomSheetFragment : BottomSheetDialogFragment() {
     private var _binding: BottomSheetHistoryPembayaranBinding? = null
     private val binding get() = _binding!!
 
-    private lateinit var summaryAdapter: PaymentSummaryAdapter
-    private lateinit var detailAdapter: PaymentDetailAdapter
+    private lateinit var timelineAdapter: TimelineAdapter
 
-    private var allPaymentDetails: MutableList<PaymentDetail> = mutableListOf()
     private var customerId: Int = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -65,7 +60,7 @@ class HistoryPembayaranBottomSheetFragment : BottomSheetDialogFragment() {
         super.onViewCreated(view, savedInstanceState)
 
         setupToolbar()
-        setupRecyclerViews()
+        setupRecyclerView()
 
         if (customerId > 0) {
             fetchHistoryPembayaran(customerId)
@@ -81,92 +76,32 @@ class HistoryPembayaranBottomSheetFragment : BottomSheetDialogFragment() {
         }
     }
 
-    private fun setupRecyclerViews() {
-        summaryAdapter = PaymentSummaryAdapter(emptyList()) { summary ->
-            val filteredDetails = allPaymentDetails.filter { it.tahun == summary.tahun }
-            detailAdapter.updateData(filteredDetails)
-        }
-        binding.rvPaymentSummary.apply {
+    private fun setupRecyclerView() {
+        timelineAdapter = TimelineAdapter(emptyList())
+        binding.rvTimeline.apply {
             layoutManager = LinearLayoutManager(context)
-            adapter = summaryAdapter
-        }
-
-        detailAdapter = PaymentDetailAdapter(emptyList()) { paymentDetail ->
-            val detailFragment = DetailTagihanFragment.newInstance(paymentDetail.idTagihan)
-            activity?.supportFragmentManager?.beginTransaction()
-                ?.replace(R.id.nav_host_fragment, detailFragment) // Ganti dengan ID container utama Anda
-                ?.addToBackStack(null)
-                ?.commit()
-            dismiss() // Tutup bottom sheet setelah navigasi
-        }
-        binding.rvPaymentDetail.apply {
-            layoutManager = LinearLayoutManager(context)
-            adapter = detailAdapter
+            adapter = timelineAdapter
         }
     }
 
     private fun fetchHistoryPembayaran(idPelanggan: Int) {
         lifecycleScope.launch {
             try {
-                val response = ApiClient.tagihanApiService.getDetailPelangganBayar(idPelanggan)
-                if (response.status && response.data != null) {
-                    processAndDisplayData(response.data)
+                val response = ApiClient.tagihanApiService.getDetailPelangganBayar2(idPelanggan)
+                if (response.status && response.timeline != null) {
+                    timelineAdapter.updateData(response.timeline)
+                    response.profil?.let {
+                        binding.tvNamaPelanggan.text = it.namaPelanggan
+                        binding.tvIdPelanggan.text = "ID: ${it.idPelanggan}"
+                        binding.tvPaket.text = it.paket
+                        binding.tvWilayah.text = it.wilayah
+                    }
                 } else {
                     Toast.makeText(context, "Gagal mengambil riwayat pembayaran", Toast.LENGTH_SHORT).show()
                 }
             } catch (e: Exception) {
                 Toast.makeText(context, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
             }
-        }
-    }
-
-    private fun processAndDisplayData(tagihanList: List<Tagihan>) {
-        val paymentDetails = mutableListOf<PaymentDetail>()
-        val summaryMap = mutableMapOf<Int, MutableList<Tagihan>>()
-
-        for (tagihan in tagihanList) {
-            val tahun = tagihan.tahunTagihan.toIntOrNull() ?: 0
-            val bulan = tagihan.bulanTagihan.toIntOrNull() ?: 0
-            summaryMap.getOrPut(tahun) { mutableListOf() }.add(tagihan)
-
-            paymentDetails.add(
-                PaymentDetail(
-                    idTagihan = tagihan.idTagihan,
-                    tahun = tahun,
-                    bulanTagihan = bulan,
-                    bulanNama = tagihan.bulanNama,
-                    jumlahTagihan = tagihan.hargaPaket.toDouble(), // Use hargaPaket
-                    status = tagihan.statusTagihan,
-                    tglBayar = tagihan.tanggalBayar ?: "-",
-                    metode = tagihan.metodeBayar ?: "-",
-                    namaPaket = tagihan.namaPaket,
-                    hargaPaket = tagihan.hargaPaket.toDouble()
-                )
-            )
-        }
-
-        val paymentSummaries = summaryMap.map { (tahun, listTagihan) ->
-            val totalTagihan = listTagihan.size
-            val lunasCount = listTagihan.count { it.statusTagihan == 1 }
-            val totalNominal = listTagihan.sumOf { it.hargaPaket.toDouble() } // Use hargaPaket
-            val totalBayar = listTagihan.filter { it.statusTagihan == 1 }.sumOf { it.hargaPaket.toDouble() } // Use hargaPaket
-            val persentase = if (totalTagihan > 0) (lunasCount.toDouble() / totalTagihan * 100) else 0.0
-
-            PaymentSummary(tahun, totalTagihan, lunasCount, totalNominal, totalBayar, persentase)
-        }.sortedByDescending { it.tahun }
-
-        summaryAdapter.updateData(paymentSummaries)
-
-        val sortedPaymentDetails = paymentDetails.sortedWith(compareByDescending<PaymentDetail> { it.tahun }.thenBy { it.bulanTagihan })
-        allPaymentDetails.clear()
-        allPaymentDetails.addAll(sortedPaymentDetails)
-
-        val mostRecentYear = paymentSummaries.firstOrNull()?.tahun
-        if (mostRecentYear != null) {
-            val initialDetails = allPaymentDetails.filter { it.tahun == mostRecentYear }
-            detailAdapter.updateData(initialDetails)
-        } else {
-            detailAdapter.updateData(emptyList())
         }
     }
 

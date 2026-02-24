@@ -1,111 +1,312 @@
 <?xml version="1.0" encoding="utf-8"?>
-<GridLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:columnCount="2"
-    android:padding="8dp"
     tools:context=".MikrotikMenuFragment">
 
-    <!-- Card Status Online -->
-    <com.google.android.material.card.MaterialCardView
-        android:id="@+id/card_status_online"
-        style="@style/DashboardCard"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_columnWeight="1"
-        android:layout_margin="8dp">
-        <LinearLayout
-            style="@style/DashboardCardContent"
-            android:layout_width="match_parent"
-            android:layout_height="120dp">
-            <ImageView
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:src="@drawable/ic_user_online" />
-            <TextView
-                style="@style/DashboardCardText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:text="Pelanggan Online" />
-        </LinearLayout>
-    </com.google.android.material.card.MaterialCardView>
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/app_bar_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
-    <!-- Card Status Offline -->
-    <com.google.android.material.card.MaterialCardView
-        android:id="@+id/card_status_offline"
-        style="@style/DashboardCard"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_columnWeight="1"
-        android:layout_margin="8dp">
-        <LinearLayout
-            style="@style/DashboardCardContent"
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbar"
             android:layout_width="match_parent"
-            android:layout_height="120dp">
-            <ImageView
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:src="@drawable/ic_user_offline" />
-            <TextView
-                style="@style/DashboardCardText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:text="Pelanggan Offline" />
-        </LinearLayout>
-    </com.google.android.material.card.MaterialCardView>
+            android:layout_height="?attr/actionBarSize"
+            android:background="?attr/colorPrimary"
+            app:navigationIcon="@drawable/ic_arrow_back"
+            app:title="MikroTik Menu"
+            app:titleTextColor="@color/white" />
 
-    <!-- Card Audit User -->
-    <com.google.android.material.card.MaterialCardView
-        android:id="@+id/card_audit_user"
-        style="@style/DashboardCard"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_columnWeight="1"
-        android:layout_margin="8dp">
-        <LinearLayout
-            style="@style/DashboardCardContent"
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <ScrollView
+            android:id="@+id/scroll_view"
             android:layout_width="match_parent"
-            android:layout_height="120dp">
-            <ImageView
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:src="@drawable/ic_audit" />
-            <TextView
-                style="@style/DashboardCardText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:text="Audit User" />
-        </LinearLayout>
-    </com.google.android.material.card.MaterialCardView>
+            android:layout_height="match_parent">
 
-    <!-- Card Tambah PPPoe -->
-    <com.google.android.material.card.MaterialCardView
-        android:id="@+id/card_tambah_pppoe"
-        style="@style/DashboardCard"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_columnWeight="1"
-        android:layout_margin="8dp">
-        <LinearLayout
-            style="@style/DashboardCardContent"
-            android:layout_width="match_parent"
-            android:layout_height="120dp">
-            <ImageView
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:src="@drawable/ic_add_user" />
-            <TextView
-                style="@style/DashboardCardText"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:text="Tambah PPPoe" />
-        </LinearLayout>
-    </com.google.android.material.card.MaterialCardView>
+                android:orientation="vertical"
+                android:padding="8dp">
 
-</GridLayout>
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/card_header_info"
+                    style="@style/DashboardCard"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="8dp">
+
+                    <LinearLayout
+                        style="@style/DashboardCardContent"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/tv_board_name"
+                            style="@style/DashboardCardText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            tools:text="Board Name: x86 ASRock Z790 PG Lightning" />
+
+                        <TextView
+                            android:id="@+id/tv_identity"
+                            style="@style/DashboardCardText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            tools:text="Identity: MikroTik" />
+
+                        <TextView
+                            android:id="@+id/tv_version"
+                            style="@style/DashboardCardText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            tools:text="Version: 7.16.2 (stable)" />
+
+                        <TextView
+                            android:id="@+id/tv_uptime"
+                            style="@style/DashboardCardText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            tools:text="Uptime: 13w6d9h39m58s" />
+
+                        <TextView
+                            android:id="@+id/tv_cpu_load"
+                            style="@style/DashboardCardText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            tools:text="CPU Load: 1%" />
+
+                        <TextView
+                            android:id="@+id/tv_free_mem"
+                            style="@style/DashboardCardText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            tools:text="Free Memory: 7027.1 MB" />
+
+                        <TextView
+                            android:id="@+id/tv_total_queue"
+                            style="@style/DashboardCardText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            tools:text="Total Queue: 0" />
+
+                        <TextView
+                            android:id="@+id/tv_total_arp"
+                            style="@style/DashboardCardText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            tools:text="Total ARP: 0" />
+
+                        <TextView
+                            android:id="@+id/tv_queue_nonaktif"
+                            style="@style/DashboardCardText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            tools:text="Queue Non-aktif: 0" />
+
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <GridLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:columnCount="2">
+
+                    <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/card_daftar_secret"
+                        style="@style/DashboardCard"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_columnWeight="1"
+                        android:layout_margin="8dp">
+
+                        <LinearLayout
+                            style="@style/DashboardCardContent"
+                            android:layout_width="match_parent"
+                            android:layout_height="120dp">
+
+                            <ImageView
+                                android:layout_width="48dp"
+                                android:layout_height="48dp"
+                                android:src="@drawable/ic_total_user" />
+
+                            <TextView
+                                style="@style/DashboardCardText"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="8dp"
+                                android:text="Daftar Secret" />
+
+                            <TextView
+                                android:id="@+id/tv_total_secret"
+                                style="@style/DashboardCardText"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textSize="20sp"
+                                android:textStyle="bold"
+                                tools:text="601" />
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
+
+                    <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/card_status_online"
+                        style="@style/DashboardCard"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_columnWeight="1"
+                        android:layout_margin="8dp">
+
+                        <LinearLayout
+                            style="@style/DashboardCardContent"
+                            android:layout_width="match_parent"
+                            android:layout_height="120dp">
+
+                            <ImageView
+                                android:layout_width="48dp"
+                                android:layout_height="48dp"
+                                android:src="@drawable/ic_user_online" />
+
+                            <TextView
+                                style="@style/DashboardCardText"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="8dp"
+                                android:text="Pelanggan Online" />
+
+                            <TextView
+                                android:id="@+id/tv_total_active"
+                                style="@style/DashboardCardText"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textSize="20sp"
+                                android:textStyle="bold"
+                                tools:text="586" />
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
+
+                    <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/card_status_offline"
+                        style="@style/DashboardCard"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_columnWeight="1"
+                        android:layout_margin="8dp">
+
+                        <LinearLayout
+                            style="@style/DashboardCardContent"
+                            android:layout_width="match_parent"
+                            android:layout_height="120dp">
+
+                            <ImageView
+                                android:layout_width="48dp"
+                                android:layout_height="48dp"
+                                android:src="@drawable/ic_user_offline" />
+
+                            <TextView
+                                style="@style/DashboardCardText"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="8dp"
+                                android:text="Pelanggan Offline" />
+
+                            <TextView
+                                android:id="@+id/tv_non_active"
+                                style="@style/DashboardCardText"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textSize="20sp"
+                                android:textStyle="bold"
+                                tools:text="15" />
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
+
+                    <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/card_audit_user"
+                        style="@style/DashboardCard"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_columnWeight="1"
+                        android:layout_margin="8dp">
+
+                        <LinearLayout
+                            style="@style/DashboardCardContent"
+                            android:layout_width="match_parent"
+                            android:layout_height="120dp">
+
+                            <ImageView
+                                android:layout_width="48dp"
+                                android:layout_height="48dp"
+                                android:src="@drawable/ic_audit" />
+
+                            <TextView
+                                style="@style/DashboardCardText"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="8dp"
+                                android:text="Audit User" />
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
+
+                    <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/card_tambah_pppoe"
+                        style="@style/DashboardCard"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_columnWeight="1"
+                        android:layout_margin="8dp">
+
+                        <LinearLayout
+                            style="@style/DashboardCardContent"
+                            android:layout_width="match_parent"
+                            android:layout_height="120dp">
+
+                            <ImageView
+                                android:layout_width="48dp"
+                                android:layout_height="48dp"
+                                android:src="@drawable/ic_add_user" />
+
+                            <TextView
+                                style="@style/DashboardCardText"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="8dp"
+                                android:text="Tambah PPPoE" />
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
+
+                </GridLayout>
+
+            </LinearLayout>
+        </ScrollView>
+
+        <ProgressBar
+            android:id="@+id/progress_bar"
+            style="?android:attr/progressBarStyleLarge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/tv_error_message"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:textColor="@android:color/holo_red_dark"
+            android:visibility="gone"
+            tools:text="Error message"
+            tools:visibility="visible"/>
+
+    </FrameLayout>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -2,13 +2,13 @@ package com.linkbit.billrt.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.linkbit.billrt.NotificationItem
 import com.linkbit.billrt.databinding.ItemNotifikasiBinding
 
-class NotificationAdapter(private var items: MutableList<NotificationItem>) :
-    RecyclerView.Adapter<NotificationAdapter.ViewHolder>() {
+class NotificationAdapter : RecyclerView.Adapter<NotificationAdapter.ViewHolder>() {
+
+    private val items = mutableListOf<NotificationItem>()
 
     class ViewHolder(val binding: ItemNotifikasiBinding) : RecyclerView.ViewHolder(binding.root)
 
@@ -28,26 +28,9 @@ class NotificationAdapter(private var items: MutableList<NotificationItem>) :
 
     override fun getItemCount() = items.size
 
-    fun updateData(newItems: List<NotificationItem>) {
-        val diffCallback = NotificationDiffCallback(this.items, newItems)
-        val diffResult = DiffUtil.calculateDiff(diffCallback)
-        
-        this.items.clear()
-        this.items.addAll(newItems)
-        diffResult.dispatchUpdatesTo(this)
+    fun submitList(newItems: List<NotificationItem>) {
+        items.clear()
+        items.addAll(newItems)
+        notifyDataSetChanged()
     }
-}
-
-class NotificationDiffCallback(
-    private val oldList: List<NotificationItem>,
-    private val newList: List<NotificationItem>
-) : DiffUtil.Callback() {
-    override fun getOldListSize() = oldList.size
-    override fun getNewListSize() = newList.size
-
-    override fun areItemsTheSame(oldPos: Int, newPos: Int) = 
-        oldList[oldPos].time == newList[newPos].time && oldList[oldPos].title == newList[newPos].title
-
-    override fun areContentsTheSame(oldPos: Int, newPos: Int) = 
-        oldList[oldPos] == newList[newPos]
 }

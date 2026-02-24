@@ -5,22 +5,20 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.appcompat.widget.SearchView
+import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.linkbit.billrt.adapter.MikrotikAccountsAdapter
 import com.linkbit.billrt.databinding.FragmentMikrotikAccountsBinding
-import com.linkbit.billrt.MikrotikAccount
-import com.linkbit.billrt.MikrotikAccountsResponse
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+import com.linkbit.billrt.viewmodel.MikrotikAccountsViewModel
 
 class MikrotikAccountsFragment : BaseFragment() {
 
     private var _binding: FragmentMikrotikAccountsBinding? = null
     private val binding get() = _binding!!
 
+    private val viewModel: MikrotikAccountsViewModel by viewModels()
     private lateinit var accountsAdapter: MikrotikAccountsAdapter
 
     override fun onCreateView(
@@ -33,14 +31,23 @@ class MikrotikAccountsFragment : BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        setupToolbar()
         setupRecyclerView()
-        setupSearchView()
-        fetchAccounts()
+        observeViewModel()
+
+        viewModel.fetchAccounts()
+    }
+
+    private fun setupToolbar() {
+        (activity as? AppCompatActivity)?.setSupportActionBar(binding.toolbar)
+        (activity as? AppCompatActivity)?.supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        binding.toolbar.setNavigationOnClickListener {
+            findNavController().navigateUp()
+        }
     }
 
     private fun setupRecyclerView() {
         accountsAdapter = MikrotikAccountsAdapter(emptyList()) { account ->
-            // KEMBALIKAN KE ALUR SEMULA: Navigasi ke MikrotikMenuFragment
             val action = MikrotikAccountsFragmentDirections.actionMikrotikAccountsFragmentToMikrotikMenuFragment(account.id)
             findNavController().navigate(action)
         }
@@ -48,47 +55,23 @@ class MikrotikAccountsFragment : BaseFragment() {
         binding.rvMikrotikAccounts.adapter = accountsAdapter
     }
 
-    private fun setupSearchView() {
-        binding.searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-            override fun onQueryTextSubmit(query: String?): Boolean = false
-            override fun onQueryTextChange(newText: String?): Boolean {
-                accountsAdapter.filter(newText)
-                return true
-            }
-        })
-    }
+    private fun observeViewModel() {
+        viewModel.accounts.observe(viewLifecycleOwner) { accounts ->
+            accountsAdapter.updateData(accounts)
+            binding.tvEmpty.visibility = if (accounts.isEmpty()) View.VISIBLE else View.GONE
+        }
 
-    private fun fetchAccounts() {
-        binding.progressBar.visibility = View.VISIBLE
-        binding.tvEmpty.visibility = View.GONE
-
-        ApiConfig.apiService.getMikrotikAccounts().enqueue(object : Callback<MikrotikAccountsResponse> {
-            override fun onResponse(call: Call<MikrotikAccountsResponse>, response: Response<MikrotikAccountsResponse>) {
-                if (!isAdded) return
-                binding.progressBar.visibility = View.GONE
-
-                if (response.isSuccessful && response.body()?.status == true) {
-                    val accounts = response.body()?.data ?: emptyList()
-                    accountsAdapter.updateData(accounts)
-                    if (accounts.isEmpty()) {
-                        binding.tvEmpty.visibility = View.VISIBLE
-                    }
-                } else {
-                    val errorMessage = response.body()?.message ?: "Gagal memuat data"
-                    binding.tvEmpty.text = "Gagal: $errorMessage"
-                    binding.tvEmpty.visibility = View.VISIBLE
-                    Toast.makeText(context, errorMessage, Toast.LENGTH_SHORT).show()
-                }
-            }
-
-            override fun onFailure(call: Call<MikrotikAccountsResponse>, t: Throwable) {
-                if (!isAdded) return
-                binding.progressBar.visibility = View.GONE
-                binding.tvEmpty.text = "Error: ${t.message}"
+        viewModel.errorMessage.observe(viewLifecycleOwner) { message ->
+            if (message != null) {
+                binding.tvEmpty.text = message
                 binding.tvEmpty.visibility = View.VISIBLE
-                Toast.makeText(context, "Error: ${t.message}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
             }
-        })
+        }
+
+        viewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
+            binding.progressBar.visibility = if (isLoading) View.VISIBLE else View.GONE
+        }
     }
 
     override fun onDestroyView() {

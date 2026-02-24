@@ -37,7 +37,7 @@ class RiwayatCatatanAdapter(
 
             val context = binding.root.context
             if (item.isDuplicate) {
-                binding.cardRiwayatItem.setCardBackgroundColor(ContextCompat.getColor(context, R.color.duplicate_background))
+                binding.cardRiwayatItem.background = ContextCompat.getDrawable(context, R.drawable.duplicate_background)
             } else {
                 // Menggunakan warna default atau putih
                 binding.cardRiwayatItem.setCardBackgroundColor(Color.WHITE)

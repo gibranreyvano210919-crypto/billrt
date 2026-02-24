@@ -15,11 +15,11 @@ class PembayaranHariIniAdapter(private val list: List<PembayaranHariIni>) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(item: PembayaranHariIni) {
             binding.tvNomorUrut.text = item.no.toString()
-            binding.tvNamaPelanggan.text = item.nama_pelanggan
+            binding.tvNamaPelanggan.text = item.namaPelanggan
             binding.tvPeriode.text = item.periode
 
             val formatRupiah = NumberFormat.getCurrencyInstance(Locale("in", "ID"))
-            binding.tvJumlahBayar.text = formatRupiah.format(item.jumlah)
+            binding.tvJumlahBayar.text = formatRupiah.format(item.jumlah.toDoubleOrNull() ?: 0.0)
 
             binding.tvMetodeBayar.text = item.metode
             binding.tvWaktu.text = item.waktu

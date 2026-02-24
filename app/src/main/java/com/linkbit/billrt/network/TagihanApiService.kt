@@ -3,15 +3,18 @@ package com.linkbit.billrt.network
 import com.linkbit.billrt.model.BayarTagihanRequest
 import com.linkbit.billrt.model.CustomerResponse
 import com.linkbit.billrt.model.GenerateTagihanResponse
-import com.linkbit.billrt.model.HistoryPembayaranApiResponse
+import com.linkbit.billrt.model.JadwalTagihanResponse
 import com.linkbit.billrt.model.ListPeriodeResponse
 import com.linkbit.billrt.model.PelangganBelumBayarResponse
 import com.linkbit.billrt.model.PelangganDetailResponse
 import com.linkbit.billrt.model.PelangganLunasResponse
+import com.linkbit.billrt.model.PelangganNunggakResponse
+import com.linkbit.billrt.model.PelangganTelatResponse
 import com.linkbit.billrt.model.RekapJumlahPelangganResponse
 import com.linkbit.billrt.model.RekapTagihanResponse
 import com.linkbit.billrt.model.StandardResponse
 import com.linkbit.billrt.model.TambahPembayaranRequest
+import com.linkbit.billrt.model.TimelineResponse
 import retrofit2.http.Body
 import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
@@ -51,6 +54,27 @@ interface TagihanApiService {
         @Query("search") search: String? = null
     ): PelangganLunasResponse
 
+    @GET("http://112.78.170.196:8890/billrt/api/api_tagihan.php?tabel=detail_pelanggan_nunggak")
+    suspend fun getPelangganNunggak(
+        @Query("bulan") bulan: Int,
+        @Query("tahun") tahun: Int,
+        @Query("search") search: String? = null
+    ): PelangganNunggakResponse
+
+    @GET("http://112.78.170.196:8890/billrt/api/api_tagihan.php?tabel=telat")
+    suspend fun getPelangganTelat(
+        @Query("bulan") bulan: Int,
+        @Query("tahun") tahun: Int,
+        @Query("search") search: String? = null,
+        @Query("id_wilayah") idWilayah: String? = null
+    ): PelangganTelatResponse
+
+    @GET("http://112.78.170.196:8890/billrt/api/api_tagihan.php?tabel=jadwal_tagihan")
+    suspend fun getJadwalTagihan(
+        @Query("mode") mode: String,
+        @Query("id_wilayah") idWilayah: Int? = null
+    ): JadwalTagihanResponse
+
     @GET("api_tagihan.php?tabel=get_data_pelanggan_new")
     suspend fun getPelangganBaru(@Query("search") search: String?): CustomerResponse
 
@@ -59,6 +83,15 @@ interface TagihanApiService {
 
     @POST("api_tagihan.php?tabel=tambah_pembayaran")
     suspend fun tambahPembayaran(@Body request: TambahPembayaranRequest): StandardResponse
+
+    @FormUrlEncoded
+    @POST("api_tagihan.php")
+    suspend fun postTagout(
+        @Query("tabel") tabel: String = "post_tagout",
+        @Field("id_tagihan") idTagihan: String,
+        @Field("alasan") alasan: String,
+        @Field("id_user") idUser: Int
+    ): StandardResponse
 
     @FormUrlEncoded
     @POST("api_tagihan.php?tabel=batal_pembayaran")
@@ -71,7 +104,7 @@ interface TagihanApiService {
     ): GenerateTagihanResponse
 
     @GET("api_tagihan.php?tabel=detail_pelanggan_bayar2")
-    suspend fun getDetailPelangganBayar(@Query("id_pelanggan") idPelanggan: Int): HistoryPembayaranApiResponse
+    suspend fun getDetailPelangganBayar2(@Query("id_pelanggan") idPelanggan: Int): TimelineResponse
 
     @GET("api_tagihan.php?tabel=get_detail_pelanggan_new")
     suspend fun getDetailPelangganNew(@Query("id") id: Int): PelangganDetailResponse

@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">billrt</string>
     <string name="menu_home">Home</string>
-    <string name="menu_smartolt">SmartOLT</string>
+    <string name="menu_smartolt">Transaksi</string>
     <string name="menu_pay">Bayar</string>
     <string name="menu_maps">Peta</string>
     <string name="menu_settings">Pengaturan</string>

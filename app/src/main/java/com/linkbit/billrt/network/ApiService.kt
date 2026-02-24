@@ -32,7 +32,7 @@ interface ApiService {
     @GET("billrt/api/index.php?tabel=semua_pelanggan_lokasi")
     fun getSemuaPelanggan(): Call<PelangganListResponse>
 
-    @GET("billrt/api/index.php?tabel=data_pelanggan")
+    @GET("billrt/api/api_tagihan.php?tabel=data_pelanggan")
     fun getDataPelanggan(
         @Query("search") search: String? = null,
         @Query("id_wilayah") idWilayah: Int? = null,
@@ -63,9 +63,6 @@ interface ApiService {
     // region Fitur MikroTik
     @GET("billrt/api/apimikrotik.php?tabel=mikrotik_accounts")
     fun getMikrotikAccounts(): Call<MikrotikAccountsResponse>
-
-    @GET("billrt/api/index.php?tabel=status_pelanggan")
-    fun getPelangganStatus(@Query("id") routerId: Int): Call<PelangganStatusResponse>
 
     @GET("billrt/api/index.php?tabel=audit_user")
     fun getAuditUser(@Query("id") routerId: Int): Call<AuditUserResponse>
@@ -145,4 +142,4 @@ data class WilayahResponse(
 data class TeknisiResponse(
     val status: Boolean,
     val data: List<Teknisi>
-) 
+)

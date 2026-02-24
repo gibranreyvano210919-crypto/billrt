@@ -6,10 +6,16 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import android.widget.Toast
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.linkbit.billrt.adapter.JadwalTagihanAdapter
 import com.linkbit.billrt.databinding.FragmentMenuPelangganBinding
 import com.linkbit.billrt.network.PelangganBaruResponse
+import com.linkbit.billrt.viewmodel.JadwalTagihanViewModel
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -19,6 +25,10 @@ class MenuPelangganFragment : BaseFragment() {
 
     private var _binding: FragmentMenuPelangganBinding? = null
     private val binding get() = _binding!!
+
+    private lateinit var jadwalViewModel: JadwalTagihanViewModel
+    private lateinit var jadwalAdapterHariIni: JadwalTagihanAdapter
+    private lateinit var jadwalAdapterBesok: JadwalTagihanAdapter
 
     private var selectedMonth: Int = Calendar.getInstance().get(Calendar.MONTH) + 1
     private var selectedYear: Int = Calendar.getInstance().get(Calendar.YEAR)
@@ -34,10 +44,16 @@ class MenuPelangganFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        jadwalViewModel = ViewModelProvider(this).get(JadwalTagihanViewModel::class.java)
+
         setupFilterSpinners()
+        setupRecyclerViews()
+        observeJadwalViewModel()
 
         binding.swipeRefreshLayout.setOnRefreshListener {
             fetchCounts()
+            jadwalViewModel.fetchJadwalTagihan("hari_ini")
+            jadwalViewModel.fetchJadwalTagihan("besok")
         }
 
         binding.toolbarMenuPelanggan.setNavigationOnClickListener {
@@ -65,11 +81,28 @@ class MenuPelangganFragment : BaseFragment() {
         }
 
         binding.cardLunas.setOnClickListener {
-            // TODO: Implement action
+            val action = MenuPelangganFragmentDirections.actionMenuPelangganFragmentToPelangganLunasFragment(selectedMonth, selectedYear)
+            findNavController().navigate(action)
         }
 
         binding.cardBelumBayar.setOnClickListener {
-            // TODO: Implement action
+            val action = MenuPelangganFragmentDirections.actionMenuPelangganFragmentToPelangganBelumBayarFragment(selectedMonth, selectedYear)
+            findNavController().navigate(action)
+        }
+
+        binding.cardNunggak.setOnClickListener {
+            val action = MenuPelangganFragmentDirections.actionMenuPelangganFragmentToPelangganNunggakFragment(selectedMonth, selectedYear)
+            findNavController().navigate(action)
+        }
+
+        binding.cardTelat.setOnClickListener {
+            val action = MenuPelangganFragmentDirections.actionMenuPelangganFragmentToPelangganTelatFragment(selectedMonth, selectedYear)
+            findNavController().navigate(action)
+        }
+        
+        binding.cardTagout.setOnClickListener {
+            val action = MenuPelangganFragmentDirections.actionMenuPelangganFragmentToPelangganTagoutFragment(selectedMonth, selectedYear)
+            findNavController().navigate(action)
         }
 
         binding.btnTambahPelanggan.setOnClickListener {
@@ -77,6 +110,42 @@ class MenuPelangganFragment : BaseFragment() {
         }
 
         fetchCounts()
+        jadwalViewModel.fetchJadwalTagihan("hari_ini")
+        jadwalViewModel.fetchJadwalTagihan("besok")
+    }
+
+    private fun setupRecyclerViews() {
+        jadwalAdapterHariIni = JadwalTagihanAdapter { Toast.makeText(context, it.namaPelanggan, Toast.LENGTH_SHORT).show() }
+        binding.rvJadwalHariIni.apply {
+            layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
+            adapter = jadwalAdapterHariIni
+        }
+
+        jadwalAdapterBesok = JadwalTagihanAdapter { Toast.makeText(context, it.namaPelanggan, Toast.LENGTH_SHORT).show() }
+        binding.rvJadwalBesok.apply {
+            layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
+            adapter = jadwalAdapterBesok
+        }
+    }
+
+    private fun observeJadwalViewModel() {
+        jadwalViewModel.jadwalHariIniList.observe(viewLifecycleOwner) { list ->
+            jadwalAdapterHariIni.submitList(list)
+        }
+
+        jadwalViewModel.jadwalBesokList.observe(viewLifecycleOwner) { list ->
+            jadwalAdapterBesok.submitList(list)
+        }
+
+        jadwalViewModel.isLoadingHariIni.observe(viewLifecycleOwner) { isLoading ->
+            binding.progressBarHariIni.isVisible = isLoading
+            binding.rvJadwalHariIni.isVisible = !isLoading
+        }
+
+        jadwalViewModel.isLoadingBesok.observe(viewLifecycleOwner) { isLoading ->
+            binding.progressBarBesok.isVisible = isLoading
+            binding.rvJadwalBesok.isVisible = !isLoading
+        }
     }
 
     private fun setupFilterSpinners() {
@@ -123,6 +192,9 @@ class MenuPelangganFragment : BaseFragment() {
                     binding.tvCountNonaktif.text = rekap?.nonaktif?.toString() ?: "0"
                     binding.tvCountLunas.text = rekap?.lunas?.toString() ?: "0"
                     binding.tvCountBelumBayar.text = rekap?.belumBayar?.toString() ?: "0"
+                    binding.tvCountTagout.text = rekap?.tagout?.toString() ?: "0"
+                    binding.tvCountTelat.text = rekap?.telat?.toString() ?: "0"
+                    binding.tvCountNunggak.text = rekap?.totalNunggak?.toString() ?: "0"
                 }
                 checkIfAllCountsLoaded()
             }
@@ -150,7 +222,7 @@ class MenuPelangganFragment : BaseFragment() {
     }
 
     private var loadCount = 0
-    private val totalLoads = 2
+    private val totalLoads = 3 // Increased for the jadwal tagihan call
     private fun checkIfAllCountsLoaded() {
         loadCount++
         if (loadCount >= totalLoads) {

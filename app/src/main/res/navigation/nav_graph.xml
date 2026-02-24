@@ -42,8 +42,8 @@
             android:id="@+id/action_berandaFragment_to_tagihanFragment"
             app:destination="@id/tagihanFragment" />
         <action
-            android:id="@+id/action_berandaFragment_to_topRedamanFragment"
-            app:destination="@id/topRedamanFragment" />
+            android:id="@+id/action_berandaFragment_to_smartOltMonitorFragment"
+            app:destination="@id/smartOltMonitorFragment" />
         <action
             android:id="@+id/action_berandaFragment_to_riwayatNotifikasiFragment"
             app:destination="@id/riwayatNotifikasiFragment" />
@@ -62,6 +62,18 @@
         <action
             android:id="@+id/action_berandaFragment_to_customerFragment"
             app:destination="@id/customerFragment" />
+        <action
+            android:id="@+id/action_berandaFragment_to_topRedamanFragment"
+            app:destination="@id/topRedamanFragment" />
+        <action
+            android:id="@+id/action_berandaFragment_to_transaksiFragment"
+            app:destination="@id/transaksiFragment" />
+        <action
+            android:id="@+id/action_berandaFragment_to_pembayaranHariIniFragment"
+            app:destination="@id/pembayaranHariIniFragment" />
+        <action
+            android:id="@+id/action_berandaFragment_to_pembukuanFragment"
+            app:destination="@id/pembukuanFragment" />
     </fragment>
 
     <fragment
@@ -84,6 +96,60 @@
         <action
             android:id="@+id/action_menuPelangganFragment_to_tambahPelangganFragment"
             app:destination="@id/tambahPelangganFragment" />
+        <action
+            android:id="@+id/action_menuPelangganFragment_to_pelangganLunasFragment"
+            app:destination="@id/pelangganLunasFragment" />
+        <action
+            android:id="@+id/action_menuPelangganFragment_to_pelangganBelumBayarFragment"
+            app:destination="@id/pelangganBelumBayarFragment" />
+        <action
+            android:id="@+id/action_menuPelangganFragment_to_pelangganNunggakFragment"
+            app:destination="@id/pelangganNunggakFragment" />
+        <action
+            android:id="@+id/action_menuPelangganFragment_to_pelangganTelatFragment"
+            app:destination="@id/pelangganTelatFragment" />
+        <action
+            android:id="@+id/action_menuPelangganFragment_to_pelangganTagoutFragment"
+            app:destination="@id/pelangganTagoutFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/pelangganNunggakFragment"
+        android:name="com.linkbit.billrt.PelangganNunggakFragment"
+        android:label="Pelanggan Nunggak"
+        tools:layout="@layout/fragment_pelanggan_nunggak">
+        <argument
+            android:name="bulan"
+            app:argType="integer" />
+        <argument
+            android:name="tahun"
+            app:argType="integer" />
+    </fragment>
+    
+    <fragment
+        android:id="@+id/pelangganTelatFragment"
+        android:name="com.linkbit.billrt.PelangganTelatFragment"
+        android:label="Pelanggan Telat"
+        tools:layout="@layout/fragment_pelanggan_telat">
+        <argument
+            android:name="bulan"
+            app:argType="integer" />
+        <argument
+            android:name="tahun"
+            app:argType="integer" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/pelangganTagoutFragment"
+        android:name="com.linkbit.billrt.PelangganTagoutFragment"
+        android:label="Pelanggan Tagout"
+        tools:layout="@layout/fragment_pelanggan_tagout">
+        <argument
+            android:name="bulan"
+            app:argType="integer" />
+        <argument
+            android:name="tahun"
+            app:argType="integer" />
     </fragment>
 
     <fragment
@@ -217,10 +283,17 @@
     </fragment>
 
     <fragment
-        android:id="@+id/totalPelangganFragment"
-        android:name="com.linkbit.billrt.TotalPelangganFragment"
-        android:label="Total Pelanggan"
-        tools:layout="@layout/fragment_total_pelanggan" />
+        android:id="@+id/daftarSecretFragment"
+        android:name="com.linkbit.billrt.DaftarSecretFragment"
+        android:label="Daftar Secret"
+        tools:layout="@layout/fragment_daftar_secret">
+        <argument
+            android:name="routerId"
+            app:argType="integer" />
+        <action
+            android:id="@+id/action_daftarSecretFragment_to_tambahPppoeFragment"
+            app:destination="@id/tambahPppoeFragment" />
+    </fragment>
 
     <fragment
         android:id="@+id/tagihanFragment"
@@ -270,6 +343,9 @@
         <action
             android:id="@+id/action_settingFragment_to_pengaturanFragment"
             app:destination="@id/pengaturanFragment" />
+        <action
+            android:id="@+id/action_settingFragment_to_periodeTagihanFragment"
+            app:destination="@id/periodeTagihanFragment" />
     </fragment>
 
     <fragment
@@ -336,6 +412,9 @@
         <action
             android:id="@+id/action_mikrotikMenuFragment_to_tambahPppoeFragment"
             app:destination="@id/tambahPppoeFragment" />
+        <action
+            android:id="@+id/action_mikrotikMenuFragment_to_daftarSecretFragment"
+            app:destination="@id/daftarSecretFragment" />
     </fragment>
 
     <fragment
@@ -433,7 +512,7 @@
         tools:layout="@layout/fragment_ganti_lokasi">
         <action
             android:id="@+id/action_gantiLokasiFragment_to_updateFotoLokasiFragment"
-            app:destination="@+id/updateFotoLokasiFragment" />
+            app:destination="@id/updateFotoLokasiFragment" />
     </fragment>
 
     <fragment
@@ -630,5 +709,51 @@
         android:name="com.linkbit.billrt.CustomerFragment"
         android:label="Customer"
         tools:layout="@layout/fragment_customer" />
+
+    <fragment
+        android:id="@+id/pembayaranHariIniFragment"
+        android:name="com.linkbit.billrt.PembayaranHariIniFragment"
+        android:label="Pembayaran Hari Ini"
+        tools:layout="@layout/fragment_pembayaran_hari_ini" />
+
+    <fragment
+        android:id="@+id/transaksiFragment"
+        android:name="com.linkbit.billrt.TransaksiFragment"
+        android:label="Riwayat Transaksi"
+        tools:layout="@layout/fragment_transaksi" />
+
+    <fragment
+        android:id="@+id/pembukuanFragment"
+        android:name="com.linkbit.billrt.PembukuanFragment"
+        android:label="Pembukuan"
+        tools:layout="@layout/fragment_pembukuan" >
+        <action
+            android:id="@+id/action_pembukuanFragment_to_laporanHarianFragment"
+            app:destination="@id/laporanHarianFragment" />
+        <action
+            android:id="@+id/action_pembukuanFragment_to_laporanBulananFragment"
+            app:destination="@id/laporanBulananFragment" />
+        <action
+            android:id="@+id/action_pembukuanFragment_to_laporanTahunanFragment"
+            app:destination="@id/laporanTahunanFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/laporanHarianFragment"
+        android:name="com.linkbit.billrt.LaporanHarianFragment"
+        android:label="Laporan Harian"
+        tools:layout="@layout/fragment_laporan_harian" />
+
+    <fragment
+        android:id="@+id/laporanBulananFragment"
+        android:name="com.linkbit.billrt.LaporanBulananFragment"
+        android:label="Laporan Bulanan"
+        tools:layout="@layout/fragment_laporan_bulanan" />
+
+    <fragment
+        android:id="@+id/laporanTahunanFragment"
+        android:name="com.linkbit.billrt.LaporanTahunanFragment"
+        android:label="Laporan Tahunan"
+        tools:layout="@layout/fragment_laporan_tahunan" />
 
 </navigation>

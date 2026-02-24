@@ -61,7 +61,8 @@ class MainActivity : AppCompatActivity() {
                 R.id.smartOltMonitorFragment,
                 R.id.pencarianCepatFragment,
                 R.id.nav_maps,
-                R.id.settingFragment -> {
+                R.id.settingFragment,
+                R.id.transaksiFragment -> {
                     binding.bottomNavView.visibility = View.VISIBLE
                 }
                 // Hide on all other destinations (like Login, Details, Wizards)

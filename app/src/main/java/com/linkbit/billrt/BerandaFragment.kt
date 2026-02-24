@@ -33,7 +33,6 @@ class BerandaFragment : BaseFragment() {
     private val binding get() = _binding!!
 
     private lateinit var notificationAdapter: NotificationAdapter
-    private val notificationList = mutableListOf<NotificationItem>()
 
     private lateinit var pembayaranHariIniAdapter: PembayaranHariIniAdapter
     private val pembayaranHariIniList = mutableListOf<PembayaranHariIni>()
@@ -87,23 +86,24 @@ class BerandaFragment : BaseFragment() {
         val navController = findNavController()
         binding.apply {
             cardUser.setOnClickListener { navController.navigate(R.id.action_berandaFragment_to_menuPelangganFragment) }
-            cardPelangganNew.setOnClickListener { navController.navigate(R.id.action_berandaFragment_to_customerFragment) }
+            cardRiwayatTunggakan.setOnClickListener { navController.navigate(R.id.action_berandaFragment_to_customerFragment) }
             cardTagihan.setOnClickListener { navController.navigate(R.id.action_berandaFragment_to_periodeTagihanFragment) }
             cardMikrotik.setOnClickListener { navController.navigate(R.id.action_berandaFragment_to_mikrotikAccountsFragment) }
             cardKas.setOnClickListener { navController.navigate(R.id.action_berandaFragment_to_kasFragment) }
             cardMap.setOnClickListener { navController.navigate(R.id.action_berandaFragment_to_mapMenuFragment) }
             cardRekapTunggakan.setOnClickListener { navController.navigate(R.id.action_berandaFragment_to_rekapTunggakanFragment) }
             cardRekapTercatat.setOnClickListener { navController.navigate(R.id.action_berandaFragment_to_rekapTercatatFragment) }
-            cardOlt.setOnClickListener { navController.navigate(R.id.action_berandaFragment_to_topRedamanFragment) }
+            cardOlt.setOnClickListener { navController.navigate(R.id.action_berandaFragment_to_smartOltMonitorFragment) }
             btnLihatSemuaNotifikasi.setOnClickListener { navController.navigate(R.id.action_berandaFragment_to_riwayatNotifikasiFragment) }
             cardSetoran.setOnClickListener { navController.navigate(R.id.action_berandaFragment_to_setoranFragment) }
             cardHistoriCatat.setOnClickListener { navController.navigate(R.id.action_berandaFragment_to_historiCatatFragment) }
             cardValidasiPeriode.setOnClickListener { navController.navigate(R.id.action_berandaFragment_to_validasiPeriodeFragment) }
+            cardPembukuan.setOnClickListener { navController.navigate(R.id.action_berandaFragment_to_pembukuanFragment) }
         }
     }
 
     private fun setupNotificationRecyclerView() {
-        notificationAdapter = NotificationAdapter(notificationList)
+        notificationAdapter = NotificationAdapter()
         binding.rvNotifikasiBeranda.apply {
             layoutManager = LinearLayoutManager(context)
             adapter = notificationAdapter
@@ -131,9 +131,7 @@ class BerandaFragment : BaseFragment() {
                     item?.let { tempList.add(it) }
                 }
 
-                notificationList.clear()
-                notificationList.addAll(tempList.reversed())
-                notificationAdapter.notifyDataSetChanged()
+                notificationAdapter.submitList(tempList.reversed())
 
                 binding.loadingProgressBar.visibility = View.GONE
                 binding.mainContentScrollview.visibility = View.VISIBLE

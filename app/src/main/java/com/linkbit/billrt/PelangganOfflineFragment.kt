@@ -4,16 +4,16 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.SearchView
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.SearchView
+import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.linkbit.billrt.adapter.PelangganOfflineAdapter
 import com.linkbit.billrt.databinding.FragmentPelangganOfflineBinding
-import com.linkbit.billrt.PelangganStatusResponse
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+import com.linkbit.billrt.viewmodel.PelangganOfflineViewModel
 
 class PelangganOfflineFragment : BaseFragment() {
 
@@ -21,8 +21,8 @@ class PelangganOfflineFragment : BaseFragment() {
     private val binding get() = _binding!!
 
     private val args: PelangganOfflineFragmentArgs by navArgs()
+    private val viewModel: PelangganOfflineViewModel by viewModels()
     private lateinit var adapter: PelangganOfflineAdapter
-    private var allPelanggan = listOf<PelangganOffline>()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -35,86 +35,55 @@ class PelangganOfflineFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        setupToolbar()
+        setupRecyclerView()
+        setupSearchView()
+        observeViewModel()
+
+        viewModel.fetchOfflineUsers(args.routerId)
+    }
+
+    private fun setupToolbar() {
+        (activity as? AppCompatActivity)?.setSupportActionBar(binding.toolbar)
+        (activity as? AppCompatActivity)?.supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        binding.toolbar.setNavigationOnClickListener {
+            findNavController().navigateUp()
+        }
+    }
+
+    private fun setupRecyclerView() {
         adapter = PelangganOfflineAdapter(emptyList())
         binding.rvPelangganOffline.layoutManager = LinearLayoutManager(context)
         binding.rvPelangganOffline.adapter = adapter
+    }
 
-        binding.swipeRefreshLayout.setOnRefreshListener {
-            fetchData()
-        }
-
+    private fun setupSearchView() {
         binding.searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-            override fun onQueryTextSubmit(query: String?): Boolean {
-                return false
-            }
-
+            override fun onQueryTextSubmit(query: String?): Boolean = false
             override fun onQueryTextChange(newText: String?): Boolean {
-                filter(newText)
+                adapter.filter(newText)
                 return true
             }
         })
-
-        fetchData()
     }
 
-    private fun filter(query: String?) {
-        val filteredList = if (query.isNullOrEmpty()) {
-            allPelanggan
-        } else {
-            allPelanggan.filter { it.name.contains(query, ignoreCase = true) }
+    private fun observeViewModel() {
+        viewModel.users.observe(viewLifecycleOwner) { users ->
+            adapter.updateData(users)
+            binding.tvEmpty.visibility = if (users.isEmpty()) View.VISIBLE else View.GONE
         }
-        adapter.updateData(filteredList)
-    }
 
-    private fun fetchData() {
-        binding.swipeRefreshLayout.isRefreshing = true
+        viewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
+            binding.progressBar.visibility = if (isLoading) View.VISIBLE else View.GONE
+        }
 
-        // Menggunakan ApiConfig agar konsisten
-        ApiConfig.apiService.getPelangganStatus(routerId = args.routerId).enqueue(object : Callback<PelangganStatusResponse> {
-            override fun onResponse(call: Call<PelangganStatusResponse>, response: Response<PelangganStatusResponse>) {
-                if (!isAdded || _binding == null) return
-                binding.swipeRefreshLayout.isRefreshing = false
-
-                if (response.isSuccessful && response.body()?.status == true) {
-                    val body = response.body()
-                    val summary = body?.summary
-                    val data = body?.data
-
-                    // Update summary TextViews
-                    binding.tvSummaryTotal.text = "Total\n${summary?.totalSecret ?: 0}"
-                    binding.tvSummaryOnline.text = "Online\n${summary?.online ?: 0}"
-                    binding.tvSummaryOffline.text = "Offline\n${summary?.offline ?: 0}"
-                    binding.tvSummaryDisabled.text = "Disabled\n${summary?.disabled ?: 0}"
-
-                    val combinedList = mutableListOf<PelangganOffline>()
-                    combinedList.addAll(data?.offline ?: emptyList())
-                    combinedList.addAll(data?.disabled ?: emptyList())
-
-                    allPelanggan = combinedList
-                    adapter.updateData(allPelanggan)
-
-                    if (allPelanggan.isEmpty()) {
-                        binding.tvEmpty.visibility = View.VISIBLE
-                    } else {
-                        binding.tvEmpty.visibility = View.GONE
-                    }
-                } else {
-                    handleFailure("Gagal memuat data: ${response.message()}")
-                }
+        viewModel.errorMessage.observe(viewLifecycleOwner) { errorMessage ->
+            if (errorMessage != null) {
+                binding.tvEmpty.text = errorMessage
+                binding.tvEmpty.visibility = View.VISIBLE
+                Toast.makeText(context, errorMessage, Toast.LENGTH_LONG).show()
             }
-
-            override fun onFailure(call: Call<PelangganStatusResponse>, t: Throwable) {
-                handleFailure("Error: ${t.message}")
-            }
-        })
-    }
-
-    private fun handleFailure(message: String) {
-        if (!isAdded || _binding == null) return
-        binding.swipeRefreshLayout.isRefreshing = false
-        binding.tvEmpty.text = message
-        binding.tvEmpty.visibility = View.VISIBLE
-        Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+        }
     }
 
     override fun onDestroyView() {
