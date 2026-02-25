@@ -2,17 +2,11 @@ package com.linkbit.billrt
 
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.Menu
-import android.view.MenuInflater
-import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.appcompat.widget.SearchView
-import androidx.core.view.MenuHost
-import androidx.core.view.MenuProvider
 import androidx.fragment.app.setFragmentResultListener
-import androidx.lifecycle.Lifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -59,26 +53,25 @@ class PelangganAktifFragment : BaseFragment() {
         binding.toolbar.setNavigationOnClickListener {
             findNavController().navigateUp()
         }
-        val menuHost: MenuHost = requireActivity()
-        menuHost.addMenuProvider(object : MenuProvider {
-            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
-                menuInflater.inflate(R.menu.menu_search, menu)
-                val searchItem = menu.findItem(R.id.action_search)
-                val searchView = searchItem.actionView as SearchView
-                searchView.queryHint = "Cari pelanggan aktif..."
-                searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-                    override fun onQueryTextSubmit(query: String?): Boolean = false
-                    override fun onQueryTextChange(newText: String?): Boolean {
-                        filter(newText)
-                        return true
-                    }
-                })
-            }
 
-            override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
-                return false
-            }
-        }, viewLifecycleOwner, Lifecycle.State.RESUMED)
+        // Inflate menu search ke toolbar
+        binding.toolbar.inflateMenu(R.menu.menu_search)
+        val searchItem = binding.toolbar.menu.findItem(R.id.action_search)
+        val searchView = searchItem.actionView as? SearchView
+
+        searchView?.apply {
+            queryHint = "Cari pelanggan aktif..."
+            setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+                override fun onQueryTextSubmit(query: String?): Boolean {
+                    return false
+                }
+
+                override fun onQueryTextChange(newText: String?): Boolean {
+                    filter(newText)
+                    return true
+                }
+            })
+        }
     }
 
     private fun setupRecyclerView() {
@@ -166,7 +159,9 @@ class PelangganAktifFragment : BaseFragment() {
             pelangganList
         } else {
             pelangganList.filter {
-                it.nama.contains(query, ignoreCase = true) || it.idPelanggan.contains(query, ignoreCase = true)
+                (it.nama?.contains(query, ignoreCase = true) ?: false) || 
+                (it.idPelanggan?.contains(query, ignoreCase = true) ?: false) ||
+                (it.alamat?.contains(query, ignoreCase = true) ?: false)
             }
         }
         pelangganAdapter.updateData(filtered)

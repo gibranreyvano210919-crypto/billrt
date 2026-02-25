@@ -17,7 +17,7 @@ class PembukuanFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         _binding = FragmentPembukuanBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -25,17 +25,19 @@ class PembukuanFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        val navController = findNavController()
+
         // Pemasukkan
         binding.tvTransaksiCash.setOnClickListener {
-            findNavController().navigate(R.id.action_pembukuanFragment_to_laporanHarianFragment)
+            navController.navigate(R.id.action_pembukuanFragment_to_laporanHarianFragment)
         }
 
         binding.tvTransaksiOnline.setOnClickListener {
-            findNavController().navigate(R.id.action_pembukuanFragment_to_laporanBulananFragment)
+            navController.navigate(R.id.action_pembukuanFragment_to_laporanBulananFragment)
         }
 
         binding.tvTotalPemasukkanLain.setOnClickListener {
-            findNavController().navigate(R.id.action_pembukuanFragment_to_laporanTahunanFragment)
+            navController.navigate(R.id.action_pembukuanFragment_to_laporanTahunanFragment)
         }
 
         // Pengeluaran
@@ -47,6 +49,29 @@ class PembukuanFragment : Fragment() {
         binding.tvListrikPdamPulsa.setOnClickListener { showToast("Listrik / PDAM / Pulsa") }
         binding.tvBayarMarketing.setOnClickListener { showToast("Bayar Marketing") }
         binding.tvLainLain.setOnClickListener { showToast("Lain lain") }
+
+        // Menu Laporan & Catatan (Dipindahkan dari Beranda)
+        binding.cardRiwayatTunggakan.setOnClickListener {
+            navController.navigate(R.id.action_berandaFragment_to_customerFragment)
+        }
+        binding.cardKas.setOnClickListener {
+            navController.navigate(R.id.action_berandaFragment_to_kasFragment)
+        }
+        binding.cardRekapTunggakan.setOnClickListener {
+            navController.navigate(R.id.action_berandaFragment_to_rekapTunggakanFragment)
+        }
+        binding.cardRekapTercatat.setOnClickListener {
+            navController.navigate(R.id.action_berandaFragment_to_rekapTercatatFragment)
+        }
+        binding.cardSetoran.setOnClickListener {
+            navController.navigate(R.id.action_berandaFragment_to_setoranFragment)
+        }
+        binding.cardHistoriCatat.setOnClickListener {
+            navController.navigate(R.id.action_berandaFragment_to_historiCatatFragment)
+        }
+        binding.cardValidasiPeriode.setOnClickListener {
+            navController.navigate(R.id.action_berandaFragment_to_validasiPeriodeFragment)
+        }
 
         // Menu Lain
         binding.menuUangDiAdmin.setOnClickListener { showToast("Uang di Admin") }

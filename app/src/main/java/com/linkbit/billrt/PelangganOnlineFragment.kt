@@ -47,7 +47,10 @@ class PelangganOnlineFragment : BaseFragment() {
 
     private fun setupToolbar() {
         (activity as? AppCompatActivity)?.setSupportActionBar(binding.toolbar)
-        (activity as? AppCompatActivity)?.supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        (activity as? AppCompatActivity)?.supportActionBar?.apply {
+            setDisplayHomeAsUpEnabled(true)
+            title = "Pelanggan Online"
+        }
         binding.toolbar.setNavigationOnClickListener {
             findNavController().navigateUp()
         }

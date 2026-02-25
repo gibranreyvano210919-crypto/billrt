@@ -171,6 +171,9 @@ interface ApiService {
     @POST("index.php?tabel=get_pelanggan_by_id")
     fun getPelangganById(@Body request: GetPelangganByIdRequest): Call<GetPelangganByIdResponse>
 
+    @GET("http://112.78.170.196:8890/billrt/api/api_pelanggan.php?tabel=apidetailpelanggan")
+    fun getApiDetailPelanggan(@Query("id_pelanggan") idPelanggan: String): Call<ApiDetailPelangganResponse>
+
     @GET("index.php?tabel=pelanggan_baru")
     fun getPelangganBaru(
         @Query("bulan") bulan: Int? = null,
@@ -191,6 +194,9 @@ interface ApiService {
 
     @POST("index.php?tabel=update_status_aktif")
     fun updateStatusPelanggan(@Body request: UpdateStatusRequest): Call<StandardResponse>
+
+    @POST("http://112.78.170.196:8890/billrt/api/api_pelanggan.php?tabel=update_mac_pelanggan")
+    fun updateMacAddress(@Query("id_pelanggan") idPelanggan: String, @Body request: UpdateMacRequest): Call<StandardResponse>
 
     @POST("index.php?tabel=hapus_pelanggan")
     fun hapusPelanggan(@Body request: PelangganIdRequest): Call<StandardResponse>

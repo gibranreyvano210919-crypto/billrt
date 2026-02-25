@@ -41,8 +41,10 @@ class MikrotikMenuFragment : BaseFragment() {
 
     private fun setupToolbar() {
         (activity as? AppCompatActivity)?.setSupportActionBar(binding.toolbar)
-        (activity as? AppCompatActivity)?.supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        (activity as? AppCompatActivity)?.supportActionBar?.title = "Menu Router"
+        (activity as? AppCompatActivity)?.supportActionBar?.apply {
+            setDisplayHomeAsUpEnabled(true)
+            title = "Menu Router"
+        }
         binding.toolbar.setNavigationOnClickListener {
             findNavController().navigateUp()
         }
@@ -88,11 +90,6 @@ class MikrotikMenuFragment : BaseFragment() {
 
         binding.cardAuditUser.setOnClickListener {
             val action = MikrotikMenuFragmentDirections.actionMikrotikMenuFragmentToAuditUserFragment(args.routerId)
-            findNavController().navigate(action)
-        }
-
-        binding.cardTambahPppoe.setOnClickListener {
-            val action = MikrotikMenuFragmentDirections.actionMikrotikMenuFragmentToTambahPppoeFragment(args.routerId)
             findNavController().navigate(action)
         }
 

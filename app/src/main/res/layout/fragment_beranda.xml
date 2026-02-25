@@ -61,7 +61,7 @@
                         android:paddingStart="16dp"
                         android:paddingTop="16dp"
                         android:paddingEnd="16dp"
-                        android:text="Menu"
+                        android:text="Menu Utama"
                         android:textAppearance="@style/TextAppearance.AppCompat.Headline" />
 
                     <GridLayout
@@ -108,44 +108,6 @@
                                 android:ellipsize="end"/>
                         </LinearLayout>
 
-                        <!-- Menu Riwayat Tunggakan -->
-                        <LinearLayout
-                            android:id="@+id/card_riwayat_tunggakan"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_columnWeight="1"
-                            android:orientation="vertical"
-                            android:gravity="center_horizontal"
-                            android:clickable="true"
-                            android:focusable="true"
-                            android:padding="8dp"
-                            android:background="?android:attr/selectableItemBackground">
-
-                            <com.google.android.material.card.MaterialCardView
-                                android:layout_width="64dp"
-                                android:layout_height="64dp"
-                                app:cardCornerRadius="16dp"
-                                app:cardElevation="4dp"
-                                app:cardBackgroundColor="@color/card_tunggakan">
-                                <ImageView
-                                    android:layout_width="32dp"
-                                    android:layout_height="32dp"
-                                    android:src="@drawable/ic_tunggakan"
-                                    app:tint="@android:color/white"
-                                    android:layout_gravity="center"/>
-                            </com.google.android.material.card.MaterialCardView>
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Riwayat Tunggakan"
-                                android:layout_marginTop="8dp"
-                                android:textAppearance="@style/TextAppearance.MaterialComponents.Caption"
-                                android:gravity="center"
-                                android:maxLines="2"
-                                android:ellipsize="end"/>
-                        </LinearLayout>
-
                         <!-- Menu Smart OLT -->
                         <LinearLayout
                             android:id="@+id/card_olt"
@@ -177,44 +139,6 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="Smart OLT"
-                                android:layout_marginTop="8dp"
-                                android:textAppearance="@style/TextAppearance.MaterialComponents.Caption"
-                                android:gravity="center"
-                                android:maxLines="2"
-                                android:ellipsize="end"/>
-                        </LinearLayout>
-
-                        <!-- Menu Tagihan -->
-                        <LinearLayout
-                            android:id="@+id/card_tagihan"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_columnWeight="1"
-                            android:orientation="vertical"
-                            android:gravity="center_horizontal"
-                            android:clickable="true"
-                            android:focusable="true"
-                            android:padding="8dp"
-                            android:background="?android:attr/selectableItemBackground">
-
-                            <com.google.android.material.card.MaterialCardView
-                                android:layout_width="64dp"
-                                android:layout_height="64dp"
-                                app:cardCornerRadius="16dp"
-                                app:cardElevation="4dp"
-                                app:cardBackgroundColor="@color/card_tagihan">
-                                <ImageView
-                                    android:layout_width="32dp"
-                                    android:layout_height="32dp"
-                                    android:src="@drawable/ic_receipt"
-                                    app:tint="@android:color/white"
-                                    android:layout_gravity="center"/>
-                            </com.google.android.material.card.MaterialCardView>
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Tagihan"
                                 android:layout_marginTop="8dp"
                                 android:textAppearance="@style/TextAppearance.MaterialComponents.Caption"
                                 android:gravity="center"
@@ -260,44 +184,6 @@
                                 android:ellipsize="end"/>
                         </LinearLayout>
 
-                        <!-- Menu Kas -->
-                        <LinearLayout
-                            android:id="@+id/card_kas"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_columnWeight="1"
-                            android:orientation="vertical"
-                            android:gravity="center_horizontal"
-                            android:clickable="true"
-                            android:focusable="true"
-                            android:padding="8dp"
-                            android:background="?android:attr/selectableItemBackground">
-
-                            <com.google.android.material.card.MaterialCardView
-                                android:layout_width="64dp"
-                                android:layout_height="64dp"
-                                app:cardCornerRadius="16dp"
-                                app:cardElevation="4dp"
-                                app:cardBackgroundColor="@color/card_kas">
-                                <ImageView
-                                    android:layout_width="32dp"
-                                    android:layout_height="32dp"
-                                    android:src="@drawable/ic_cash"
-                                    app:tint="@android:color/white"
-                                    android:layout_gravity="center"/>
-                            </com.google.android.material.card.MaterialCardView>
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Kas"
-                                android:layout_marginTop="8dp"
-                                android:textAppearance="@style/TextAppearance.MaterialComponents.Caption"
-                                android:gravity="center"
-                                android:maxLines="2"
-                                android:ellipsize="end"/>
-                        </LinearLayout>
-
                         <!-- Menu Maps -->
                         <LinearLayout
                             android:id="@+id/card_map"
@@ -329,196 +215,6 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="Maps"
-                                android:layout_marginTop="8dp"
-                                android:textAppearance="@style/TextAppearance.MaterialComponents.Caption"
-                                android:gravity="center"
-                                android:maxLines="2"
-                                android:ellipsize="end"/>
-                        </LinearLayout>
-
-                        <!-- Menu Rekap Tunggakan -->
-                        <LinearLayout
-                            android:id="@+id/card_rekap_tunggakan"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_columnWeight="1"
-                            android:orientation="vertical"
-                            android:gravity="center_horizontal"
-                            android:clickable="true"
-                            android:focusable="true"
-                            android:padding="8dp"
-                            android:background="?android:attr/selectableItemBackground">
-
-                            <com.google.android.material.card.MaterialCardView
-                                android:layout_width="64dp"
-                                android:layout_height="64dp"
-                                app:cardCornerRadius="16dp"
-                                app:cardElevation="4dp"
-                                app:cardBackgroundColor="@color/card_tunggakan">
-                                <ImageView
-                                    android:layout_width="32dp"
-                                    android:layout_height="32dp"
-                                    android:src="@drawable/ic_tunggakan"
-                                    app:tint="@android:color/white"
-                                    android:layout_gravity="center"/>
-                            </com.google.android.material.card.MaterialCardView>
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Tunggakan"
-                                android:layout_marginTop="8dp"
-                                android:textAppearance="@style/TextAppearance.MaterialComponents.Caption"
-                                android:gravity="center"
-                                android:maxLines="2"
-                                android:ellipsize="end"/>
-                        </LinearLayout>
-
-                        <!-- Menu Rekap Tercatat -->
-                        <LinearLayout
-                            android:id="@+id/card_rekap_tercatat"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_columnWeight="1"
-                            android:orientation="vertical"
-                            android:gravity="center_horizontal"
-                            android:clickable="true"
-                            android:focusable="true"
-                            android:padding="8dp"
-                            android:background="?android:attr/selectableItemBackground">
-
-                            <com.google.android.material.card.MaterialCardView
-                                android:layout_width="64dp"
-                                android:layout_height="64dp"
-                                app:cardCornerRadius="16dp"
-                                app:cardElevation="4dp"
-                                app:cardBackgroundColor="@color/card_tercatat">
-                                <ImageView
-                                    android:layout_width="32dp"
-                                    android:layout_height="32dp"
-                                    android:src="@drawable/ic_tercatat"
-                                    app:tint="@android:color/white"
-                                    android:layout_gravity="center"/>
-                            </com.google.android.material.card.MaterialCardView>
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Tercatat"
-                                android:layout_marginTop="8dp"
-                                android:textAppearance="@style/TextAppearance.MaterialComponents.Caption"
-                                android:gravity="center"
-                                android:maxLines="2"
-                                android:ellipsize="end"/>
-                        </LinearLayout>
-
-                        <!-- Menu Setoran -->
-                        <LinearLayout
-                            android:id="@+id/card_setoran"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_columnWeight="1"
-                            android:orientation="vertical"
-                            android:gravity="center_horizontal"
-                            android:clickable="true"
-                            android:focusable="true"
-                            android:padding="8dp"
-                            android:background="?android:attr/selectableItemBackground">
-
-                            <com.google.android.material.card.MaterialCardView
-                                android:layout_width="64dp"
-                                android:layout_height="64dp"
-                                app:cardCornerRadius="16dp"
-                                app:cardElevation="4dp"
-                                app:cardBackgroundColor="@color/card_setoran">
-                                <ImageView
-                                    android:layout_width="32dp"
-                                    android:layout_height="32dp"
-                                    android:src="@drawable/ic_setoran"
-                                    app:tint="@android:color/white"
-                                    android:layout_gravity="center"/>
-                            </com.google.android.material.card.MaterialCardView>
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Setoran"
-                                android:layout_marginTop="8dp"
-                                android:textAppearance="@style/TextAppearance.MaterialComponents.Caption"
-                                android:gravity="center"
-                                android:maxLines="2"
-                                android:ellipsize="end"/>
-                        </LinearLayout>
-
-                        <!-- Menu Histori Catat -->
-                        <LinearLayout
-                            android:id="@+id/card_histori_catat"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_columnWeight="1"
-                            android:orientation="vertical"
-                            android:gravity="center_horizontal"
-                            android:clickable="true"
-                            android:focusable="true"
-                            android:padding="8dp"
-                            android:background="?android:attr/selectableItemBackground">
-
-                            <com.google.android.material.card.MaterialCardView
-                                android:layout_width="64dp"
-                                android:layout_height="64dp"
-                                app:cardCornerRadius="16dp"
-                                app:cardElevation="4dp"
-                                app:cardBackgroundColor="@color/card_histori_catat">
-                                <ImageView
-                                    android:layout_width="32dp"
-                                    android:layout_height="32dp"
-                                    android:src="@drawable/ic_history"
-                                    app:tint="@android:color/white"
-                                    android:layout_gravity="center"/>
-                            </com.google.android.material.card.MaterialCardView>
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Histori Catat"
-                                android:layout_marginTop="8dp"
-                                android:textAppearance="@style/TextAppearance.MaterialComponents.Caption"
-                                android:gravity="center"
-                                android:maxLines="2"
-                                android:ellipsize="end"/>
-                        </LinearLayout>
-
-                        <!-- Menu Validasi Periode -->
-                        <LinearLayout
-                            android:id="@+id/card_validasi_periode"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_columnWeight="1"
-                            android:orientation="vertical"
-                            android:gravity="center_horizontal"
-                            android:clickable="true"
-                            android:focusable="true"
-                            android:padding="8dp"
-                            android:background="?android:attr/selectableItemBackground">
-
-                            <com.google.android.material.card.MaterialCardView
-                                android:layout_width="64dp"
-                                android:layout_height="64dp"
-                                app:cardCornerRadius="16dp"
-                                app:cardElevation="4dp"
-                                app:cardBackgroundColor="@color/card_validasi">
-                                <ImageView
-                                    android:layout_width="32dp"
-                                    android:layout_height="32dp"
-                                    android:src="@drawable/ic_validate"
-                                    app:tint="@android:color/white"
-                                    android:layout_gravity="center"/>
-                            </com.google.android.material.card.MaterialCardView>
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Validasi Periode"
                                 android:layout_marginTop="8dp"
                                 android:textAppearance="@style/TextAppearance.MaterialComponents.Caption"
                                 android:gravity="center"

@@ -3,10 +3,10 @@ package com.linkbit.billrt
 import android.os.Bundle
 import android.view.*
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.linkbit.billrt.adapter.PelangganNunggakAdapter
 import com.linkbit.billrt.databinding.FragmentPelangganNunggakBinding
@@ -38,7 +38,6 @@ class PelangganNunggakFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentPelangganNunggakBinding.inflate(inflater, container, false)
-        setHasOptionsMenu(true)
         return binding.root
     }
 
@@ -59,28 +58,27 @@ class PelangganNunggakFragment : Fragment() {
     }
 
     private fun setupToolbar() {
-        (activity as? AppCompatActivity)?.setSupportActionBar(binding.toolbar)
+        binding.toolbar.title = "Pelanggan Nunggak"
         binding.toolbar.subtitle = null
         binding.toolbar.setNavigationOnClickListener {
-            activity?.onBackPressed()
+            findNavController().navigateUp()
         }
-    }
 
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        inflater.inflate(R.menu.search_menu, menu)
-        val searchItem = menu.findItem(R.id.action_search)
-        val searchView = searchItem.actionView as SearchView
+        // Inflate menu search ke toolbar
+        binding.toolbar.inflateMenu(R.menu.menu_search)
+        val searchItem = binding.toolbar.menu.findItem(R.id.action_search)
+        val searchView = searchItem.actionView as? SearchView
 
-        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-            override fun onQueryTextSubmit(query: String?): Boolean {
-                return false
-            }
-
-            override fun onQueryTextChange(newText: String?): Boolean {
-                viewModel.fetchPelangganNunggak(bulan, tahun, newText.orEmpty())
-                return true
-            }
-        })
+        searchView?.apply {
+            queryHint = "Cari pelanggan nunggak..."
+            setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+                override fun onQueryTextSubmit(query: String?): Boolean = false
+                override fun onQueryTextChange(newText: String?): Boolean {
+                    viewModel.fetchPelangganNunggak(bulan, tahun, newText.orEmpty())
+                    return true
+                }
+            })
+        }
     }
 
     private fun setupRecyclerView() {

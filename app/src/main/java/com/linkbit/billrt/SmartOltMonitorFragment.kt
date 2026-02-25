@@ -13,6 +13,7 @@ import com.linkbit.billrt.databinding.FragmentSmartoltBinding
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.util.Locale
 
 class SmartOltMonitorFragment : BaseFragment() {
 
@@ -86,7 +87,6 @@ class SmartOltMonitorFragment : BaseFragment() {
                         totalOltCount = oltResponse.detailOlt?.size ?: 0
                         allOnuList = oltResponse.detailOlt?.flatMap { olt ->
                             olt.onu_list?.map { onuData ->
-                                // Dynamically find the power value by looking for a value with a '-'
                                 val powerValue = onuData.values.find { it.contains("-") && it.replace(".", "").replace("-", "").all(Char::isDigit) }
 
                                 SmartOnuItem(
@@ -123,48 +123,85 @@ class SmartOltMonitorFragment : BaseFragment() {
         })
     }
 
-    private fun filterOnuList(query: String?) {
-        if (query.isNullOrBlank()) {
-            onuAdapter.updateData(allOnuList)
-            if (allOnuList.isEmpty()) {
-                binding.tvEmptyOlt.text = "Tidak ada ONU yang tersedia."
-                binding.tvEmptyOlt.visibility = View.VISIBLE
-                binding.rvOltList.visibility = View.GONE
-            } else {
-                binding.tvEmptyOlt.text = "Total OLT: $totalOltCount, Total ONU: ${allOnuList.size}"
-                binding.tvEmptyOlt.visibility = View.VISIBLE
-                binding.rvOltList.visibility = View.VISIBLE
-            }
-            return
-        }
+    private fun normalizeMac(mac: String?): String {
+        return mac?.replace(Regex("[^A-Za-z0-9]"), "")?.toLowerCase(Locale.ROOT) ?: ""
+    }
 
-        val macsFromMatchingNames = allOnuList
-            .filter { it.name?.contains(query, ignoreCase = true) == true }
-            .mapNotNull { it.macAddress }
-            .toSet()
-
-        val filteredList = allOnuList.filter {
-            it.oltName.contains(query, ignoreCase = true) ||
-            it.name?.contains(query, ignoreCase = true) == true ||
-            it.macAddress?.contains(query, ignoreCase = true) == true ||
-            (it.macAddress != null && macsFromMatchingNames.contains(it.macAddress))
-        }
-        
+    private fun updateAdapterAndViews(filteredList: List<SmartOnuItem>, query: String?) {
         onuAdapter.updateData(filteredList)
 
         if (filteredList.isEmpty()) {
-            binding.tvEmptyOlt.text = "Tidak ada hasil untuk: $query"
+            val emptyText = if (query.isNullOrBlank()) "Tidak ada ONU yang tersedia." else "Tidak ada hasil untuk: $query"
+            binding.tvEmptyOlt.text = emptyText
             binding.tvEmptyOlt.visibility = View.VISIBLE
             binding.rvOltList.visibility = View.GONE
         } else {
-            binding.tvEmptyOlt.text = "Menampilkan ${filteredList.size} dari ${allOnuList.size} ONU (Total OLT: $totalOltCount)"
+            val statusText = if (query.isNullOrBlank()) {
+                "Total OLT: $totalOltCount, Total ONU: ${allOnuList.size}"
+            } else {
+                "Menampilkan ${filteredList.size} dari ${allOnuList.size} ONU (Total OLT: $totalOltCount)"
+            }
+            binding.tvEmptyOlt.text = statusText
             binding.tvEmptyOlt.visibility = View.VISIBLE
             binding.rvOltList.visibility = View.VISIBLE
         }
     }
 
+    private fun filterOnuList(query: String?) {
+        val trimmedQuery = query?.trim()
+
+        if (trimmedQuery.isNullOrBlank()) {
+            updateAdapterAndViews(allOnuList, null)
+            return
+        }
+
+        val normalizedQuery = normalizeMac(trimmedQuery)
+        val directResults = allOnuList.filter {
+            it.oltName.contains(trimmedQuery, ignoreCase = true) ||
+                    (it.macAddress != null && normalizeMac(it.macAddress).contains(normalizedQuery))
+        }
+
+        // Update UI immediately with direct search results
+        updateAdapterAndViews(directResults, trimmedQuery)
+
+        // Perform API search for customer name to get MAC addresses
+        apiService.getDataPelanggan(search = trimmedQuery).enqueue(object : Callback<PelangganResponse> {
+            override fun onResponse(call: Call<PelangganResponse>, response: Response<PelangganResponse>) {
+                if (!isAdded || !response.isSuccessful) return
+
+                // Make sure the query hasn't changed while the API call was in flight
+                val currentQuery = binding.searchView.query.toString().trim()
+                if (currentQuery != trimmedQuery) {
+                    return
+                }
+
+                val macsFromApi = response.body()?.data
+                    ?.mapNotNull { it.macAddress }
+                    ?.map { normalizeMac(it) }
+                    ?.filter { it.isNotBlank() }
+                    ?.toSet() ?: emptySet()
+
+                if (macsFromApi.isNotEmpty()) {
+                    val apiResults = allOnuList.filter { onu ->
+                        onu.macAddress != null && normalizeMac(onu.macAddress) in macsFromApi
+                    }
+
+                    val combinedResults = (directResults + apiResults).distinctBy { it.sn }
+                    updateAdapterAndViews(combinedResults, trimmedQuery)
+                }
+            }
+
+            override fun onFailure(call: Call<PelangganResponse>, t: Throwable) {
+                // If API fails, we just stick with the direct results that are already displayed.
+                // You could add logging here.
+            }
+        })
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
+        allOnuList = emptyList()
+        totalOltCount = 0
         _binding = null
     }
 }

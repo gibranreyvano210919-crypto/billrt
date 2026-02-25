@@ -5,6 +5,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.appcompat.widget.SearchView
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.linkbit.billrt.databinding.FragmentPelangganBaruBinding
@@ -31,8 +33,33 @@ class PelangganBaruFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        setupToolbar()
         setupRecyclerView()
+        setupSwipeRefresh()
         fetchPelangganBaru()
+    }
+
+    private fun setupToolbar() {
+        binding.toolbar.title = "Pelanggan Baru (${args.bulan}/${args.tahun})"
+        binding.toolbar.setNavigationOnClickListener {
+            findNavController().navigateUp()
+        }
+
+        // Inflate menu search ke toolbar
+        binding.toolbar.inflateMenu(R.menu.menu_search)
+        val searchItem = binding.toolbar.menu.findItem(R.id.action_search)
+        val searchView = searchItem.actionView as? SearchView
+
+        searchView?.apply {
+            queryHint = "Cari pelanggan baru..."
+            setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+                override fun onQueryTextSubmit(query: String?): Boolean = false
+                override fun onQueryTextChange(newText: String?): Boolean {
+                    filter(newText)
+                    return true
+                }
+            })
+        }
     }
 
     private fun setupRecyclerView() {
@@ -41,12 +68,21 @@ class PelangganBaruFragment : BaseFragment() {
         binding.rvPelangganBaru.adapter = pelangganBaruAdapter
     }
 
+    private fun setupSwipeRefresh() {
+        binding.swipeRefreshLayout.setOnRefreshListener {
+            fetchPelangganBaru()
+        }
+    }
+
     private fun fetchPelangganBaru() {
-        binding.progressBar.visibility = View.VISIBLE
+        if (!binding.swipeRefreshLayout.isRefreshing) {
+            binding.progressBar.visibility = View.VISIBLE
+        }
         apiService.getPelangganBaru(bulan = args.bulan, tahun = args.tahun).enqueue(object : Callback<PelangganBaruResponse> {
             override fun onResponse(call: Call<PelangganBaruResponse>, response: Response<PelangganBaruResponse>) {
                 if (!isAdded) return
                 binding.progressBar.visibility = View.GONE
+                binding.swipeRefreshLayout.isRefreshing = false
                 if (response.isSuccessful) {
                     pelangganBaruList = response.body()?.data ?: emptyList()
                     pelangganBaruAdapter.updateData(pelangganBaruList)
@@ -58,9 +94,22 @@ class PelangganBaruFragment : BaseFragment() {
             override fun onFailure(call: Call<PelangganBaruResponse>, t: Throwable) {
                 if (!isAdded) return
                 binding.progressBar.visibility = View.GONE
+                binding.swipeRefreshLayout.isRefreshing = false
                 Toast.makeText(context, "Error: ${t.message}", Toast.LENGTH_SHORT).show()
             }
         })
+    }
+
+    private fun filter(query: String?) {
+        val filtered = if (query.isNullOrEmpty()) {
+            pelangganBaruList
+        } else {
+            pelangganBaruList.filter {
+                it.namaPelanggan?.contains(query, ignoreCase = true) == true || 
+                it.idPelanggan.contains(query, ignoreCase = true)
+            }
+        }
+        pelangganBaruAdapter.updateData(filtered)
     }
 
     override fun onDestroyView() {

@@ -21,10 +21,6 @@ data class Periode(
 // --- Model untuk Daftar Pelanggan Belum Bayar ---
 data class PelangganBelumBayarResponse(
     val status: Boolean,
-    val filter: String?,
-    val periode: Periode?,
-    @SerializedName("total_penunggak")
-    val totalPenunggak: Int,
     val data: List<PelangganBelumBayarItem>?
 ) : Serializable
 
@@ -36,10 +32,12 @@ data class PelangganBelumBayarItem(
     val wilayah: String?,
     val invoice: String?,
     val nominal: Float,
-    @SerializedName("status_aktif") val statusAktif: String?,
     @SerializedName("status_pembayaran") val statusPembayaran: Int,
-    @SerializedName("bulan_tagihan") val bulanTagihan: Int?,
-    @SerializedName("tahun_tagihan") val tahunTagihan: Int?
+    @SerializedName("status_text") val statusText: String?,
+    @SerializedName("catatan_tagout") val catatanTagout: String?,
+    @SerializedName("bulan_tagihan") val bulanTagihan: String?,
+    @SerializedName("tahun_tagihan") val tahunTagihan: Int?,
+    @SerializedName("tgl_bayar_terakhir") val tglBayarTerakhir: String?
 ) : Serializable, PelangganIdentifiable
 
 

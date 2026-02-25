@@ -7,6 +7,8 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.linkbit.billrt.databinding.ItemPelangganBelumBayarBinding
 import com.linkbit.billrt.model.PelangganBelumBayarItem
+import java.text.NumberFormat
+import java.util.Locale
 
 class PelangganBelumBayarAdapter(
     private val onItemClick: (PelangganBelumBayarItem) -> Unit
@@ -30,9 +32,21 @@ class PelangganBelumBayarAdapter(
             binding.tvTelepon.text = "Telepon: ${item.teleponPelanggan ?: "-"}"
             binding.tvWilayah.text = "Wilayah: ${item.wilayah ?: "-"}"
             binding.tvInvoice.text = "Invoice: ${item.invoice ?: "-"}"
-            binding.tvNominal.text = "Nominal: Rp. ${item.nominal}"
-            binding.tvPeriodeTagihan.text = "Periode: ${item.bulanTagihan}/${item.tahunTagihan}"
-            binding.tvStatusTagihan.text = "Status: ${if (item.statusPembayaran == 0) "Belum Bayar" else "Lunas"}"
+            binding.tvNominal.text = "Nominal: ${formatCurrency(item.nominal)}"
+            binding.tvPeriodeTagihan.text = "Periode: ${item.bulanTagihan} ${item.tahunTagihan}"
+            binding.tvStatusTagihan.text = "Status: ${item.statusText}"
+            binding.tvPembayaranTerakhir.text = "Bayar Terakhir: ${item.tglBayarTerakhir}"
+        }
+    }
+
+    private fun formatCurrency(amount: Float): String {
+        val format = NumberFormat.getCurrencyInstance(Locale("in", "ID"))
+        try {
+            val formatted = format.format(amount.toDouble())
+            // Mengganti simbol Rp menjadi Rp. dan menambahkan ,- di akhir
+            return formatted.replace("Rp", "Rp ").replace(",00", ",-")
+        } catch (e: Exception) {
+            return "Rp 0,-"
         }
     }
 

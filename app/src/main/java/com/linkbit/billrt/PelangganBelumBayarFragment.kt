@@ -66,7 +66,12 @@ class PelangganBelumBayarFragment : Fragment() {
         setupRecyclerView()
         observeViewModel()
 
+        // Listener untuk refresh data setelah pembayaran atau tagout berhasil
         setFragmentResultListener("payment_successful") { _, _ ->
+            viewModel.fetchPelangganBelumBayar(bulan, tahun, idWilayah)
+        }
+        
+        setFragmentResultListener("tagout_successful") { _, _ ->
             viewModel.fetchPelangganBelumBayar(bulan, tahun, idWilayah)
         }
 

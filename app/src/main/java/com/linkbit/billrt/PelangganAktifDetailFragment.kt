@@ -1,13 +1,16 @@
 package com.linkbit.billrt
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.linkbit.billrt.databinding.FragmentPelangganAktifDetailBinding
+import com.linkbit.billrt.model.StandardResponse
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -28,18 +31,22 @@ class PelangganAktifDetailFragment : BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        setupToolbar()
         fetchPelangganDetails()
+    }
+
+    private fun setupToolbar() {
+        binding.toolbar.setNavigationOnClickListener { findNavController().navigateUp() }
     }
 
     private fun fetchPelangganDetails() {
         val pelangganId = args.pelangganId
-        val request = GetPelangganByIdRequest(id_pelanggan = pelangganId)
 
         // Tampilkan progress bar saat memuat
         // binding.progressBar.visibility = View.VISIBLE
 
-        apiService.getPelangganById(request).enqueue(object : Callback<GetPelangganByIdResponse> {
-            override fun onResponse(call: Call<GetPelangganByIdResponse>, response: Response<GetPelangganByIdResponse>) {
+        apiService.getApiDetailPelanggan(pelangganId).enqueue(object : Callback<ApiDetailPelangganResponse> {
+            override fun onResponse(call: Call<ApiDetailPelangganResponse>, response: Response<ApiDetailPelangganResponse>) {
                 if (!isAdded || _binding == null) return
                 // binding.progressBar.visibility = View.GONE
 
@@ -52,7 +59,7 @@ class PelangganAktifDetailFragment : BaseFragment() {
                 }
             }
 
-            override fun onFailure(call: Call<GetPelangganByIdResponse>, t: Throwable) {
+            override fun onFailure(call: Call<ApiDetailPelangganResponse>, t: Throwable) {
                 if (!isAdded || _binding == null) return
                 // binding.progressBar.visibility = View.GONE
                 Toast.makeText(context, "Error: ${t.message}", Toast.LENGTH_SHORT).show()
@@ -60,12 +67,72 @@ class PelangganAktifDetailFragment : BaseFragment() {
         })
     }
 
-    private fun populateUI(pelanggan: PelangganData) {
-        binding.tvNamaPelanggan.text = pelanggan.nama
-        binding.tvIdPelanggan.text = "ID: ${pelanggan.idPelanggan}"
-        binding.tvAlamat.text = pelanggan.alamat ?: "Alamat tidak tersedia"
-        binding.tvTelepon.text = pelanggan.telepon ?: "Telepon tidak tersedia"
-        // Anda bisa menambahkan field lainnya di sini sesuai kebutuhan
+    private fun populateUI(pelanggan: ApiDetailPelangganData) {
+        binding.toolbar.title = pelanggan.card1Identitas.namaPelanggan
+
+        // Card 1
+        binding.tvIdPelanggan.text = "ID Pelanggan: ${pelanggan.card1Identitas.idPelanggan}"
+        binding.tvNamaPelanggan.text = "Nama: ${pelanggan.card1Identitas.namaPelanggan}"
+        binding.tvTeleponPelanggan.text = "Telepon: ${pelanggan.card1Identitas.teleponPelanggan}"
+
+        // Card 2
+        binding.tvRekapStatus.text = "Rekap Status: ${pelanggan.card2Tagihan.rekapStatus}"
+        binding.tvJumlahNunggak.text = "Jumlah Nunggak: ${pelanggan.card2Tagihan.jumlahNunggak}"
+
+        // Card 3
+        binding.tvUsername.text = "Username: ${pelanggan.card3Jaringan.username}"
+        binding.tvStatusKoneksi.text = "Status Koneksi: ${pelanggan.card3Jaringan.statusKoneksi}"
+        binding.tvUptime.text = "Uptime: ${pelanggan.card3Jaringan.uptime}"
+        binding.tvIpAktif.text = "IP Aktif: ${pelanggan.card3Jaringan.ipAktif}"
+        binding.tvMacClientLive.text = "MAC Client Live: ${pelanggan.card3Jaringan.macClientLive ?: "-"}"
+        binding.tvMacAddressDb.text = "MAC Address DB: ${pelanggan.card3Jaringan.macAddressDb ?: "-"}"
+        binding.tvTotalUsage.text = "Total Usage: ${pelanggan.card3Jaringan.totalUsage}"
+        binding.tvLastLogout.text = "Last Logout: ${pelanggan.card3Jaringan.lastLogout}"
+
+        binding.tvMacAddressDb.setOnClickListener {
+            val bottomSheet = ReplaceMacBottomSheetFragment.newInstance(pelanggan.card3Jaringan.macAddressDb).apply {
+                setOnSaveListener { newMac ->
+                    updateMacAddress(pelanggan.card1Identitas.idPelanggan, newMac)
+                }
+            }
+            bottomSheet.show(childFragmentManager, "ReplaceMacBottomSheetFragment")
+        }
+
+        // Card 4
+        binding.tvTglDaftar.text = "Tanggal Daftar: ${pelanggan.card4Detail.tglDaftar}"
+        binding.tvInstallationDate.text = "Tanggal Instalasi: ${pelanggan.card4Detail.installationDate}"
+        binding.tvAlamatPelanggan.text = "Alamat: ${pelanggan.card4Detail.alamatPelanggan}"
+        binding.tvLatlong.text = "Lokasi: ${pelanggan.card4Detail.latitude}, ${pelanggan.card4Detail.longitude}"
+        binding.tvGoogleMapsLink.text = "Buka di Google Maps"
+        binding.tvGoogleMapsLink.setOnClickListener {
+            val gmmIntentUri = Uri.parse(pelanggan.card4Detail.googleMapsLink)
+            val mapIntent = Intent(Intent.ACTION_VIEW, gmmIntentUri)
+            startActivity(mapIntent)
+        }
+
+        // Card 5
+        binding.tvNamaPaket.text = "Nama Paket: ${pelanggan.card5Paket.namaPaket}"
+        binding.tvHargaPaket.text = "Harga: ${pelanggan.card5Paket.hargaPaket}"
+        binding.tvProfileMikrotik.text = "Profile Mikrotik: ${pelanggan.card5Paket.profileMikrotik ?: "-"}"
+        binding.tvWilayahPaket.text = "Wilayah: ${pelanggan.card5Paket.wilayah}"
+    }
+
+    private fun updateMacAddress(pelangganId: String, newMac: String) {
+        val request = UpdateMacRequest(macAddress = newMac)
+        apiService.updateMacAddress(pelangganId, request).enqueue(object : Callback<StandardResponse> {
+            override fun onResponse(call: Call<StandardResponse>, response: Response<StandardResponse>) {
+                if (response.isSuccessful && response.body()?.status == true) {
+                    Toast.makeText(context, "MAC Address berhasil diupdate", Toast.LENGTH_SHORT).show()
+                    fetchPelangganDetails() // Refresh data
+                } else {
+                    Toast.makeText(context, "Gagal mengupdate MAC Address", Toast.LENGTH_SHORT).show()
+                }
+            }
+
+            override fun onFailure(call: Call<StandardResponse>, t: Throwable) {
+                Toast.makeText(context, "Error: ${t.message}", Toast.LENGTH_SHORT).show()
+            }
+        })
     }
 
     override fun onDestroyView() {

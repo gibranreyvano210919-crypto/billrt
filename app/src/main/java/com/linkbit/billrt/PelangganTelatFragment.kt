@@ -3,10 +3,10 @@ package com.linkbit.billrt
 import android.os.Bundle
 import android.view.*
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.linkbit.billrt.adapter.PelangganTelatAdapter
 import com.linkbit.billrt.databinding.FragmentPelangganTelatBinding
@@ -26,7 +26,6 @@ class PelangganTelatFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setHasOptionsMenu(true)
         arguments?.let {
             bulan = it.getInt("bulan")
             tahun = it.getInt("tahun")
@@ -59,10 +58,26 @@ class PelangganTelatFragment : Fragment() {
     }
 
     private fun setupToolbar() {
-        (activity as? AppCompatActivity)?.setSupportActionBar(binding.toolbar)
-        val actionBar = (activity as? AppCompatActivity)?.supportActionBar
-        actionBar?.title = "Pelanggan Telat"
-        actionBar?.setDisplayHomeAsUpEnabled(true)
+        binding.toolbar.title = "Pelanggan Telat"
+        binding.toolbar.setNavigationOnClickListener {
+            findNavController().navigateUp()
+        }
+
+        // Inflate menu search ke toolbar
+        binding.toolbar.inflateMenu(R.menu.menu_search)
+        val searchItem = binding.toolbar.menu.findItem(R.id.action_search)
+        val searchView = searchItem.actionView as? SearchView
+
+        searchView?.apply {
+            queryHint = "Cari pelanggan telat..."
+            setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+                override fun onQueryTextSubmit(query: String?): Boolean = false
+                override fun onQueryTextChange(newText: String?): Boolean {
+                    viewModel.fetchPelangganTelat(bulan, tahun, newText.orEmpty(), idWilayah)
+                    return true
+                }
+            })
+        }
     }
 
     private fun setupRecyclerView() {
@@ -91,33 +106,6 @@ class PelangganTelatFragment : Fragment() {
                 Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
             }
         }
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        inflater.inflate(R.menu.menu_search, menu)
-        val searchItem = menu.findItem(R.id.action_search)
-        val searchView = searchItem.actionView as SearchView
-
-        searchView.queryHint = "Cari Pelanggan..."
-        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-            override fun onQueryTextSubmit(query: String?): Boolean {
-                return false
-            }
-
-            override fun onQueryTextChange(newText: String?): Boolean {
-                viewModel.fetchPelangganTelat(bulan, tahun, newText.orEmpty(), idWilayah)
-                return true
-            }
-        })
-        super.onCreateOptionsMenu(menu, inflater)
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if (item.itemId == android.R.id.home) {
-            activity?.onBackPressed()
-            return true
-        }
-        return super.onOptionsItemSelected(item)
     }
 
     override fun onDestroyView() {

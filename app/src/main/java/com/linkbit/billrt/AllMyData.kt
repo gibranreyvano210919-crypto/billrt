@@ -487,3 +487,63 @@ data class AuditResult(
 // region Pembayaran
 data class TagihanData(val id_tagihan: String, val periode: String, val nama_paket: String, val harga: Float, val status_bayar: String) : Serializable
 // endregion
+
+// region ApiDetailPelanggan
+
+data class ApiDetailPelangganResponse(
+    val status: Boolean,
+    val data: ApiDetailPelangganData?,
+    val message: String?
+)
+
+data class ApiDetailPelangganData(
+    @SerializedName("card_1_identitas") val card1Identitas: Card1Identitas,
+    @SerializedName("card_2_tagihan") val card2Tagihan: Card2Tagihan,
+    @SerializedName("card_3_jaringan") val card3Jaringan: Card3Jaringan,
+    @SerializedName("card_4_detail") val card4Detail: Card4Detail,
+    @SerializedName("card_5_paket") val card5Paket: Card5Paket
+)
+
+data class Card1Identitas(
+    @SerializedName("id_pelanggan") val idPelanggan: String,
+    @SerializedName("nama_pelanggan") val namaPelanggan: String,
+    @SerializedName("telepon_pelanggan") val teleponPelanggan: String
+)
+
+data class Card2Tagihan(
+    @SerializedName("rekap_status") val rekapStatus: String,
+    @SerializedName("jumlah_nunggak") val jumlahNunggak: Int
+)
+
+data class Card3Jaringan(
+    val username: String,
+    @SerializedName("status_koneksi") val statusKoneksi: String,
+    val uptime: String,
+    @SerializedName("ip_aktif") val ipAktif: String,
+    @SerializedName("mac_client_live") val macClientLive: String?,
+    @SerializedName("mac_address_db") val macAddressDb: String?,
+    @SerializedName("total_usage") val totalUsage: String,
+    @SerializedName("last_logout") val lastLogout: String
+)
+
+data class Card4Detail(
+    @SerializedName("tgl_daftar") val tglDaftar: String,
+    @SerializedName("installation_date") val installationDate: String,
+    @SerializedName("alamat_pelanggan") val alamatPelanggan: String,
+    val latitude: String,
+    val longitude: String,
+    @SerializedName("google_maps_link") val googleMapsLink: String
+)
+
+data class Card5Paket(
+    @SerializedName("nama_paket") val namaPaket: String,
+    @SerializedName("harga_paket") val hargaPaket: String,
+    @SerializedName("profile_mikrotik") val profileMikrotik: String?,
+    val wilayah: String
+)
+
+data class UpdateMacRequest(
+    @SerializedName("mac_address") val macAddress: String
+)
+
+// endregion

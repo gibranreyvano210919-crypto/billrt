@@ -257,33 +257,6 @@
                         </LinearLayout>
                     </com.google.android.material.card.MaterialCardView>
 
-                    <com.google.android.material.card.MaterialCardView
-                        android:id="@+id/card_tambah_pppoe"
-                        style="@style/DashboardCard"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_columnWeight="1"
-                        android:layout_margin="8dp">
-
-                        <LinearLayout
-                            style="@style/DashboardCardContent"
-                            android:layout_width="match_parent"
-                            android:layout_height="120dp">
-
-                            <ImageView
-                                android:layout_width="48dp"
-                                android:layout_height="48dp"
-                                android:src="@drawable/ic_add_user" />
-
-                            <TextView
-                                style="@style/DashboardCardText"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="8dp"
-                                android:text="Tambah PPPoE" />
-                        </LinearLayout>
-                    </com.google.android.material.card.MaterialCardView>
-
                 </GridLayout>
 
             </LinearLayout>

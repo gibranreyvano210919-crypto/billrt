@@ -16,6 +16,12 @@ object ApiConfig {
 
         val client = OkHttpClient.Builder()
             .addInterceptor(loggingInterceptor)
+            .addInterceptor { chain ->
+                val request = chain.request().newBuilder()
+                    .header("Cache-Control", "no-cache")
+                    .build()
+                chain.proceed(request)
+            }
             .build()
 
         val gson = GsonBuilder()

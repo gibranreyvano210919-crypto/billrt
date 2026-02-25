@@ -17,7 +17,6 @@
             android:layout_height="?attr/actionBarSize"
             android:background="?attr/colorPrimary"
             app:navigationIcon="@drawable/ic_arrow_back"
-            app:title="Pelanggan Offline"
             app:titleTextColor="@color/white" />
 
     </com.google.android.material.appbar.AppBarLayout>

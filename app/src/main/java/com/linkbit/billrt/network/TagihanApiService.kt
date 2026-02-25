@@ -97,6 +97,10 @@ interface TagihanApiService {
     @POST("api_tagihan.php?tabel=batal_pembayaran")
     suspend fun batalPembayaran(@Field("id_tagihan") idTagihan: String): StandardResponse
 
+    @FormUrlEncoded
+    @POST("api_tagihan.php?tabel=batal_tagout")
+    suspend fun batalTagout(@Field("id_tagihan") idTagihan: String): StandardResponse
+
     @GET("api_tagihan.php?tabel=generate_invoice")
     suspend fun generateTagihan(
         @Query("bulan") bulan: Int,

@@ -8,6 +8,7 @@ import android.widget.FrameLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.widget.SearchView
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
@@ -33,9 +34,32 @@ class PelangganIsolirFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        setupToolbar()
         setupRecyclerView()
-        setupSearchView()
+        setupSwipeRefresh()
         fetchPelangganIsolir()
+    }
+
+    private fun setupToolbar() {
+        binding.toolbar.setNavigationOnClickListener {
+            findNavController().navigateUp()
+        }
+
+        // Inflate menu search ke toolbar
+        binding.toolbar.inflateMenu(R.menu.menu_search)
+        val searchItem = binding.toolbar.menu.findItem(R.id.action_search)
+        val searchView = searchItem.actionView as? SearchView
+
+        searchView?.apply {
+            queryHint = "Cari pelanggan isolir..."
+            setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+                override fun onQueryTextSubmit(query: String?): Boolean = false
+                override fun onQueryTextChange(newText: String?): Boolean {
+                    filter(newText)
+                    return true
+                }
+            })
+        }
     }
 
     private fun setupRecyclerView() {
@@ -49,6 +73,12 @@ class PelangganIsolirFragment : BaseFragment() {
         )
         binding.rvPelangganIsolir.layoutManager = LinearLayoutManager(context)
         binding.rvPelangganIsolir.adapter = pelangganAdapter
+    }
+
+    private fun setupSwipeRefresh() {
+        binding.swipeRefreshLayout.setOnRefreshListener {
+            fetchPelangganIsolir()
+        }
     }
 
     private fun showStatusBottomSheet(pelanggan: PelangganIsolir) {
@@ -102,22 +132,15 @@ class PelangganIsolirFragment : BaseFragment() {
         })
     }
 
-    private fun setupSearchView() {
-        binding.searchViewPelangganIsolir.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-            override fun onQueryTextSubmit(query: String?): Boolean = false
-            override fun onQueryTextChange(newText: String?): Boolean {
-                filter(newText)
-                return true
-            }
-        })
-    }
-
     private fun fetchPelangganIsolir() {
-        binding.progressBar.visibility = View.VISIBLE
+        if (!binding.swipeRefreshLayout.isRefreshing) {
+            binding.progressBar.visibility = View.VISIBLE
+        }
         apiService.getPelangganIsolir(null, null).enqueue(object : Callback<PelangganIsolirResponse> {
             override fun onResponse(call: Call<PelangganIsolirResponse>, response: Response<PelangganIsolirResponse>) {
                 if (!isAdded) return
                 binding.progressBar.visibility = View.GONE
+                binding.swipeRefreshLayout.isRefreshing = false
                 if (response.isSuccessful) {
                     val responseBody = response.body()
                     pelangganList = responseBody?.data ?: emptyList()
@@ -131,6 +154,7 @@ class PelangganIsolirFragment : BaseFragment() {
             override fun onFailure(call: Call<PelangganIsolirResponse>, t: Throwable) {
                 if (!isAdded) return
                 binding.progressBar.visibility = View.GONE
+                binding.swipeRefreshLayout.isRefreshing = false
                 Toast.makeText(context, "Error: ${t.message}", Toast.LENGTH_SHORT).show()
             }
         })

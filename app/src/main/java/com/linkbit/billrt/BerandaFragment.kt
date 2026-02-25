@@ -86,19 +86,11 @@ class BerandaFragment : BaseFragment() {
         val navController = findNavController()
         binding.apply {
             cardUser.setOnClickListener { navController.navigate(R.id.action_berandaFragment_to_menuPelangganFragment) }
-            cardRiwayatTunggakan.setOnClickListener { navController.navigate(R.id.action_berandaFragment_to_customerFragment) }
-            cardTagihan.setOnClickListener { navController.navigate(R.id.action_berandaFragment_to_periodeTagihanFragment) }
             cardMikrotik.setOnClickListener { navController.navigate(R.id.action_berandaFragment_to_mikrotikAccountsFragment) }
-            cardKas.setOnClickListener { navController.navigate(R.id.action_berandaFragment_to_kasFragment) }
             cardMap.setOnClickListener { navController.navigate(R.id.action_berandaFragment_to_mapMenuFragment) }
-            cardRekapTunggakan.setOnClickListener { navController.navigate(R.id.action_berandaFragment_to_rekapTunggakanFragment) }
-            cardRekapTercatat.setOnClickListener { navController.navigate(R.id.action_berandaFragment_to_rekapTercatatFragment) }
             cardOlt.setOnClickListener { navController.navigate(R.id.action_berandaFragment_to_smartOltMonitorFragment) }
-            btnLihatSemuaNotifikasi.setOnClickListener { navController.navigate(R.id.action_berandaFragment_to_riwayatNotifikasiFragment) }
-            cardSetoran.setOnClickListener { navController.navigate(R.id.action_berandaFragment_to_setoranFragment) }
-            cardHistoriCatat.setOnClickListener { navController.navigate(R.id.action_berandaFragment_to_historiCatatFragment) }
-            cardValidasiPeriode.setOnClickListener { navController.navigate(R.id.action_berandaFragment_to_validasiPeriodeFragment) }
             cardPembukuan.setOnClickListener { navController.navigate(R.id.action_berandaFragment_to_pembukuanFragment) }
+            btnLihatSemuaNotifikasi.setOnClickListener { navController.navigate(R.id.action_berandaFragment_to_riwayatNotifikasiFragment) }
         }
     }
 

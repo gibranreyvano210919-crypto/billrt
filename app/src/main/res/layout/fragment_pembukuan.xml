@@ -127,7 +127,7 @@
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- Total Pendapatan -->
+        <!-- Menu Laporan & Catatan (Dipindahkan dari Beranda) -->
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -145,46 +145,116 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="8dp"
-                    android:text="Total Pendapatan"
+                    android:text="Laporan &amp; Catatan"
                     android:textAppearance="?attr/textAppearanceHeadline6" />
 
-                <LinearLayout
+                <GridLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal">
+                    android:columnCount="3"
+                    android:padding="4dp">
 
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:gravity="center"
-                        android:text="Total Pemasukkan" />
+                    <!-- Menu Riwayat Tunggakan -->
+                    <LinearLayout
+                        android:id="@+id/card_riwayat_tunggakan"
+                        style="@style/MenuLainLayout"
+                        android:layout_columnWeight="1">
+                        <ImageView
+                            style="@style/MenuLainIcon"
+                            android:src="@drawable/ic_tunggakan"
+                            app:tint="@color/card_tunggakan" />
+                        <TextView
+                            style="@style/MenuLainText"
+                            android:text="Riwayat Tunggakan" />
+                    </LinearLayout>
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:layout_marginEnd="8dp"
-                        android:gravity="center"
-                        android:text="-" />
+                    <!-- Menu Kas -->
+                    <LinearLayout
+                        android:id="@+id/card_kas"
+                        style="@style/MenuLainLayout"
+                        android:layout_columnWeight="1">
+                        <ImageView
+                            style="@style/MenuLainIcon"
+                            android:src="@drawable/ic_cash"
+                            app:tint="@color/card_kas" />
+                        <TextView
+                            style="@style/MenuLainText"
+                            android:text="Kas" />
+                    </LinearLayout>
 
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:gravity="center"
-                        android:text="Total Pengeluaran" />
-                </LinearLayout>
+                    <!-- Menu Rekap Tunggakan -->
+                    <LinearLayout
+                        android:id="@+id/card_rekap_tunggakan"
+                        style="@style/MenuLainLayout"
+                        android:layout_columnWeight="1">
+                        <ImageView
+                            style="@style/MenuLainIcon"
+                            android:src="@drawable/ic_tunggakan"
+                            app:tint="@color/card_tunggakan" />
+                        <TextView
+                            style="@style/MenuLainText"
+                            android:text="Tunggakan" />
+                    </LinearLayout>
 
-                <com.google.android.material.chip.Chip
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal"
-                    android:layout_marginTop="8dp"
-                    android:text="Pendapatan" />
+                    <!-- Menu Rekap Tercatat -->
+                    <LinearLayout
+                        android:id="@+id/card_rekap_tercatat"
+                        style="@style/MenuLainLayout"
+                        android:layout_columnWeight="1">
+                        <ImageView
+                            style="@style/MenuLainIcon"
+                            android:src="@drawable/ic_tercatat"
+                            app:tint="@color/card_tercatat" />
+                        <TextView
+                            style="@style/MenuLainText"
+                            android:text="Tercatat" />
+                    </LinearLayout>
+
+                    <!-- Menu Setoran -->
+                    <LinearLayout
+                        android:id="@+id/card_setoran"
+                        style="@style/MenuLainLayout"
+                        android:layout_columnWeight="1">
+                        <ImageView
+                            style="@style/MenuLainIcon"
+                            android:src="@drawable/ic_setoran"
+                            app:tint="@color/card_setoran" />
+                        <TextView
+                            style="@style/MenuLainText"
+                            android:text="Setoran" />
+                    </LinearLayout>
+
+                    <!-- Menu Histori Catat -->
+                    <LinearLayout
+                        android:id="@+id/card_histori_catat"
+                        style="@style/MenuLainLayout"
+                        android:layout_columnWeight="1">
+                        <ImageView
+                            style="@style/MenuLainIcon"
+                            android:src="@drawable/ic_history"
+                            app:tint="@color/card_histori_catat" />
+                        <TextView
+                            style="@style/MenuLainText"
+                            android:text="Histori Catat" />
+                    </LinearLayout>
+
+                    <!-- Menu Validasi Periode -->
+                    <LinearLayout
+                        android:id="@+id/card_validasi_periode"
+                        style="@style/MenuLainLayout"
+                        android:layout_columnWeight="1">
+                        <ImageView
+                            style="@style/MenuLainIcon"
+                            android:src="@drawable/ic_validate"
+                            app:tint="@color/card_validasi" />
+                        <TextView
+                            style="@style/MenuLainText"
+                            android:text="Validasi Periode" />
+                    </LinearLayout>
+
+                </GridLayout>
 
             </LinearLayout>
-
         </com.google.android.material.card.MaterialCardView>
 
         <!-- Menu Lain -->
