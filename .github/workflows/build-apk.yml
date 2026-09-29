@@ -33,20 +33,13 @@ jobs:
           name: Aplikasi-Billrt-Debug
           path: app/build/outputs/apk/debug/*.apk
 
-      - name: Send APK to Telegram Bot
+      - name: Send Notification to Telegram Bot
         env:
-          TELEGRAM_BOT_TOKEN: "5934206711:AAFA04QmCLsX0yXEsB1f4ZZPScnvT2EB3p4"
+          TELEGRAM_BOT_TOKEN: "5818535303:AAE78Ew9YsjdDEjWqXW0y-NkkoZ5bGCvuzg"
           TELEGRAM_CHAT_ID: "5396063519"
         run: |
-          APK_PATH=$(find app/build/outputs/apk/debug -name "*.apk" | head -n 1)
-          if [ -f "$APK_PATH" ]; then
-            echo "Mengirim APK ke Telegram..."
-            CAPTION="✅ Build APK Berhasil! (Billrt Lite)%0A📦 File: $(basename "$APK_PATH")"
-            curl -F chat_id="$TELEGRAM_CHAT_ID" \
-                 -F document=@"$APK_PATH" \
-                 -F caption="$CAPTION" \
-                 "https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/sendDocument"
-          else
-            echo "Error: APK tidak ditemukan di path tersebut!"
-            exit 1
-          fi
+          RUN_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          MESSAGE="✅ Build APK Berhasil! (Billrt Lite)%0A📦 Ukuran APK: ~67 MB (Melebihi batas 50MB Telegram Bot API)%0A📥 Download APK via GitHub Artifacts:%0A$RUN_URL"
+          curl -s -X POST "https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/sendMessage" \
+               --data-urlencode "chat_id=$TELEGRAM_CHAT_ID" \
+               --data-urlencode "text=$MESSAGE"

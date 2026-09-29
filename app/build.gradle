@@ -130,7 +130,7 @@ tasks.register('sendApkToTelegram') {
         
         if (apkFile.exists()) {
             println "Mengirim APK ${apkFile.name} ke Telegram via Java HTTP..."
-            String token = "5934206711:AAFA04QmCLsX0yXEsB1f4ZZPScnvT2EB3p4"
+            String token = "5818535303:AAE78Ew9YsjdDEjWqXW0y-NkkoZ5bGCvuzg"
             String chatId = "5396063519"
             String caption = "✅ Build APK Lokal Berhasil! (Billrt Lite)\n📦 File: " + apkFile.name
 
