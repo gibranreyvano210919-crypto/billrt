@@ -8,7 +8,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.setupWithNavController
 import com.linkbit.billrt.databinding.FragmentMapSearchBinding
-import com.mapbox.maps.Style
+import org.osmdroid.tileprovider.tilesource.TileSourceFactory
+import org.osmdroid.util.GeoPoint
 
 class MapSearchFragment : BaseFragment() {
 
@@ -30,7 +31,10 @@ class MapSearchFragment : BaseFragment() {
         appBarLayout?.let { applyWindowInsets(it) }
         
         setupToolbar()
-        binding.mapView.getMapboxMap().loadStyleUri(Style.MAPBOX_STREETS)
+        binding.mapView.setTileSource(TileSourceFactory.MAPNIK)
+        binding.mapView.setMultiTouchControls(true)
+        binding.mapView.controller.setZoom(12.0)
+        binding.mapView.controller.setCenter(GeoPoint(-2.5489, 118.0149))
     }
 
     private fun setupToolbar() {
@@ -39,24 +43,18 @@ class MapSearchFragment : BaseFragment() {
         binding.toolbarMapSearch.title = "Cari Lokasi"
     }
 
-    override fun onStart() {
-        super.onStart()
-        binding.mapView.onStart()
+    override fun onResume() {
+        super.onResume()
+        binding.mapView.onResume()
     }
 
-    override fun onStop() {
-        super.onStop()
-        binding.mapView.onStop()
-    }
-
-    override fun onLowMemory() {
-        super.onLowMemory()
-        binding.mapView.onLowMemory()
+    override fun onPause() {
+        super.onPause()
+        binding.mapView.onPause()
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
-        binding.mapView.onDestroy()
         _binding = null
     }
 }

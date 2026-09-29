@@ -8,18 +8,6 @@ pluginManagement {
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
-        // Pindahkan maven Mapbox ke posisi PALING ATAS
-        maven {
-            url = uri("https://api.mapbox.com/downloads/v2/releases/maven")
-            authentication {
-                basic(BasicAuthentication)
-            }
-            credentials {
-                username = "mapbox"
-                // Gunakan Secret Token (sk.xxx) yang sudah kamu centang DOWNLOADS:READ tadi
-                password = "sk.eyJ1Ijoic3VkYXJ0YWtpc3dhcmEiLCJhIjoiY21sMXI3NTU1MDl0bTNkc2QwaHAwZmRtcyJ9.I6uP_DuaPPNrie8jIeZjjQ"
-            }
-        }
         google()
         mavenCentral()
         maven { url 'https://jitpack.io' }

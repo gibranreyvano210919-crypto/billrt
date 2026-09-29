@@ -2,12 +2,11 @@ package com.linkbit.billrt
 
 import android.Manifest
 import android.annotation.SuppressLint
-import android.content.Context
 import android.content.pm.PackageManager
-import android.graphics.Bitmap
-import android.graphics.Canvas
 import android.graphics.Color
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -20,7 +19,6 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.gms.location.LocationServices
 import com.google.android.material.bottomsheet.BottomSheetDialog
-import com.google.gson.Gson
 import com.linkbit.billrt.adapter.PelangganSearchAdapter
 import com.linkbit.billrt.adapter.WilayahFilterAdapter
 import com.linkbit.billrt.databinding.BottomSheetFilterWilayahBinding
@@ -28,15 +26,13 @@ import com.linkbit.billrt.databinding.BottomSheetMapToolsBinding
 import com.linkbit.billrt.databinding.DialogPelangganSearchBinding
 import com.linkbit.billrt.databinding.FragmentMapPelangganBinding
 import com.linkbit.billrt.model.StandardResponse
-import com.mapbox.geojson.Point
-import com.mapbox.maps.CameraOptions
-import com.mapbox.maps.MapView
-import com.mapbox.maps.Style
-import com.mapbox.maps.plugin.animation.flyTo
-import com.mapbox.maps.plugin.annotation.annotations
-import com.mapbox.maps.plugin.annotation.generated.*
-import com.mapbox.maps.plugin.gestures.addOnMapClickListener
-import com.mapbox.maps.plugin.locationcomponent.location
+import org.osmdroid.events.MapEventsReceiver
+import org.osmdroid.tileprovider.tilesource.TileSourceFactory
+import org.osmdroid.util.GeoPoint
+import org.osmdroid.views.MapView
+import org.osmdroid.views.overlay.MapEventsOverlay
+import org.osmdroid.views.overlay.Marker
+import org.osmdroid.views.overlay.Polyline
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -46,28 +42,24 @@ class MapPelangganFragment : BaseFragment() {
     private var _binding: FragmentMapPelangganBinding? = null
     private val binding get() = _binding!!
     private var mapView: MapView? = null
-    private var pointAnnotationManager: PointAnnotationManager? = null
-    private var lineAnnotationManager: PolylineAnnotationManager? = null
-    private var manualPointsAnnotationManager: CircleAnnotationManager? = null
-    private var annotationToMove: PointAnnotation? = null
+    private var markerToMove: Marker? = null
 
     private var allPelangganList = listOf<PelangganMapData>()
     private var allWilayahList = listOf<WilayahData>()
 
-    private val searchHandler = android.os.Handler(android.os.Looper.getMainLooper())
+    private val searchHandler = Handler(Looper.getMainLooper())
     private var searchRunnable: Runnable? = null
 
     private enum class MapMode { NONE, MOVE_ANNOTATION, ADD_LOCATION, MANUAL_POLYLINE }
     private var currentMode = MapMode.NONE
     private var pelangganToUpdate: PelangganMapData? = null
 
-    private val manualPolylinePoints = mutableListOf<Point>()
-    private var manualPolylineAnnotation: PolylineAnnotation? = null
+    private val manualPolylinePoints = mutableListOf<GeoPoint>()
+    private var manualPolylineOverlay: Polyline? = null
 
     private val mapStyles = listOf(
-        "Satelit" to Style.SATELLITE_STREETS,
-        "Jalan" to Style.MAPBOX_STREETS,
-        "Gelap" to Style.DARK
+        "Jalan" to TileSourceFactory.MAPNIK,
+        "Satelit" to TileSourceFactory.USGS_SAT
     )
     private var currentStyleIndex = 0
 
@@ -93,6 +85,9 @@ class MapPelangganFragment : BaseFragment() {
         setupToolbar()
         
         mapView = binding.mapView
+        mapView?.setTileSource(mapStyles[currentStyleIndex].second)
+        mapView?.setMultiTouchControls(true)
+
         setupSearchView()
         fetchMapData()
         checkLocationPermissionAndCenter()
@@ -198,7 +193,8 @@ class MapPelangganFragment : BaseFragment() {
             .setTitle("Pilih Gaya Peta")
             .setItems(styleNames) { _, which ->
                 currentStyleIndex = which
-                setupMap(allPelangganList)
+                mapView?.setTileSource(mapStyles[currentStyleIndex].second)
+                mapView?.invalidate()
             }
             .show()
     }
@@ -234,28 +230,15 @@ class MapPelangganFragment : BaseFragment() {
                 val lat = parts[0].toDoubleOrNull()
                 val lng = parts[1].toDoubleOrNull()
                 if (lat != null && lng != null && lat in -90.0..90.0 && lng in -180.0..180.0) {
-                    val point = Point.fromLngLat(lng, lat)
-                    mapView?.getMapboxMap()?.flyTo(
-                        CameraOptions.Builder()
-                            .center(point)
-                            .zoom(18.0)
-                            .build()
-                    )
-                    manualPointsAnnotationManager?.deleteAll()
-                    val circleOptions = CircleAnnotationOptions()
-                        .withPoint(point)
-                        .withCircleRadius(8.0)
-                        .withCircleColor("#0000FF") 
-                        .withCircleStrokeWidth(2.0)
-                        .withCircleStrokeColor("#FFFFFF")
-                    manualPointsAnnotationManager?.create(circleOptions)
+                    val point = GeoPoint(lat, lng)
+                    mapView?.controller?.setZoom(18.0)
+                    mapView?.controller?.animateTo(point)
                     Toast.makeText(context, "Menuju ke koordinat...", Toast.LENGTH_SHORT).show()
                     return
                 }
             }
         }
 
-        // Search for customer name via API
         fetchMapData(query)
     }
 
@@ -274,11 +257,9 @@ class MapPelangganFragment : BaseFragment() {
 
     private fun clearManualPolyline() {
         manualPolylinePoints.clear()
-        manualPointsAnnotationManager?.deleteAll()
-        manualPolylineAnnotation?.let {
-            lineAnnotationManager?.delete(it)
-            manualPolylineAnnotation = null
-        }
+        manualPolylineOverlay?.let { mapView?.overlays?.remove(it) }
+        manualPolylineOverlay = null
+        mapView?.invalidate()
         updateManualPolylineDistance()
     }
 
@@ -292,12 +273,12 @@ class MapPelangganFragment : BaseFragment() {
 
     @SuppressLint("MissingPermission")
     private fun fetchAndCenterOnUserLocation() {
-        mapView?.location?.enabled = true
         val fusedClient = LocationServices.getFusedLocationProviderClient(requireActivity())
         fusedClient.lastLocation.addOnSuccessListener { loc ->
             loc?.let {
-                val point = Point.fromLngLat(it.longitude, it.latitude)
-                mapView?.getMapboxMap()?.flyTo(CameraOptions.Builder().center(point).zoom(14.0).build())
+                val point = GeoPoint(it.latitude, it.longitude)
+                mapView?.controller?.setZoom(14.0)
+                mapView?.controller?.animateTo(point)
             }
         }
     }
@@ -325,28 +306,19 @@ class MapPelangganFragment : BaseFragment() {
                     }
                     setupMap(allPelangganList)
                     
-                    // Fokus kamera jika ada kata kunci pencarian
                     if (!cari.isNullOrBlank()) {
                         if (allPelangganList.isNotEmpty()) {
-                            // Ambil pelanggan pertama yang memiliki koordinat
                             val found = allPelangganList.firstOrNull { it.lat != null && it.lng != null }
                             if (found != null) {
-                                val point = Point.fromLngLat(found.lng!!, found.lat!!)
-                                // Gunakan flyTo untuk fokus yang lebih halus dan dalam (highlight)
-                                mapView?.getMapboxMap()?.flyTo(
-                                    CameraOptions.Builder()
-                                        .center(point)
-                                        .zoom(18.5)
-                                        .build()
-                                )
+                                val point = GeoPoint(found.lat!!, found.lng!!)
+                                mapView?.controller?.setZoom(18.5)
+                                mapView?.controller?.animateTo(point)
                                 Toast.makeText(context, "Ditemukan: ${found.nama}", Toast.LENGTH_SHORT).show()
-                                // Otomatis tampilkan detail untuk hasil tunggal atau pertama
                                 showPelangganDetailDialog(found)
                             } else {
                                 Toast.makeText(context, "Pelanggan ditemukan, namun koordinat belum diatur", Toast.LENGTH_LONG).show()
                             }
                         } else {
-                            // Warning jika hasil pencarian kosong (Tidak ditemukan)
                             Toast.makeText(context, "⚠️ Pelanggan '$cari' tidak ditemukan", Toast.LENGTH_LONG).show()
                         }
                     }
@@ -365,154 +337,109 @@ class MapPelangganFragment : BaseFragment() {
     }
 
     private fun setupMap(pelangganList: List<PelangganMapData>) {
-        val styleUri = mapStyles[currentStyleIndex].second
-        mapView?.getMapboxMap()?.loadStyleUri(styleUri) { style ->
-            val locationIcon = bitmapFromVector(requireContext(), R.drawable.ic_marker_pelanggan)
-            if (locationIcon != null) {
-                style.addImage("location_icon", locationIcon)
-            }
+        val currentMapView = mapView ?: return
+        currentMapView.overlays.clear()
 
-            val annotationApi = mapView?.annotations
-            
-            if (pointAnnotationManager == null) {
-                pointAnnotationManager = annotationApi?.createPointAnnotationManager()
-            }
-            pointAnnotationManager?.deleteAll()
+        val locationIcon = ContextCompat.getDrawable(requireContext(), R.drawable.ic_marker_pelanggan)
 
-            if (lineAnnotationManager == null) {
-                 lineAnnotationManager = annotationApi?.createPolylineAnnotationManager()
-            }
-
-            if(manualPointsAnnotationManager == null) {
-                manualPointsAnnotationManager = annotationApi?.createCircleAnnotationManager()
-            }
-
-            val optionsList = pelangganList.mapNotNull { p ->
-                if (p.lat != null && p.lng != null) {
-                    PointAnnotationOptions()
-                        .withPoint(Point.fromLngLat(p.lng, p.lat))
-                        .withTextField(p.nama)
-                        .withTextColor(Color.YELLOW)
-                        .withTextSize(12.0)
-                        .withTextAnchor(com.mapbox.maps.extension.style.layers.properties.generated.TextAnchor.TOP)
-                        .withTextOffset(listOf(0.0, 0.5))
-                        .withIconImage("location_icon")
-                        .withIconSize(0.7)
-                        .withIconAnchor(com.mapbox.maps.extension.style.layers.properties.generated.IconAnchor.BOTTOM)
-                        .withData(Gson().toJsonTree(p))
-                } else null
-            }
-
-            pointAnnotationManager?.create(optionsList)
-
-            pointAnnotationManager?.addClickListener(OnPointAnnotationClickListener { annotation ->
-                if (currentMode != MapMode.MOVE_ANNOTATION) {
-                    val json = annotation.getData()
-                    if (json != null && json.isJsonObject) {
-                        val pData = Gson().fromJson(json, PelangganMapData::class.java)
-                        showPelangganDetailDialog(pData, annotation)
+        pelangganList.forEach { p ->
+            val lat = p.lat
+            val lng = p.lng
+            if (lat != null && lng != null) {
+                val point = GeoPoint(lat, lng)
+                val marker = Marker(currentMapView).apply {
+                    position = point
+                    title = p.nama
+                    snippet = "ID: ${p.id} | Wilayah: ${p.namaWilayah}"
+                    icon = locationIcon
+                    setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+                    relatedObject = p
+                    setOnMarkerClickListener { m, _ ->
+                        if (currentMode != MapMode.MOVE_ANNOTATION) {
+                            val pData = m.relatedObject as? PelangganMapData
+                            if (pData != null) {
+                                showPelangganDetailDialog(pData, m)
+                            }
+                        }
+                        true
                     }
                 }
-                true
-            })
-
-            mapView?.getMapboxMap()?.addOnMapClickListener { point ->
-                handleMapClick(point)
-                true
+                currentMapView.overlays.add(marker)
             }
         }
+
+        // Map Click Receiver
+        val mapEventsReceiver = object : MapEventsReceiver {
+            override fun singleTapConfirmedHelper(p: GeoPoint): Boolean {
+                handleMapClick(p)
+                return true
+            }
+
+            override fun longPressHelper(p: GeoPoint): Boolean {
+                return false
+            }
+        }
+        currentMapView.overlays.add(MapEventsOverlay(mapEventsReceiver))
+
+        currentMapView.invalidate()
     }
 
-    private fun bitmapFromVector(context: Context, vectorResId: Int): Bitmap? {
-        val vectorDrawable = ContextCompat.getDrawable(context, vectorResId) ?: return null
-        vectorDrawable.setBounds(0, 0, vectorDrawable.intrinsicWidth, vectorDrawable.intrinsicHeight)
-        val bitmap = Bitmap.createBitmap(vectorDrawable.intrinsicWidth, vectorDrawable.intrinsicHeight, Bitmap.Config.ARGB_8888)
-        val canvas = Canvas(bitmap)
-        vectorDrawable.draw(canvas)
-        return bitmap
-    }
-
-    private fun haversine(lat1: Double, lon1: Double, lat2: Double, lon2: Double): Double {
-        val R = 6371e3
-        val phi1 = Math.toRadians(lat1)
-        val phi2 = Math.toRadians(lat2)
-        val deltaPhi = Math.toRadians(lat2 - lat1)
-        val deltaLambda = Math.toRadians(lon2 - lon1)
-
-        val a = Math.sin(deltaPhi / 2) * Math.sin(deltaPhi / 2) +
-                Math.cos(phi1) * Math.cos(phi2) *
-                Math.sin(deltaLambda / 2) * Math.sin(deltaLambda / 2)
-        val c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
-        return R * c
-    }
-
-    private fun showPelangganDetailDialog(pData: PelangganMapData, annotation: PointAnnotation? = null) {
+    private fun showPelangganDetailDialog(pData: PelangganMapData, marker: Marker? = null) {
         AlertDialog.Builder(requireContext())
             .setTitle("Detail Pelanggan")
             .setMessage("ID: ${pData.id}\nNama: ${pData.nama}\nWilayah: ${pData.namaWilayah}\nKoordinat: ${pData.lat}, ${pData.lng}")
             .setPositiveButton("OK", null)
             .setNeutralButton("Pindah") { _, _ ->
-                if (annotation != null) {
-                    startMoveMode(annotation)
+                if (marker != null) {
+                    startMoveMode(marker)
                 } else {
-                    // Jika dialog muncul dari pencarian dan kita ingin pindah, 
-                    // mode pindah butuh objek annotation asli dari manager.
-                    // Untuk saat ini kita batasi pindah hanya dari klik marker langsung.
                     Toast.makeText(context, "Gunakan marker di peta untuk memindahkan", Toast.LENGTH_SHORT).show()
                 }
             }
             .show()
     }
 
-    private fun startMoveMode(annotation: PointAnnotation) {
+    private fun startMoveMode(marker: Marker) {
         currentMode = MapMode.MOVE_ANNOTATION
-        annotationToMove = annotation
+        markerToMove = marker
         Toast.makeText(context, "Mode pemindahan aktif. Klik lokasi baru di peta.", Toast.LENGTH_LONG).show()
     }
 
-    private fun handleMapClick(point: Point) {
+    private fun handleMapClick(point: GeoPoint) {
+        val currentMapView = mapView ?: return
         when (currentMode) {
             MapMode.MOVE_ANNOTATION -> {
-                val newPoint = Point.fromLngLat(point.longitude(), point.latitude())
-                annotationToMove?.let { annotation ->
-                    val json = annotation.getData()
-                    if (json != null && json.isJsonObject) {
-                        val pData = Gson().fromJson(json, PelangganMapData::class.java)
-                        updateAnnotationAndApi(pData.id, newPoint)
+                markerToMove?.let { marker ->
+                    val pData = marker.relatedObject as? PelangganMapData
+                    if (pData != null) {
+                        updateAnnotationAndApi(pData.id, point)
                     }
                 }
                 currentMode = MapMode.NONE
-                annotationToMove = null
+                markerToMove = null
             }
             MapMode.ADD_LOCATION -> {
-                val newPoint = Point.fromLngLat(point.longitude(), point.latitude())
                 pelangganToUpdate?.let { p ->
-                    updateAnnotationAndApi(p.id, newPoint)
+                    updateAnnotationAndApi(p.id, point)
                 }
                 currentMode = MapMode.NONE
                 pelangganToUpdate = null
             }
             MapMode.MANUAL_POLYLINE -> {
                 manualPolylinePoints.add(point)
-                val circleOptions = CircleAnnotationOptions()
-                    .withPoint(point)
-                    .withCircleRadius(5.0)
-                    .withCircleColor("#FF0000")
-                    .withCircleStrokeWidth(1.5)
-                    .withCircleStrokeColor("#FFFFFF")
-                manualPointsAnnotationManager?.create(circleOptions)
-
                 if (manualPolylinePoints.size > 1) {
-                    manualPolylineAnnotation?.let { lineAnnotationManager?.delete(it) }
-                    val lineOptions = PolylineAnnotationOptions()
-                        .withPoints(manualPolylinePoints)
-                        .withLineColor("#FF0000")
-                        .withLineWidth(2.0)
-                    manualPolylineAnnotation = lineAnnotationManager?.create(lineOptions)
+                    manualPolylineOverlay?.let { currentMapView.overlays.remove(it) }
+                    manualPolylineOverlay = Polyline(currentMapView).apply {
+                        setPoints(manualPolylinePoints)
+                        outlinePaint.color = Color.RED
+                        outlinePaint.strokeWidth = 4f
+                    }
+                    currentMapView.overlays.add(manualPolylineOverlay)
+                    currentMapView.invalidate()
                     updateManualPolylineDistance()
                 }
             }
-            MapMode.NONE -> { 
+            MapMode.NONE -> {
                 // Do nothing
             }
         }
@@ -524,19 +451,19 @@ class MapPelangganFragment : BaseFragment() {
             for (i in 0 until manualPolylinePoints.size - 1) {
                 val p1 = manualPolylinePoints[i]
                 val p2 = manualPolylinePoints[i + 1]
-                totalDistance += haversine(p1.latitude(), p1.longitude(), p2.latitude(), p2.longitude())
+                totalDistance += p1.distanceToAsDouble(p2)
             }
         }
         binding.distanceText.text = "Jarak: ${String.format("%.2f", totalDistance)} meter"
     }
     
-    private fun updateAnnotationAndApi(pelangganId: String, newPoint: Point) {
-        val request = UpdateLokasiRequest(pelangganId.toInt(), newPoint.latitude(), newPoint.longitude())
+    private fun updateAnnotationAndApi(pelangganId: String, newPoint: GeoPoint) {
+        val request = UpdateLokasiRequest(pelangganId.toInt(), newPoint.latitude, newPoint.longitude)
         apiService.updateLokasi(request).enqueue(object : Callback<StandardResponse> {
             override fun onResponse(call: Call<StandardResponse>, response: Response<StandardResponse>) {
                 if (response.isSuccessful && response.body()?.status == true) {
                     Toast.makeText(context, response.body()?.message, Toast.LENGTH_SHORT).show()
-                    fetchMapData() // Refresh map
+                    fetchMapData()
                 } else {
                     Toast.makeText(context, "Gagal update: ${response.body()?.message}", Toast.LENGTH_SHORT).show()
                 }
@@ -588,9 +515,18 @@ class MapPelangganFragment : BaseFragment() {
             .show()
     }
 
+    override fun onResume() {
+        super.onResume()
+        mapView?.onResume()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        mapView?.onPause()
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
-        mapView?.onDestroy()
         _binding = null
     }
 }

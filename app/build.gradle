@@ -38,13 +38,24 @@ android {
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
-        // Token Mapbox
-        buildConfigField "String", "MAPBOX_ACCESS_TOKEN", "\"${properties.getProperty('MAPBOX_ACCESS_TOKEN', '')}\""
+        // Batasi bahasa resource hanya untuk Bahasa Indonesia & Inggris (menghapus translasi bahasa lain yang tidak dipakai)
+        resourceConfigurations += ["id", "en"]
+    }
+
+    // Pemisahan APK berdasarkan arsitektur CPU (Sangat efektif untuk library berukuran besar seperti Mapbox v11)
+    splits {
+        abi {
+            enable true
+            reset()
+            include 'arm64-v8a', 'armeabi-v7a'
+            universalApk false
+        }
     }
 
     buildTypes {
         release {
-            minifyEnabled true // Disarankan true untuk rilis agar APK lebih kecil
+            minifyEnabled true // R8 Code Shrinking & Obfuscation
+            shrinkResources true // Mengosongkan resource/gambar library yang tidak terpakai
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
@@ -93,9 +104,8 @@ dependencies {
     // Google Services
     implementation 'com.google.android.gms:play-services-location:21.0.1'
 
-    // Mapbox v11
-    implementation 'com.mapbox.maps:android:11.1.0'
-    implementation 'com.mapbox.plugin:maps-annotation:11.1.0'
+    // OpenStreetMap (osmdroid)
+    implementation 'org.osmdroid:osmdroid-android:6.1.18'
 
     // Chart
     implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
@@ -122,9 +132,9 @@ tasks.register('sendApkToTelegram') {
     doLast {
         def apkFile = file("${layout.buildDirectory.get()}/outputs/apk/debug/app-debug.apk")
         if (!apkFile.exists()) {
-            def tree = fileTree(dir: "${layout.buildDirectory.get()}/outputs/apk/debug", include: "*.apk")
+            def tree = fileTree(dir: "${layout.buildDirectory.get()}/outputs/apk", include: "**/*.apk")
             if (!tree.isEmpty()) {
-                apkFile = tree.singleFile
+                apkFile = tree.files.find { it.name.contains("arm64-v8a") } ?: tree.first()
             }
         }
         

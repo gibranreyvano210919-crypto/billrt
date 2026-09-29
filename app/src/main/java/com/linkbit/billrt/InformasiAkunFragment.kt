@@ -46,7 +46,7 @@ class InformasiAkunFragment : BaseFragment() {
             append("Base URL: ${ApiConfig.BASE_URL}\n\n")
             append("Firebase DB: https://mikrotik-alert-default-rtdb.asia-southeast1.firebasedatabase.app/\n\n")
             append("Firebase API Key: AIzaSyCxjftKa70YPfRXbYwC73-O0riEF0QiDeg\n\n")
-            append("Mapbox Token: ${BuildConfig.MAPBOX_ACCESS_TOKEN}\n\n")
+            append("Engine Peta: OpenStreetMap (osmdroid)\n\n")
             val cloudinaryUrl = "cloudinary://659683344485174:97OJC46y3FKwrrH3zE1INElGJ4Q@dbqwn9fcr"
             append("Cloudinary: $cloudinaryUrl")
         }

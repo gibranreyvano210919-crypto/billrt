@@ -30,13 +30,10 @@
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <com.mapbox.maps.MapView
+        <org.osmdroid.views.MapView
             android:id="@+id/mapView"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            app:mapbox_cameraTargetLat="-2.5489"
-            app:mapbox_cameraTargetLng="118.0149"
-            app:mapbox_cameraZoom="4.0" />
+            android:layout_height="match_parent" />
 
     </FrameLayout>
 
