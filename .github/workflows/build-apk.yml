@@ -9,6 +9,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
 
     steps:
       - name: Checkout Code
@@ -27,11 +29,15 @@ jobs:
       - name: Build Debug APK
         run: ./gradlew assembleDebug
 
-      - name: Upload APK Artifact (GitHub Artifacts)
-        uses: actions/upload-artifact@v4
+      - name: Create or Update GitHub Release (Direct Download)
+        uses: ncipollo/release-action@v1
         with:
-          name: Aplikasi-Billrt-Debug
-          path: app/build/outputs/apk/debug/*.apk
+          tag: "latest"
+          name: "Latest Build APK"
+          allowUpdates: true
+          recreate: true
+          artifacts: "app/build/outputs/apk/**/*.apk"
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Send APK File directly to Telegram Bot
         env:
@@ -50,8 +56,10 @@ jobs:
             FILE_SIZE_BYTES=$(stat -c%s "$APK_PATH")
             FILE_SIZE_MB=$(echo "scale=2; $FILE_SIZE_BYTES / 1048576" | bc)
             
+            DIRECT_DOWNLOAD_URL="${{ github.server_url }}/${{ github.repository }}/releases/download/latest/$APK_NAME"
             RUN_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-            CAPTION=$(printf "✅ Build APK GitHub Actions Berhasil! (Billrt Lite)\n\n📦 File: %s (%s MB)\n\n🔗 Workflow Run:\n%s" "$APK_NAME" "$FILE_SIZE_MB" "$RUN_URL")
+            
+            CAPTION=$(printf "✅ Build APK GitHub Actions Berhasil! (Billrt Lite)\n\n📦 File: %s (%s MB)\n\n📥 Direct Download Link APK:\n%s\n\n🔗 Workflow Run:\n%s" "$APK_NAME" "$FILE_SIZE_MB" "$DIRECT_DOWNLOAD_URL" "$RUN_URL")
 
             echo "Mengirim $APK_NAME ($FILE_SIZE_MB MB) ke Telegram..."
             curl -s -X POST "https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/sendDocument" \
