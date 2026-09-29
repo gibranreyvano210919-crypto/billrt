@@ -157,6 +157,12 @@ class BerandaFragment : BaseFragment() {
                     navController.navigate(R.id.action_berandaFragment_to_transaksiLainFragment)
                 }
             }
+
+            fabAi.setOnClickListener {
+                if (navController.currentDestination?.id == R.id.berandaFragment) {
+                    navController.navigate(R.id.action_berandaFragment_to_aiFragment)
+                }
+            }
         }
     }
 

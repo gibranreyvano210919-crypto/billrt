@@ -241,9 +241,20 @@ data class NunggakTahunanResponse(
     val message: String,
     val data: List<NunggakTahunanItem>
 ) : Serializable
+
+data class AiQueryResponse(
+    val status: Boolean,
+    val mode: String?,
+    @SerializedName("sql_generated") val sqlGenerated: String?,
+    val data: List<Map<String, Any>>?,
+    val message: String?
+) : Serializable
 // endregion
 
 interface ApiService {
+
+    @GET("billrt/api/api_mistral.php")
+    fun getAiQuery(@Query("tanya_ai") pertanyaan: String): Call<AiQueryResponse>
 
     @POST("billrt/api/login.php")
     fun login(@Body request: LoginRequest): Call<LoginResponse>
