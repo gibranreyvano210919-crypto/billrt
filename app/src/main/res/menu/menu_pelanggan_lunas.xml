@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/action_search"
+        android:icon="@drawable/ic_search"
+        android:title="Cari"
+        app:actionViewClass="androidx.appcompat.widget.SearchView"
+        app:showAsAction="always|collapseActionView" />
+    <item
+        android:id="@+id/action_filter"
+        android:icon="@drawable/ic_calendar_month"
+        android:title="Filter"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/action_reset_filter"
+        android:title="Reset Filter"
+        app:showAsAction="never" />
+</menu>

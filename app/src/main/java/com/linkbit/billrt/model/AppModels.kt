@@ -81,6 +81,7 @@ data class PelangganData(
     @SerializedName("nama_wilayah") val wilayah: String,
     val status: String?,
     @SerializedName("mac_address") val macAddress: String?,
+    @SerializedName("mikrotik_username") val mikrotikUsername: String?,
     var isTercatat: Boolean = false
 ) : Serializable
 
@@ -102,7 +103,15 @@ data class SaveLocationRequest(
 data class InputCatatanRequest(
     @SerializedName("pelanggan_list") val pelangganList: List<String>,
     @SerializedName("id_teknisi") val idTeknisi: String,
-    @SerializedName("tanggal_catat") val tanggalCatat: String
+    @SerializedName("id_teknisi_collection") val idTeknisiCollection: String? = null,
+    @SerializedName("id_setoran") val idSetoran: Int? = null,
+    @SerializedName("nama_setoran") val namaSetoran: String? = null,
+    @SerializedName("tanggal_catat") val tanggalCatat: String,
+    @SerializedName("bulan") val bulan: String? = null,
+    @SerializedName("tahun") val tahun: Int? = null,
+    @SerializedName("nominal") val nominal: Int? = null,
+    @SerializedName("keterangan") val keterangan: String? = null,
+    @SerializedName("verified") val verified: Int? = 0
 ) : Serializable
 // endregion
 
@@ -113,30 +122,23 @@ data class MikrotikAccountsResponse(
     val data: List<MikrotikAccount>
 ) : Serializable
 
+data class MikrotikAccountDetailResponse(
+    val status: Boolean,
+    val data: MikrotikAccount
+) : Serializable
+
 data class MikrotikAccount(
     val id: Int,
     @SerializedName("router_name") val routerName: String,
     @SerializedName("ip_address") val ipAddress: String,
     val username: String,
+    val password: String? = null,
     val port: Int,
-    @SerializedName("created_at") val createdAt: String
+    @SerializedName("owner_id") val ownerId: Int? = null,
+    @SerializedName("created_at") val createdAt: String? = null
 ) : Serializable
 
-data class AuditUserResponse(
-    val status: Boolean,
-    val summary: AuditSummary?,
-    val data: List<AuditResult>?
-) : Serializable
-
-data class AuditSummary(
-    @SerializedName("total_audit_issue") val totalAuditIssue: Int,
-    @SerializedName("total_mikrotik") val totalMikrotik: Int,
-    @SerializedName("total_database") val totalDatabase: Int
-) : Serializable
-
-data class AuditResult(val username: String, val info: String, val status: String) : Serializable
-
-data class StandardResponse(val status: Boolean, val message: String)
+data class StandardResponse(val status: Boolean, val message: String) : Serializable
 
 data class MasterTeknisiResponse(val status: Boolean, val data: List<MasterTeknisi>)
 
@@ -152,7 +154,9 @@ data class PppoeOfflineUser(
     @SerializedName(".id") val id: String,
     val name: String,
     val profile: String,
-    val disabled: String
+    val disabled: String,
+    val comment: String?,
+    @SerializedName("last_logged_out") val lastLoggedOut: String?
 ) : Serializable
 
 data class PppoeOnlineResponse(
@@ -167,6 +171,29 @@ data class PppoeOnlineUser(
     val address: String,
     val uptime: String,
     @SerializedName("caller_id") val callerId: String
+) : Serializable
+
+data class MikrotikBillingResponse(
+    val status: Boolean,
+    val message: String,
+    @SerializedName("total_data") val totalData: Int,
+    val data: List<MikrotikBillingItem>
+) : Serializable
+
+data class MikrotikBillingItem(
+    @SerializedName("no_urut") val noUrut: Int,
+    @SerializedName("id_pelanggan") val idPelanggan: String,
+    @SerializedName("nama_pelanggan") val namaPelanggan: String,
+    @SerializedName("telepon_pelanggan") val teleponPelanggan: String,
+    @SerializedName("mikrotik_username") val mikrotikUsername: String,
+    @SerializedName("mikrotik_password") val mikrotikPassword: String,
+    @SerializedName("router_name") val routerName: String,
+    @SerializedName("tgl_expired") val tglExpired: String,
+    @SerializedName("status_aktif") val statusAktif: String,
+    @SerializedName("mikrotik_disabled") val mikrotikDisabled: String,
+    @SerializedName("mac_address") val macAddress: String,
+    @SerializedName("is_online") val isOnline: Boolean,
+    @SerializedName("is_disabled") val isDisabled: Boolean
 ) : Serializable
 
 // endregion
@@ -217,6 +244,85 @@ data class CatatanTagihanGroup(
 
 data class CatatanTagihanItem(
     val id: Int,
-    @SerializedName("id_pelanggan") val idPelanggan: String
+    @SerializedName("id_pelanggan") val idPelanggan: String,
+    @SerializedName("nama_pelanggan") val namaPelanggan: String?,
+    val nominal: Int?,
+    val keterangan: String?,
+    @SerializedName("id_setoran") val idSetoran: Int?,
+    @SerializedName("nama_setoran") val namaSetoran: String?,
+    val bulan: String?,
+    val tahun: Int?,
+    val verified: Int?,
+    @SerializedName("nama_teknisi") val namaTeknisi: String? = null
+) : Serializable
+// endregion
+
+// region Nota Data (Receipt Response)
+data class NotaDataResponse(
+    val status: Boolean,
+    val message: String? = null,
+    val data: NotaDataContainer? = null
+) : Serializable
+
+data class NotaDataContainer(
+    val periode: String? = null,
+    @SerializedName("nama_pencatat") val namaPencatat: String? = null,
+    @SerializedName("jumlah_bayar") val jumlahBayar: Float? = null,
+    val nota: NotaData? = null
+) : Serializable
+
+data class NotaData(
+    @SerializedName("no_nota") val noNota: String? = null,
+    @SerializedName("tanggal_bayar") val tanggalBayar: String? = null,
+    @SerializedName("metode_bayar") val metodeBayar: String? = null,
+    val keterangan: String? = null,
+    val wilayah: NotaWilayah? = null,
+    @SerializedName("periode_tagihan") val periodeTagihan: NotaPeriodeTagihan? = null,
+    val perusahaan: NotaPerusahaan? = null,
+    val pelanggan: NotaPelanggan? = null,
+    @SerializedName("rincian_item") val rincianItem: List<NotaRincianItem>? = null,
+    @SerializedName("total_bayar") val totalBayar: Float? = null,
+    val kasir: String? = null
+) : Serializable
+
+data class NotaWilayah(
+    @SerializedName("id_wilayah") val idWilayah: Any? = null,
+    @SerializedName("nama_wilayah") val namaWilayah: String? = null
+) : Serializable
+
+data class NotaPeriodeTagihan(
+    @SerializedName("bulan_tagihan") val bulanTagihan: Int? = null,
+    @SerializedName("nama_bulan") val namaBulan: String? = null,
+    @SerializedName("tahun_tagihan") val tahunTagihan: Int? = null,
+    @SerializedName("periode_format") val periodeFormat: String? = null
+) : Serializable
+
+data class NotaPerusahaan(
+    @SerializedName("nama_perusahaan") val namaPerusahaan: String? = null,
+    @SerializedName("alamat_perusahaan") val alamatPerusahaan: String? = null,
+    @SerializedName("telepon_perusahaan") val teleponPerusahaan: String? = null,
+    @SerializedName("email_perusahaan") val emailPerusahaan: String? = null,
+    @SerializedName("bank_nama") val bankNama: String? = null,
+    @SerializedName("bank_atas_nama") val bankAtasNama: String? = null,
+    @SerializedName("bank_no_rekening") val bankNoRekening: String? = null,
+    @SerializedName("logo_perusahaan") val logoPerusahaan: String? = null
+) : Serializable
+
+data class NotaPelanggan(
+    @SerializedName("id_pelanggan") val idPelanggan: Any? = null,
+    @SerializedName("nama_pelanggan") val namaPelanggan: String? = null,
+    @SerializedName("id_wilayah", alternate = ["idWilayah"]) val idWilayah: Any? = null,
+    @SerializedName("no_hp", alternate = ["telepon_pelanggan", "telepon"]) val noHp: String? = null,
+    @SerializedName("alamat", alternate = ["alamat_pelanggan"]) val alamat: String? = null
+) : Serializable
+
+data class NotaRincianItem(
+    val deskripsi: String? = null,
+    @SerializedName("id_tagihan") val idTagihan: Any? = null,
+    @SerializedName("bulan_tagihan") val bulanTagihan: Int? = null,
+    @SerializedName("nama_bulan") val namaBulan: String? = null,
+    @SerializedName("tahun_tagihan") val tahunTagihan: Int? = null,
+    val periode: String? = null,
+    val harga: Float? = null
 ) : Serializable
 // endregion

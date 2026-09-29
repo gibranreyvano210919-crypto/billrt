@@ -1,27 +1,22 @@
 package com.linkbit.billrt
 
-import android.graphics.Color
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import android.view.LayoutInflater
-import android.view.Menu
-import android.view.MenuInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.EditText
-import androidx.appcompat.app.AppCompatActivity
+import android.widget.Toast
 import androidx.appcompat.widget.SearchView
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.setFragmentResultListener
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.linkbit.billrt.adapter.PelangganBelumBayarAdapter
 import com.linkbit.billrt.databinding.FragmentBelumBayarBinding
 import com.linkbit.billrt.viewmodel.PelangganBelumBayarViewModel
 
-class PelangganBelumBayarFragment : Fragment() {
+class PelangganBelumBayarFragment : BaseFragment() {
 
     private var _binding: FragmentBelumBayarBinding? = null
     private val binding get() = _binding!!
@@ -31,18 +26,19 @@ class PelangganBelumBayarFragment : Fragment() {
 
     private var bulan: Int = 0
     private var tahun: Int = 0
-    private var idWilayah: Int? = null
+    private var idWilayah: Int? = null // State filter wilayah
 
     private val searchHandler = Handler(Looper.getMainLooper())
     private var searchRunnable: Runnable? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setHasOptionsMenu(true)
         arguments?.let {
             bulan = it.getInt("bulan")
             tahun = it.getInt("tahun")
-            idWilayah = if (it.containsKey("id_wilayah")) it.getInt("id_wilayah") else null
+            if (it.containsKey("id_wilayah")) {
+                idWilayah = it.getInt("id_wilayah")
+            }
         }
     }
 
@@ -57,29 +53,71 @@ class PelangganBelumBayarFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        (activity as? AppCompatActivity)?.setSupportActionBar(binding.toolbar)
-        (activity as? AppCompatActivity)?.supportActionBar?.title = "Belum Bayar (${getNamaBulan(bulan)} $tahun)"
+        applyWindowInsets(binding.appBarLayout)
+        
+        viewModel = ViewModelProvider(requireActivity()).get(PelangganBelumBayarViewModel::class.java)
 
-
-        viewModel = ViewModelProvider(this).get(PelangganBelumBayarViewModel::class.java)
-
+        setupToolbar()
         setupRecyclerView()
         observeViewModel()
-
-        // Listener untuk refresh data setelah pembayaran atau tagout berhasil
-        setFragmentResultListener("payment_successful") { _, _ ->
-            viewModel.fetchPelangganBelumBayar(bulan, tahun, idWilayah)
-        }
-        
-        setFragmentResultListener("tagout_successful") { _, _ ->
-            viewModel.fetchPelangganBelumBayar(bulan, tahun, idWilayah)
-        }
+        setupFragmentResultListeners()
 
         binding.swipeRefreshLayout.setOnRefreshListener {
-            viewModel.fetchPelangganBelumBayar(bulan, tahun, idWilayah)
+            val searchView = binding.toolbar.menu.findItem(R.id.action_search).actionView as? SearchView
+            viewModel.fetchPelangganBelumBayar(bulan, tahun, idWilayah, searchView?.query?.toString())
         }
 
+        // Fetch data awal
         viewModel.fetchPelangganBelumBayar(bulan, tahun, idWilayah)
+    }
+
+    private fun setupToolbar() {
+        binding.toolbar.apply {
+            title = "Belum Bayar"
+            subtitle = "${getNamaBulan(bulan)} $tahun"
+            setNavigationIcon(R.drawable.ic_arrow_back)
+            setNavigationOnClickListener { findNavController().navigateUp() }
+            
+            menu.clear()
+            inflateMenu(R.menu.search_menu)
+            
+            setOnMenuItemClickListener { menuItem ->
+                when (menuItem.itemId) {
+                    R.id.action_reset_filter -> {
+                        idWilayah = null
+                        subtitle = "${getNamaBulan(bulan)} $tahun"
+                        viewModel.resetFilter()
+                        Toast.makeText(context, "Filter direset", Toast.LENGTH_SHORT).show()
+                        true
+                    }
+                    R.id.action_filter -> {
+                        showWilayahFilter()
+                        true
+                    }
+                    else -> false
+                }
+            }
+
+            val searchItem = menu.findItem(R.id.action_search)
+            val searchView = searchItem.actionView as? SearchView
+            searchView?.queryHint = "Cari pelanggan..."
+            searchView?.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+                override fun onQueryTextSubmit(query: String?): Boolean {
+                    searchRunnable?.let { searchHandler.removeCallbacks(it) }
+                    viewModel.fetchPelangganBelumBayar(bulan, tahun, idWilayah, query)
+                    return true
+                }
+
+                override fun onQueryTextChange(newText: String?): Boolean {
+                    searchRunnable?.let { searchHandler.removeCallbacks(it) }
+                    searchRunnable = Runnable {
+                        viewModel.fetchPelangganBelumBayar(bulan, tahun, idWilayah, newText)
+                    }
+                    searchHandler.postDelayed(searchRunnable!!, 500)
+                    return true
+                }
+            })
+        }
     }
 
     private fun getNamaBulan(bulan: Int): String {
@@ -116,62 +154,45 @@ class PelangganBelumBayarFragment : Fragment() {
             adapter.submitList(list)
             binding.swipeRefreshLayout.isRefreshing = false
         }
-
         viewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
             binding.swipeRefreshLayout.isRefreshing = isLoading
         }
     }
 
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        inflater.inflate(R.menu.search_menu, menu)
-        val searchItem = menu.findItem(R.id.action_search)
-        val searchView = searchItem.actionView as SearchView
-
-        val searchText = searchView.findViewById<EditText>(androidx.appcompat.R.id.search_src_text)
-        searchText.setTextColor(Color.WHITE)
-        searchText.setHintTextColor(Color.LTGRAY)
-
-        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-            override fun onQueryTextSubmit(query: String?): Boolean {
-                Log.d("SearchDebug", "Submit query: '$query'")
-                searchRunnable?.let { searchHandler.removeCallbacks(it) }
-                viewModel.fetchPelangganBelumBayar(bulan, tahun, idWilayah, query)
-                return true
+    private fun setupFragmentResultListeners() {
+        parentFragmentManager.setFragmentResultListener("filter_wilayah", viewLifecycleOwner) { _, bundle ->
+            // Mengambil data menggunakan key yang spesifik untuk menghindari deprecation Any?
+            val selectedId = if (bundle.containsKey("id_wilayah")) {
+                val value = bundle.get("id_wilayah")
+                if (value is Int) value else null
+            } else null
+            
+            val namaWilayah = bundle.getString("nama_wilayah") ?: "Semua Wilayah"
+            
+            this.idWilayah = selectedId
+            binding.toolbar.subtitle = if (selectedId == null) {
+                "${getNamaBulan(bulan)} $tahun"
+            } else {
+                "Wilayah: $namaWilayah"
             }
-
-            override fun onQueryTextChange(newText: String?): Boolean {
-                Log.d("SearchDebug", "Query text change: '$newText'")
-                searchRunnable?.let { searchHandler.removeCallbacks(it) }
-                searchRunnable = Runnable {
-                    viewModel.fetchPelangganBelumBayar(bulan, tahun, idWilayah, newText)
-                }
-                searchHandler.postDelayed(searchRunnable!!, 500) // 500ms debounce
-                return true
-            }
-        })
-
-        searchView.setOnCloseListener {
-            viewModel.fetchPelangganBelumBayar(bulan, tahun, idWilayah, null)
-            true
+            
+            Log.d("SearchDebug", "Filter Diterapkan -> idWilayah: $selectedId")
+            
+            val searchView = binding.toolbar.menu.findItem(R.id.action_search).actionView as? SearchView
+            viewModel.fetchPelangganBelumBayar(bulan, tahun, selectedId, searchView?.query?.toString())
         }
 
-        super.onCreateOptionsMenu(menu, inflater)
+        parentFragmentManager.setFragmentResultListener("payment_successful", viewLifecycleOwner) { _, bundle ->
+            if (bundle.getBoolean("refresh")) viewModel.fetchPelangganBelumBayar(bulan, tahun, idWilayah)
+        }
+    }
+
+    private fun showWilayahFilter() {
+        BelumBayarFilterBottomSheet.newInstance().show(parentFragmentManager, BelumBayarFilterBottomSheet.TAG)
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
-    }
-
-    companion object {
-        fun newInstance(bulan: Int, tahun: Int, idWilayah: Int? = null): PelangganBelumBayarFragment {
-            val fragment = PelangganBelumBayarFragment()
-            val args = Bundle()
-            args.putInt("bulan", bulan)
-            args.putInt("tahun", tahun)
-            idWilayah?.let { args.putInt("id_wilayah", it) }
-            fragment.arguments = args
-            return fragment
-        }
     }
 }

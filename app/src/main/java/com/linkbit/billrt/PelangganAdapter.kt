@@ -11,7 +11,7 @@ class PelangganAdapter(
     private val onDetailClick: ((PelangganData) -> Unit)? = null,
     private val onMenuClick: ((PelangganData, View) -> Unit)? = null,
     private val onEditClick: ((PelangganData) -> Unit)? = null,
-    private val onItemLongClick: ((PelangganData) -> Unit)? = null // New
+    private val onItemLongClick: ((PelangganData) -> Unit)? = null
 ) : RecyclerView.Adapter<PelangganAdapter.PelangganViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PelangganViewHolder {
@@ -37,14 +37,22 @@ class PelangganAdapter(
             binding.tvIdPelanggan.text = "ID: ${pelanggan.idPelanggan}"
             binding.tvAlamat.text = pelanggan.alamat
             binding.tvWilayah.text = "Wilayah: ${pelanggan.namaWilayah}"
-            binding.tvStatusBerlangganan.text = "Status: ${pelanggan.tglDaftar}"
+            binding.tvTglPasang.text = "Tgl Pasang: ${pelanggan.installationDate ?: "-"}"
+            binding.tvStatusBerlangganan.text = "Tgl Daftar: ${pelanggan.tglDaftar ?: "-"}"
 
-            if (onDetailClick != null) {
-                binding.btnLihatDetail.visibility = View.VISIBLE
-                binding.btnLihatDetail.setOnClickListener { onDetailClick.invoke(pelanggan) }
-            } else {
-                binding.btnLihatDetail.visibility = View.GONE
+            // Setup Klik satu kali untuk detail (seluruh item)
+            itemView.setOnClickListener {
+                onDetailClick?.invoke(pelanggan)
             }
+
+            // Setup Klik lama untuk menu tambahan
+            itemView.setOnLongClickListener {
+                onItemLongClick?.invoke(pelanggan)
+                true
+            }
+
+            // Button Lihat Detail disembunyikan (sesuai layout XML terbaru)
+            binding.btnLihatDetail.visibility = View.GONE
 
             if (onMenuClick != null) {
                 binding.btnMenuPelanggan.visibility = View.VISIBLE
@@ -60,11 +68,6 @@ class PelangganAdapter(
                 binding.btnEdit.setOnClickListener { onEditClick.invoke(pelanggan) }
             } else {
                 binding.btnEdit.visibility = View.GONE
-            }
-
-            itemView.setOnLongClickListener {
-                onItemLongClick?.invoke(pelanggan)
-                true
             }
         }
     }

@@ -2,7 +2,7 @@ package com.linkbit.billrt
 
 import com.google.gson.JsonElement
 import com.google.gson.annotations.SerializedName
-import com.linkbit.billrt.model.StandardResponse
+import com.linkbit.billrt.model.*
 import com.linkbit.billrt.network.PelangganBaruResponse
 import retrofit2.Call
 import retrofit2.http.Body
@@ -11,9 +11,31 @@ import retrofit2.http.FormUrlEncoded
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Query
+import retrofit2.http.Url
 import java.io.Serializable
 
 // region Data Classes
+
+// Bill Statement
+data class BillStatementSummary(
+    @SerializedName("total_income") val totalIncome: Double,
+    @SerializedName("income_format") val incomeFormat: String,
+    @SerializedName("total_expense") val totalExpense: Double,
+    @SerializedName("expense_format") val expenseFormat: String
+) : Serializable
+
+data class BillStatementFilter(
+    val tipe: String,
+    val bulan: Int,
+    val tahun: Int
+) : Serializable
+
+data class BillStatementResponse(
+    val status: Boolean,
+    val filter: BillStatementFilter,
+    val type: String,
+    val summary: BillStatementSummary
+) : Serializable
 
 // Pengaturan
 data class PengaturanResponse(
@@ -28,26 +50,26 @@ data class PengaturanResponse(
     @SerializedName("logo_perusahaan") val logoPerusahaan: String?,
     @SerializedName("masa_tenggang") val masaTenggang: String?,
     @SerializedName("updated_at") val updatedAt: String?
-)
+) : Serializable
 
 data class UpdatePengaturanResponse(
     val status: Boolean,
     val message: String,
     val data: PengaturanResponse
-)
+) : Serializable
 
 // Pelanggan
-data class GetPelangganByIdRequest(val id_pelanggan: String)
+data class GetPelangganByIdRequest(val id_pelanggan: String) : Serializable
 
 data class GetPelangganByIdResponse(
     val status: Boolean,
     val message: String?,
     val data: PelangganData?
-)
+) : Serializable
 
 // Rekap
 data class RekapStatusPelanggan(
-    val aktif: Int,
+    val aktif: String?,
     val isolir: Int,
     val nonaktif: Int,
     val total: Int,
@@ -55,14 +77,17 @@ data class RekapStatusPelanggan(
     @SerializedName("belum_bayar") val belumBayar: Int,
     val tagout: Int,
     val telat: Int,
-    @SerializedName("total_nunggak") val totalNunggak: Int
-)
+    @SerializedName("total_nunggak") val totalNunggak: Int,
+    @SerializedName("nunggak_tahunan") val nunggakTahunan: Int,
+    @SerializedName("telat_tahunan") val telatTahunan: Int,
+    val baru: Int
+) : Serializable
 
 data class RekapStatusPelangganResponse(
     val status: Boolean,
     val message: String,
     val data: RekapStatusPelanggan
-)
+) : Serializable
 
 // Tagout
 data class TagoutItem(
@@ -81,19 +106,19 @@ data class TagoutResponse(
     val message: String,
     val total: Int,
     val data: List<TagoutItem>
-)
+) : Serializable
 
 // Periode
 data class PeriodeTagihan(
     @SerializedName("bulan_tagihan") val bulanTagihan: Int,
     @SerializedName("tahun_tagihan") val tahunTagihan: Int
-)
+) : Serializable
 
 data class ListPeriodeResponse(
     val status: Boolean,
     val message: String?,
     val data: List<PeriodeTagihan>?
-)
+) : Serializable
 
 // Detail Tagihan
 data class DetailBayarResponse(
@@ -101,7 +126,7 @@ data class DetailBayarResponse(
     @SerializedName("is_lunas") val isLunas: Boolean,
     val message: String,
     val data: JsonElement
-)
+) : Serializable
 
 data class DetailBayarLunasData(
     @SerializedName("no_invoice") val noInvoice: String,
@@ -116,7 +141,7 @@ data class DetailBayarLunasData(
     @SerializedName("metode") val metode: String,
     @SerializedName("admin_penerima") val adminPenerima: String,
     @SerializedName("catatan") val catatan: String
-)
+) : Serializable
 
 data class DetailBayarBelumLunasData(
     @SerializedName("no_invoice") val noInvoice: String,
@@ -129,7 +154,56 @@ data class DetailBayarBelumLunasData(
     @SerializedName("nominal") val nominal: Float,
     @SerializedName("jatuh_tempo") val jatuhTempo: String,
     @SerializedName("instruksi") val instruksi: String
-)
+) : Serializable
+
+data class TagihanBelumBayar(
+    @SerializedName("id_pelanggan") val idPelanggan: Int,
+    @SerializedName("nama_pelanggan") val namaPelanggan: String,
+    @SerializedName("telepon_pelanggan") val teleponPelanggan: String?,
+    @SerializedName("mikrotik_username") val mikrotikUsername: String?,
+    @SerializedName("nama_paket") val namaPaket: String?,
+    @SerializedName("harga_paket") val hargaPaket: Float,
+    @SerializedName("wilayah") val wilayah: String?,
+    @SerializedName("periode_tunggakan") val periodeTunggakan: String?,
+    @SerializedName("total_nominal") val totalNominal: Float,
+    @SerializedName("tgl_bayar_terakhir") val tglBayarTerakhir: String?,
+    @SerializedName("nama_pencatat") val namaPencatat: String?,
+    @SerializedName("performa_pembayaran") val performaPembayaran: String?,
+    @SerializedName("performa_float") val performaFloat: Float?,
+    @SerializedName("invoice") val listIdTagihan: String?,
+    @SerializedName("rincian_tunggakan") val rincianTunggakan: List<String>?
+) : Serializable
+
+data class TagihanBelumBayarResponse(
+    val status: Boolean,
+    val data: List<TagihanBelumBayar>
+) : Serializable
+
+data class TambahPembayaranMultiRequest(
+    @SerializedName("id_tagihan_list") val idTagihanList: List<String>,
+    @SerializedName("id_pelanggan") val idPelanggan: String,
+    @SerializedName("metode_bayar") val metodeBayar: String,
+    @SerializedName("id_user") val idUser: Int,
+    @SerializedName("tanggal_bayar") val tanggalBayar: String? = null
+) : Serializable
+
+data class NunggakTahunanItem(
+    val id: Int,
+    val nama: String,
+    val telepon: String?,
+    val alamat: String?,
+    val wilayah: String?,
+    val paket: String?,
+    val username: String?,
+    @SerializedName("jumlah_bulan") val jumlahBulan: Int,
+    @SerializedName("list_bulan") val listBulan: String?
+) : Serializable
+
+data class NunggakTahunanResponse(
+    val status: Boolean,
+    val message: String,
+    val data: List<NunggakTahunanItem>
+) : Serializable
 
 // endregion
 
@@ -161,6 +235,7 @@ interface ApiService {
     @GET("http://112.78.170.196:8890/billrt/api/api_tagihan.php?tabel=data_pelanggan")
     fun getDataPelanggan(
         @Query("search") search: String? = null,
+        @Query("id_wilayah") idWilayah: Int? = null,
         @Query("filter_tipe") filterTipe: String? = null,
         @Query("bulan") bulan: Int? = null,
         @Query("tahun") tahun: Int? = null,
@@ -168,55 +243,95 @@ interface ApiService {
         @Query("status_aktif") status: String? = null
     ): Call<PelangganResponse>
 
-    @POST("index.php?tabel=get_pelanggan_by_id")
-    fun getPelangganById(@Body request: GetPelangganByIdRequest): Call<GetPelangganByIdResponse>
+    @GET("http://112.78.170.196:8890/billrt/api/api_tagihan.php?tabel=data_pelanggan_cepat")
+    fun getDataPelangganCepat(
+        @Query("search") search: String? = null,
+        @Query("id_wilayah") idWilayah: Int? = null
+    ): Call<PelangganResponse>
 
-    @GET("http://112.78.170.196:8890/billrt/api/api_pelanggan.php?tabel=apidetailpelanggan")
+    @GET("api_tagihan.php?tabel=get_pelanggan_by_id")
+    fun getPelangganById(@Query("id_pelanggan") id: String): Call<GetPelangganByIdResponse>
+
+    @GET("api_pelanggan.php?tabel=apidetailpelanggan")
     fun getApiDetailPelanggan(@Query("id_pelanggan") idPelanggan: String): Call<ApiDetailPelangganResponse>
 
-    @GET("index.php?tabel=pelanggan_baru")
+    @GET("api_pelanggan.php")
+    fun getPelangganDetailV2(
+        @Query("tabel") tabel: String = "apidetailpelanggan",
+        @Query("id_pelanggan") idPelanggan: String
+    ): Call<PelangganDetailV2Response>
+
+    @GET("api_tagihan.php?tabel=pelanggan_baru")
     fun getPelangganBaru(
         @Query("bulan") bulan: Int? = null,
         @Query("tahun") tahun: Int? = null
     ): Call<PelangganBaruResponse>
     
-    @GET("index.php?tabel=pelanggan_nonaktif")
+    @GET("api_tagihan.php?tabel=pelanggan_nonaktif")
     fun getPelangganNonaktif(
         @Query("bulan") bulan: Int?,
         @Query("tahun") tahun: Int?
     ): Call<PelangganNonaktifResponse>
 
-    @GET("index.php?tabel=pelanggan_isolir")
+    @GET("api_tagihan.php?tabel=pelanggan_isolir")
     fun getPelangganIsolir(
         @Query("bulan") bulan: Int?,
         @Query("tahun") tahun: Int?
     ): Call<PelangganIsolirResponse>
 
-    @POST("index.php?tabel=update_status_aktif")
-    fun updateStatusPelanggan(@Body request: UpdateStatusRequest): Call<StandardResponse>
+    @POST("http://112.78.170.196:8885/billrt/api/index.php?tabel=update_status_aktif")
+    fun updateStatusPelanggan(@Body request: UpdateStatusRequest): Call<com.linkbit.billrt.model.StandardResponse>
 
-    @POST("http://112.78.170.196:8890/billrt/api/api_pelanggan.php?tabel=update_mac_pelanggan")
-    fun updateMacAddress(@Query("id_pelanggan") idPelanggan: String, @Body request: UpdateMacRequest): Call<StandardResponse>
+    @POST("api_pelanggan.php?tabel=update_mac_address")
+    fun updateMacAddress(
+        @Query("id_pelanggan") id_pelanggan: String,
+        @Body request: UpdateMacRequest
+    ): Call<com.linkbit.billrt.model.StandardResponse>
 
     @POST("index.php?tabel=hapus_pelanggan")
-    fun hapusPelanggan(@Body request: PelangganIdRequest): Call<StandardResponse>
+    fun hapusPelanggan(@Body request: PelangganIdRequest): Call<com.linkbit.billrt.model.StandardResponse>
 
     @POST("index.php?tabel=simpan_pelanggan")
-    fun simpanPelanggan(@Body request: SimpanPelangganRequest): Call<StandardResponse>
+    fun simpanPelanggan(@Body request: SimpanPelangganRequest): Call<com.linkbit.billrt.model.StandardResponse>
 
-    @POST("index.php?tabel=tambah_pelanggan")
-    fun tambahPelanggan(@Body request: SimpanPelangganRequest): Call<StandardResponse>
+    @POST("http://112.78.170.196:8890/billrt/api/api_tagihan.php?tabel=tambah_pelanggan")
+    fun tambahPelanggan(@Body request: SimpanPelangganRequest): Call<TambahPelangganResponse>
 
-    @POST("index.php")
-    fun updatePelanggan(@Query("tabel") tabel: String, @Body request: UpdatePelangganRequest): Call<StandardResponse>
+    @POST("api_tagihan.php")
+    fun updatePelanggan(@Query("tabel") tabel: String, @Body request: UpdatePelangganRequest): Call<com.linkbit.billrt.model.StandardResponse>
+
+    @POST("api_pelanggan.php")
+    fun updateTeleponPelanggan(
+        @Query("tabel") tabel: String = "update_telepon_pelanggan",
+        @Query("id_pelanggan") id_pelanggan: String,
+        @Body request: UpdateTeleponRequest
+    ): Call<com.linkbit.billrt.model.StandardResponse>
+
+    @FormUrlEncoded
+    @POST("api_tagihan.php?tabel=isolir_pelanggan")
+    fun isolirPelanggan(
+        @Field("id_pelanggan") idPelanggan: String
+    ): Call<com.linkbit.billrt.model.StandardResponse>
+
+    @FormUrlEncoded
+    @POST("api_tagihan.php?tabel=nonaktif_pelanggan")
+    fun nonaktifPelanggan(
+        @Field("id_pelanggan") idPelanggan: String
+    ): Call<com.linkbit.billrt.model.StandardResponse>
+
+    @FormUrlEncoded
+    @POST("api_tagihan.php?tabel=aktifkan_pelanggan")
+    fun aktifkanPelanggan(
+        @Field("id_pelanggan") idPelanggan: String
+    ): Call<com.linkbit.billrt.model.StandardResponse>
     // endregion
 
     // region Maps & ODP
     @GET("api_maps.php")
     fun getPelangganMap(@Query("q") q: String? = null): Call<GetPelangganResponse>
 
-    @POST("index.php?tabel=update_koordinat_map")
-    fun updateLokasi(@Body request: UpdateLokasiRequest): Call<StandardResponse>
+    @POST("http://112.78.170.196:8885/billrt/api/index.php?tabel=update_koordinat_map")
+    fun updateLokasi(@Body request: UpdateLokasiRequest): Call<com.linkbit.billrt.model.StandardResponse>
 
     @GET("index.php?tabel=detail_pelanggan_map")
     fun getPelangganDetailMap(@Query("id_pelanggan") idPelanggan: String): Call<PelangganDetailMapResponse>
@@ -225,58 +340,58 @@ interface ApiService {
     fun getOdp(@Query("search") search: String? = null): Call<OdpResponse>
 
     @GET("index.php?tabel=odp_ports")
-    fun getOdpDetail(@Query("odp_id") odpId: Int): Call<OdpDetailResponse>
+    fun getOdpDetail(@Query("odpId") odpId: Int): Call<OdpDetailResponse>
 
     @GET("index.php?tabel=odp_lokasi_pelanggan")
     fun getOdpLokasiPelanggan(@Query("search") search: String? = null): Call<OdpLokasiPelangganResponse>
 
     @POST("index.php?tabel=simpan_odp")
-    fun simpanOdp(@Body request: OdpData): Call<StandardResponse>
+    fun simpanOdp(@Body request: OdpData): Call<com.linkbit.billrt.model.StandardResponse>
 
     @POST("index.php?tabel=update_port_odp")
-    fun updatePortOdp(@Body request: OdpPort): Call<StandardResponse>
+    fun updatePortOdp(@Body request: OdpPort): Call<com.linkbit.billrt.model.StandardResponse>
 
     @POST("index.php?tabel=hapus_odp")
-    fun hapusOdp(@Body request: OdpData): Call<StandardResponse>
+    fun hapus_odp(@Body request: OdpData): Call<com.linkbit.billrt.model.StandardResponse>
 
     @POST("index.php?tabel=simpan_jalur_kabel")
-    fun simpanJalurKabel(@Body request: SimpanJalurKabelRequest): Call<StandardResponse>
+    fun simpanJalurKabel(@Body request: SimpanJalurKabelRequest): Call<com.linkbit.billrt.model.StandardResponse>
 
     @POST("index.php?tabel=hapus_jalur_kabel")
-    fun hapusJalurKabel(@Body request: HapusJalurKabelRequest): Call<StandardResponse>
+    fun hapusJalurKabel(@Body request: HapusJalurKabelRequest): Call<com.linkbit.billrt.model.StandardResponse>
 
     @POST("index.php?tabel=cabut_layanan_port")
-    fun cabutLayananPort(@Body request: CabutLayananPortRequest): Call<StandardResponse>
+    fun cabutLayananPort(@Body request: CabutLayananPortRequest): Call<com.linkbit.billrt.model.StandardResponse>
     // endregion
 
     // region Master Data (Paket, Wilayah)
-    @GET("index.php?tabel=paket_internet")
+    @GET("api_tagihan.php?tabel=paket_internet")
     fun getPaket(): Call<PaketResponse>
 
     @POST("index.php?tabel=simpan_paket")
-    fun simpanPaket(@Body request: SimpanPaketRequest): Call<StandardResponse>
+    fun simpanPaket(@Body request: SimpanPaketRequest): Call<com.linkbit.billrt.model.StandardResponse>
 
     @POST("index.php?tabel=hapus_paket")
-    fun hapusPaket(@Body request: HapusPaketRequest): Call<StandardResponse>
+    fun hapusPaket(@Body request: HapusPaketRequest): Call<com.linkbit.billrt.model.StandardResponse>
 
-    @GET("index.php?tabel=wilayah")
+    @GET("api_tagihan.php?tabel=wilayah")
     fun getWilayah(): Call<WilayahResponse>
 
-    @GET("index.php?tabel=wilayah_pelanggan_nested")
-    fun getWilayahPelangganNested(): Call<WilayahPelangganNestedResponse>
+    @GET("http://112.78.170.196:8885/billrt/api/index.php?tabel=wilayah_pelanggan_nested")
+    fun getWilayahPelangganNested(@Query("cari") cari: String? = null): Call<WilayahPelangganNestedResponse>
 
     @POST("index.php?tabel=simpan_wilayah")
-    fun simpanWilayah(@Body request: SimpanWilayahRequest): Call<StandardResponse>
+    fun simpanWilayah(@Body request: SimpanWilayahRequest): Call<com.linkbit.billrt.model.StandardResponse>
 
     @POST("index.php?tabel=hapus_wilayah")
-    fun hapusWilayah(@Body request: HapusWilayahRequest): Call<StandardResponse>
+    fun hapusWilayah(@Body request: HapusWilayahRequest): Call<com.linkbit.billrt.model.StandardResponse>
     // endregion
 
     // region Laporan & Tagihan
-    @GET("http://112.78.170.196:8890/billrt/api/api_tagihan.php?tabel=rekap_status_pelanggan")
+    @GET("api_tagihan.php?tabel=rekap_status_pelanggan")
     fun getRekapStatusPelanggan(@Query("bulan") bulan: Int, @Query("tahun") tahun: Int): Call<RekapStatusPelangganResponse>
 
-    @GET("http://112.78.170.196:8890/billrt/api/api_tagihan.php?tabel=get_tagout")
+    @GET("api_tagihan.php?tabel=get_tagout")
     fun getTagout(
         @Query("bulan") bulan: Int? = null,
         @Query("tahun") tahun: Int? = null
@@ -292,22 +407,31 @@ interface ApiService {
     fun getRekapTunggakan(@Query("bulan") bulan: Int, @Query("tahun") tahun: Int): Call<RekapTunggakanResponse>
 
     @GET("index.php?tabel=riwayat_catatan")
-    fun getRiwayatCatatan(@Query("id_pelanggan") idPelanggan: String): Call<RiwayatCatatanResponse>
+    fun getRiwayatCatatan(
+        @Query("id_pelanggan") idPelanggan: String,
+        @Query("bulan") bulan: Int,
+        @Query("tahun") tahun: Int
+    ): Call<RiwayatCatatanResponse>
 
-    @GET("index.php?tabel=catatan_tagihan")
-    fun getCatatanTagihan(@Query("search") search: String, @Query("bulan") bulan: Int, @Query("tahun") tahun: Int): Call<GroupedKasResponse>
+    @GET("http://112.78.170.196:8885/billrt/api/index.php?tabel=catatan_tagihan")
+    fun getCatatanTagihan(
+        @Query("id_teknisi") idTeknisi: String,
+        @Query("search") search: String,
+        @Query("bulan") bulan: Int,
+        @Query("tahun") tahun: Int
+    ): Call<GroupedKasResponse>
 
     @POST("index.php?tabel=tambah_catatan")
-    fun tambahCatatan(@Query("bulan") bulan: Int, @Query("tahun") tahun: Int, @Body request: InputCatatanRequest): Call<StandardResponse>
+    fun tambahCatatan(@Query("bulan") bulan: Int, @Query("tahun") tahun: Int, @Body request: InputCatatanRequest): Call<com.linkbit.billrt.model.StandardResponse>
 
     @POST("index.php?tabel=hapus_catatan")
-    fun hapusCatatan(@Body request: HapusCatatanRequest): Call<StandardResponse>
+    fun hapusCatatan(@Body request: HapusCatatanRequest): Call<com.linkbit.billrt.model.StandardResponse>
 
     @POST("index.php?tabel=verify_catatan")
-    fun verifyCatatan(@Body request: VerifyCatatanRequest): Call<StandardResponse>
+    fun verifyCatatan(@Body request: VerifyCatatanRequest): Call<com.linkbit.billrt.model.StandardResponse>
 
     @POST("index.php?tabel=unverify_catatan")
-    fun unverifyCatatan(@Body request: UnverifyCatatanRequest): Call<StandardResponse>
+    fun unverifyCatatan(@Body request: UnverifyCatatanRequest): Call<com.linkbit.billrt.model.StandardResponse>
     
     // Endpoint baru untuk detail pembayaran
     @GET("api_tagihan.php?tabel=detail_bayar_v2")
@@ -321,14 +445,56 @@ interface ApiService {
         @Field("tanggal_bayar") tanggal_bayar: String,
         @Field("keterangan") keterangan: String,
         @Field("admin_id") admin_id: Int
-    ): StandardResponse
+    ): com.linkbit.billrt.model.StandardResponse
+
+    @GET("api_tagihan.php?tabel=pelanggan_belum_bayar_all")
+    fun getPelangganBelumBayarAll(
+        @Query("id_pelanggan") id_pelanggan: String
+    ): Call<TagihanBelumBayarResponse>
+
+    @POST("http://112.78.170.196:8890/billrt/api/api_tagihan.php?tabel=tambah_pembayaran_multi")
+    fun tambahPembayaranMulti(@Body request: TambahPembayaranMultiRequest): Call<NotaDataResponse>
+
+    @GET("api_tagihan.php?tabel=list_pembayaran_pencarian")
+    fun getListPembayaranPencarian(
+        @Query("bulan") bulan: Int? = null,
+        @Query("tahun") tahun: Int? = null,
+        @Query("search") search: String? = null
+    ): Call<PembayaranHariIniResponse>
+
+    @GET("api_tagihan.php?tabel=list_pembayaran_hari_ini")
+    fun getPembayaranHariIni(
+        @Query("tanggal") tanggal: String? = null,
+        @Query("search") search: String? = null,
+        @Query("id_user_pencatat") idUser: Int? = null
+    ): Call<PembayaranHariIniResponse>
+
+    @GET("api_tagihan.php?tabel=rekap_total_income_expense")
+    fun getBillStatement(
+        @Query("bulan") bulan: Int,
+        @Query("tahun") tahun: Int
+    ): Call<BillStatementResponse>
+
+    @GET("api_tagihan.php?tabel=detail_nunggak_tahunan")
+    fun getDetailNunggakTahunan(@Query("tahun") tahun: Int): Call<NunggakTahunanResponse>
+
+    @GET("api_pembukuan.php?tabel=pemasukan")
+    fun getPemasukan(
+        @Query("bulan") bulan: Int,
+        @Query("tahun") tahun: Int,
+        @Query("id_user_pencatat") idUserpencatat: Int,
+        @Query("search") search: String
+    ): Call<PemasukanResponse>
+
+    @GET("api_tagihan.php?tabel=list_admin")
+    fun getListAdmin(): Call<AdminResponse>
     // endregion
 
     // region Mikrotik & OLT
     @GET("index.php?tabel=master_teknisi")
     fun getMasterTeknisi(): Call<MasterTeknisiResponse>
 
-    @GET("apimikrotik.php?tabel=mikrotik_accounts")
+    @GET("api_mikrotik.php?tabel=list_mikrotik")
     fun getMikrotikAccounts(): Call<MikrotikAccountsResponse>
 
     @GET("apimikrotik.php")
@@ -342,15 +508,18 @@ interface ApiService {
     fun removeActive(
         @Field("id") id: Int,
         @Field("username") username: String
-    ): Call<StandardResponse>
-
-    @GET("apimikrotik.php")
-    fun auditUser(
-        @Query("tabel") tabel: String = "audit_user",
-        @Query("id") routerId: Int
-    ): Call<AuditUserResponse>
+    ): Call<com.linkbit.billrt.model.StandardResponse>
 
     @GET("smartolt.php")
     fun getOltData(): Call<OltApiResponse>
+
+    @GET("smartolt_highspeed.php")
+    fun getHighSpeedOltData(): Call<HighSpeedOltResponse>
+
+    @GET("api_master_olt.php?tabel=master_olt")
+    fun getMasterOlt(): Call<OltResponse>
+
+    @GET("api_master_olt.php?tabel=detail_master_olt")
+    fun getOltDetail(@Query("id_olt") id_olt: Int): Call<OltDetailResponse>
     // endregion
 }

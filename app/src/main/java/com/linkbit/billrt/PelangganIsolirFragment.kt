@@ -34,6 +34,9 @@ class PelangganIsolirFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        // Sinkronisasi Insets agar toolbar tidak menabrak status bar
+        applyWindowInsets(binding.appBarLayout)
+        
         setupToolbar()
         setupRecyclerView()
         setupSwipeRefresh()
@@ -101,12 +104,17 @@ class PelangganIsolirFragment : BaseFragment() {
         val customerName = bottomSheetView.findViewById<TextView>(R.id.tv_customer_name)
         val mikrotikUsername = bottomSheetView.findViewById<TextView>(R.id.tv_mikrotik_username)
         val batalkanIsolir = bottomSheetView.findViewById<TextView>(R.id.option_batalkan_isolir)
+        val optionNonaktifkan = bottomSheetView.findViewById<TextView>(R.id.option_nonaktifkan_pelanggan)
 
         customerName.text = pelanggan.namaPelanggan
         mikrotikUsername.text = "Username: ${pelanggan.mikrotikUsername ?: "-"}"
 
         batalkanIsolir.setOnClickListener {
             updateStatus(pelanggan.idPelanggan, "aktif", bottomSheetDialog)
+        }
+
+        optionNonaktifkan.setOnClickListener {
+            nonaktifkanStatus(pelanggan.idPelanggan, bottomSheetDialog)
         }
 
         bottomSheetDialog.show()
@@ -132,6 +140,24 @@ class PelangganIsolirFragment : BaseFragment() {
         })
     }
 
+    private fun nonaktifkanStatus(idPelanggan: String, dialog: BottomSheetDialog) {
+        ApiConfig.apiService.nonaktifPelanggan(idPelanggan).enqueue(object : Callback<StandardResponse> {
+            override fun onResponse(call: Call<StandardResponse>, response: Response<StandardResponse>) {
+                if (response.isSuccessful && response.body()?.status == true) {
+                    Toast.makeText(context, response.body()?.message ?: "Pelanggan dinonaktifkan", Toast.LENGTH_SHORT).show()
+                    fetchPelangganIsolir() // Refresh the list
+                    dialog.dismiss()
+                } else {
+                    Toast.makeText(context, response.body()?.message ?: "Gagal menonaktifkan", Toast.LENGTH_SHORT).show()
+                }
+            }
+
+            override fun onFailure(call: Call<StandardResponse>, t: Throwable) {
+                Toast.makeText(context, "Error: ${t.message}", Toast.LENGTH_SHORT).show()
+            }
+        })
+    }
+
     private fun fetchPelangganIsolir() {
         if (!binding.swipeRefreshLayout.isRefreshing) {
             binding.progressBar.visibility = View.VISIBLE
@@ -145,7 +171,6 @@ class PelangganIsolirFragment : BaseFragment() {
                     val responseBody = response.body()
                     pelangganList = responseBody?.data ?: emptyList()
                     pelangganAdapter.updateData(pelangganList)
-                    binding.tvTotalPelanggan.text = "Total: ${responseBody?.total ?: 0}"
                 } else {
                     Toast.makeText(context, "Gagal memuat data", Toast.LENGTH_SHORT).show()
                 }

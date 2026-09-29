@@ -40,6 +40,12 @@ class BayarBottomSheetFragment : BottomSheetDialogFragment() {
             dismiss()
         }
 
+        binding.btnRiwayatBayar.setOnClickListener {
+            val historySheet = HistoryPembayaranBottomSheetFragment.newInstance(item.id_pelanggan)
+            historySheet.show(parentFragmentManager, HistoryPembayaranBottomSheetFragment.TAG)
+            dismiss()
+        }
+
         binding.btnCetak.setOnClickListener {
             Toast.makeText(context, "Cetak invoice: ${item.invoice}", Toast.LENGTH_SHORT).show()
             dismiss()

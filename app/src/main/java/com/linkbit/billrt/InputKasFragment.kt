@@ -4,6 +4,8 @@ import android.app.DatePickerDialog
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,17 +13,16 @@ import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.widget.SearchView
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.linkbit.billrt.adapter.PelangganChecklistAdapter
+import com.linkbit.billrt.databinding.BottomSheetPreviewKasBinding
 import com.linkbit.billrt.databinding.FragmentInputKasBinding
 import com.linkbit.billrt.model.CatatanTagihanResponse
 import com.linkbit.billrt.model.InputCatatanRequest
-import com.linkbit.billrt.model.MasterTeknisi
-import com.linkbit.billrt.model.MasterTeknisiResponse
 import com.linkbit.billrt.model.StandardResponse
 import com.linkbit.billrt.network.RetrofitClient
 import retrofit2.Call
@@ -36,7 +37,7 @@ class InputKasFragment : BaseFragment() {
     private var _binding: FragmentInputKasBinding? = null
     private val binding get() = _binding!!
 
-    private var teknisiList: List<MasterTeknisi> = emptyList()
+    private lateinit var sessionManager: SessionManager
     private lateinit var pelangganAdapter: PelangganChecklistAdapter
     private var selectedPelanggans: List<InputKasPelanggan> = emptyList()
     private val selectedDate = Calendar.getInstance()
@@ -46,6 +47,7 @@ class InputKasFragment : BaseFragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentInputKasBinding.inflate(inflater, container, false)
+        sessionManager = SessionManager(requireContext())
         return binding.root
     }
 
@@ -58,52 +60,91 @@ class InputKasFragment : BaseFragment() {
             insets
         }
 
+        binding.tvNamaTeknisiLogin.text = sessionManager.getUserName()
+
         setupDatePicker()
         setupMonthAndYearSpinners()
         setupRecyclerView()
-        setupSearchView()
-        fetchTeknisi()
-        fetchData() // Initial fetch without search term
+        setupSearchEditText()
+        fetchData()
 
         binding.btnSubmit.setOnClickListener {
             showConfirmationDialog()
         }
 
-        binding.infoIcon.setOnClickListener {
-            showSelectedPelangganDialog()
+        binding.btnPreviewPilihan.setOnClickListener {
+            showPreviewBottomSheet()
         }
     }
 
-    private fun showSelectedPelangganDialog() {
-        val pelangganNames = selectedPelanggans.map { it.nama }.toTypedArray()
-        val adapter = ArrayAdapter(requireContext(), R.layout.dialog_list_item_mepet, pelangganNames)
+    private fun setupSearchEditText() {
+        binding.etSearchPelanggan.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                searchRunnable?.let { searchHandler.removeCallbacks(it) }
+                searchRunnable = Runnable {
+                    fetchData(s?.toString())
+                }
+                searchHandler.postDelayed(searchRunnable!!, 400)
+            }
+            override fun afterTextChanged(s: Editable?) {}
+        })
+    }
 
-        AlertDialog.Builder(requireContext())
-            .setTitle("Pelanggan Terpilih (${pelangganNames.size})")
-            .setAdapter(adapter, null)
-            .setPositiveButton("Tutup", null)
-            .show()
+    private fun showPreviewBottomSheet() {
+        if (selectedPelanggans.isEmpty()) return
+
+        val dialog = BottomSheetDialog(requireContext())
+        val dialogBinding = BottomSheetPreviewKasBinding.inflate(layoutInflater)
+        dialog.setContentView(dialogBinding.root)
+
+        val pelangganNames = selectedPelanggans.map { "${it.nama} (${it.idPelanggan})" }
+        dialogBinding.rvPreviewPelanggan.layoutManager = LinearLayoutManager(requireContext())
+        
+        dialogBinding.rvPreviewPelanggan.adapter = object : androidx.recyclerview.widget.RecyclerView.Adapter<androidx.recyclerview.widget.RecyclerView.ViewHolder>() {
+            inner class ViewHolder(view: View) : androidx.recyclerview.widget.RecyclerView.ViewHolder(view) {
+                val textView: android.widget.TextView = view.findViewById(android.R.id.text1)
+            }
+            override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): androidx.recyclerview.widget.RecyclerView.ViewHolder {
+                val view = LayoutInflater.from(parent.context).inflate(R.layout.dialog_list_item_mepet, parent, false)
+                return ViewHolder(view)
+            }
+            override fun onBindViewHolder(holder: androidx.recyclerview.widget.RecyclerView.ViewHolder, position: Int) {
+                (holder as ViewHolder).textView.text = pelangganNames[position]
+            }
+            override fun getItemCount(): Int = pelangganNames.size
+        }
+
+        dialogBinding.btnTutup.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        dialog.show()
     }
 
     private fun showConfirmationDialog() {
-        val selectedTeknisiName = binding.namaTeknisi.text.toString()
-        val bulan = binding.spinnerBulanInput.selectedItem.toString()
-        val tahun = binding.spinnerTahunInput.selectedItem.toString()
+        val selectedTeknisiName = sessionManager.getUserName()
+        val bulanStr = binding.spinnerBulanInput.selectedItem.toString()
+        val tahunStr = binding.spinnerTahunInput.selectedItem.toString()
+        val nominal = binding.inputNominalSetor.text.toString()
+        val keterangan = binding.inputKeterangan.text.toString()
 
-        if (selectedPelanggans.isEmpty() || selectedTeknisiName.isEmpty()) {
-            Toast.makeText(context, "Teknisi dan Pelanggan harus dipilih", Toast.LENGTH_SHORT).show()
+        if (selectedPelanggans.isEmpty()) {
+            Toast.makeText(context, "Pelanggan harus dipilih", Toast.LENGTH_SHORT).show()
             return
         }
 
-        val message = "Konfirmasi data berikut:\n\n" +
+        val message = "Konfirmasi simpan catatan bulk:\n\n" +
                       "Teknisi: $selectedTeknisiName\n" +
-                      "Periode: $bulan $tahun\n" +
-                      "Total Pelanggan: ${selectedPelanggans.size}"
+                      "Periode: $bulanStr $tahunStr\n" +
+                      "Total: ${selectedPelanggans.size} Pelanggan\n" +
+                      "Nominal Per Item: Rp $nominal\n" +
+                      "Keterangan: $keterangan"
 
         AlertDialog.Builder(requireContext())
             .setTitle("Konfirmasi Input")
             .setMessage(message)
-            .setPositiveButton("Konfirmasi & Kirim") { _, _ ->
+            .setPositiveButton("Simpan Data") { _, _ ->
                 submitCatatanInBulk()
             }
             .setNegativeButton("Batal", null)
@@ -125,14 +166,14 @@ class InputKasFragment : BaseFragment() {
         binding.spinnerBulanInput.adapter = bulanAdapter
         binding.spinnerBulanInput.setSelection(currentMonth)
 
-        val tahunArray = (currentYear - 5..currentYear + 5).map { it.toString() }
+        val tahunArray = (currentYear - 2..currentYear + 2).map { it.toString() }
         val tahunAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, tahunArray)
         binding.spinnerTahunInput.adapter = tahunAdapter
         binding.spinnerTahunInput.setSelection(tahunArray.indexOf(currentYear.toString()))
 
         val listener = object: AdapterView.OnItemSelectedListener {
             override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
-                fetchData(binding.searchViewPelanggan.query.toString())
+                fetchData(binding.etSearchPelanggan.text.toString())
             }
             override fun onNothingSelected(p0: AdapterView<*>?) {}
         }
@@ -160,44 +201,19 @@ class InputKasFragment : BaseFragment() {
     private fun setupRecyclerView() {
         pelangganAdapter = PelangganChecklistAdapter(emptyList()) { pelanggans ->
             selectedPelanggans = pelanggans
-            binding.tvPelangganTerpilih.text = if (pelanggans.isEmpty()) {
-                "Pelanggan Belum Dipilih"
-            } else {
-                "${pelanggans.size} Pelanggan Dipilih"
-            }
-            binding.infoIcon.isVisible = pelanggans.isNotEmpty()
+            updateSelectionUI()
         }
         binding.rvPelangganCheckable.layoutManager = LinearLayoutManager(context)
         binding.rvPelangganCheckable.adapter = pelangganAdapter
     }
 
-    private fun setupSearchView() {
-        binding.searchViewPelanggan.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-            override fun onQueryTextSubmit(query: String?): Boolean = false
-            override fun onQueryTextChange(newText: String?): Boolean {
-                searchRunnable?.let { searchHandler.removeCallbacks(it) }
-                searchRunnable = Runnable {
-                    fetchData(newText)
-                }
-                searchHandler.postDelayed(searchRunnable!!, 300) // Debounce for 300ms
-                return true
-            }
-        })
-    }
-
-    private fun fetchTeknisi() {
-        RetrofitClient.instance.getMasterTeknisi().enqueue(object : Callback<MasterTeknisiResponse> {
-            override fun onResponse(call: Call<MasterTeknisiResponse>, response: Response<MasterTeknisiResponse>) {
-                if (!isAdded || _binding == null) return
-                if (response.isSuccessful) {
-                    teknisiList = response.body()?.data ?: emptyList()
-                    val teknisiNames = teknisiList.map { it.namaTeknisi }
-                    val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, teknisiNames)
-                    binding.namaTeknisi.setAdapter(adapter)
-                }
-            }
-            override fun onFailure(call: Call<MasterTeknisiResponse>, t: Throwable) { /* Handle failure */ }
-        })
+    private fun updateSelectionUI() {
+        binding.tvPelangganTerpilih.text = if (selectedPelanggans.isEmpty()) {
+            "Pelanggan Belum Dipilih"
+        } else {
+            "${selectedPelanggans.size} Pelanggan Dipilih"
+        }
+        binding.btnPreviewPilihan.isVisible = selectedPelanggans.isNotEmpty()
     }
 
     private fun fetchData(searchQuery: String? = null) {
@@ -211,7 +227,10 @@ class InputKasFragment : BaseFragment() {
                 val pelangganList = response.body()?.data ?: emptyList()
                 val activePelangganList = pelangganList.filter { it.statusAktif == "aktif" }
 
-                RetrofitClient.instance.getCatatanTagihan(bulan, tahun).enqueue(object: Callback<CatatanTagihanResponse>{
+                val tknId = sessionManager.getTeknisiId()
+                val idTeknisi = if (tknId != -1) tknId.toString() else sessionManager.getUserId() ?: "-1"
+
+                RetrofitClient.instance.getCatatanTagihan(idTeknisi, bulan, tahun).enqueue(object: Callback<CatatanTagihanResponse>{
                     override fun onResponse(call: Call<CatatanTagihanResponse>, response: Response<CatatanTagihanResponse>) {
                         val tercatatIds = if(response.isSuccessful) {
                             response.body()?.data?.flatMap { it.list }?.mapNotNull { it.idPelanggan }?.toSet() ?: emptySet()
@@ -223,7 +242,7 @@ class InputKasFragment : BaseFragment() {
                             InputKasPelanggan(
                                 idPelanggan = it.idPelanggan,
                                 nama = it.namaPelanggan,
-                                wilayah = null, // Wilayah is not in PelangganListItem
+                                wilayah = null,
                                 status = it.statusAktif,
                                 macAddress = it.macAddress,
                                 isTercatat = tercatatIds.contains(it.idPelanggan),
@@ -253,32 +272,53 @@ class InputKasFragment : BaseFragment() {
     }
 
     private fun submitCatatanInBulk() {
-        val selectedTeknisiName = binding.namaTeknisi.text.toString()
-        val selectedTeknisi = teknisiList.find { it.namaTeknisi == selectedTeknisiName }
+        val tknId = sessionManager.getTeknisiId()
+        val idTeknisi = if (tknId != -1) tknId.toString() else sessionManager.getUserId() ?: "-1"
 
-        if (selectedTeknisi == null) {
-            Toast.makeText(context, "Teknisi tidak valid. Harap pilih dari daftar.", Toast.LENGTH_LONG).show()
+        if (idTeknisi == "-1") {
+            Toast.makeText(context, "ID Teknisi tidak ditemukan", Toast.LENGTH_LONG).show()
             return
         }
 
         val tanggalCatat = binding.inputTanggal.text.toString()
-        val bulan = binding.spinnerBulanInput.selectedItemPosition + 1
-        val tahun = binding.spinnerTahunInput.selectedItem.toString().toInt()
+        val bulanInt = binding.spinnerBulanInput.selectedItemPosition + 1
+        val bulanStr = String.format("%02d", bulanInt)
+        val tahunInt = binding.spinnerTahunInput.selectedItem.toString().toInt()
+        
+        val nominalInt = binding.inputNominalSetor.text.toString().filter { it.isDigit() }.toIntOrNull() ?: 0
+        val keteranganStr = binding.inputKeterangan.text.toString()
 
         val pelangganIdList = selectedPelanggans.map { it.idPelanggan }
 
         val request = InputCatatanRequest(
             pelangganList = pelangganIdList,
-            idTeknisi = selectedTeknisi.id.toString(),
-            tanggalCatat = tanggalCatat
+            idTeknisi = idTeknisi,
+            idTeknisiCollection = idTeknisi,
+            idSetoran = 1,
+            namaSetoran = "Setoran Tagihan Mobile",
+            tanggalCatat = tanggalCatat,
+            bulan = bulanStr,
+            tahun = tahunInt,
+            nominal = nominalInt,
+            keterangan = keteranganStr,
+            verified = 0
         )
 
-        RetrofitClient.instance.tambahCatatan(bulan, tahun, request).enqueue(object : Callback<StandardResponse> {
+        RetrofitClient.instance.tambahCatatan(bulanInt, tahunInt, request).enqueue(object : Callback<StandardResponse> {
             override fun onResponse(call: Call<StandardResponse>, response: Response<StandardResponse>) {
                 if (response.isSuccessful) {
-                    Toast.makeText(context, "Data berhasil disimpan", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, response.body()?.message ?: "Berhasil simpan bulk", Toast.LENGTH_SHORT).show()
+                    
+                    // Reset UI
+                    binding.inputNominalSetor.text?.clear()
+                    binding.inputKeterangan.text?.clear()
+                    selectedPelanggans = emptyList()
+                    pelangganAdapter.clearSelection()
+                    updateSelectionUI()
+                    
+                    fetchData(binding.etSearchPelanggan.text.toString())
                 } else {
-                    Toast.makeText(context, "Gagal menyimpan data", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, "Gagal simpan data", Toast.LENGTH_SHORT).show()
                 }
             }
 

@@ -6,8 +6,12 @@
     app:startDestination="@id/loginFragment">
 
     <action
-        android:id="@+id/action_global_updateLokasiPelangganFragment"
-        app:destination="@id/updateLokasiPelangganFragment" />
+        android:id="@+id/action_global_bayarTagihanFragment"
+        app:destination="@id/bayarTagihanFragment" />
+
+    <action
+        android:id="@+id/action_global_cetakNotaFragment"
+        app:destination="@id/cetakNotaFragment" />
 
     <fragment
         android:id="@+id/berandaFragment"
@@ -74,6 +78,41 @@
         <action
             android:id="@+id/action_berandaFragment_to_pembukuanFragment"
             app:destination="@id/pembukuanFragment" />
+        <action
+            android:id="@+id/action_berandaFragment_to_billStatementFragment"
+            app:destination="@id/billStatementFragment" />
+        <action
+            android:id="@+id/action_berandaFragment_to_oltMonitorFragment"
+            app:destination="@id/oltMonitorFragment" />
+        <action
+            android:id="@+id/action_berandaFragment_to_transaksiLainFragment"
+            app:destination="@id/transaksiLainFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/transaksiLainFragment"
+        android:name="com.linkbit.billrt.TransaksiLainFragment"
+        android:label="Transaksi Lain"
+        tools:layout="@layout/fragment_transaksi_lain" />
+
+    <fragment
+        android:id="@+id/oltMonitorFragment"
+        android:name="com.linkbit.billrt.OltMonitorFragment"
+        android:label="Monitoring OLT"
+        tools:layout="@layout/fragment_monitoring_olt">
+        <action
+            android:id="@+id/action_oltMonitorFragment_to_oltDetailMonitorFragment"
+            app:destination="@id/oltDetailMonitorFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/oltDetailMonitorFragment"
+        android:name="com.linkbit.billrt.OltDetailMonitorFragment"
+        android:label="Detail ONU OLT"
+        tools:layout="@layout/fragment_olt_detail_monitor">
+        <argument
+            android:name="oltId"
+            app:argType="integer" />
     </fragment>
 
     <fragment
@@ -111,6 +150,38 @@
         <action
             android:id="@+id/action_menuPelangganFragment_to_pelangganTagoutFragment"
             app:destination="@id/pelangganTagoutFragment" />
+        <action
+            android:id="@+id/action_menuPelangganFragment_to_pelangganNunggakTahunanFragment"
+            app:destination="@id/pelangganNunggakTahunanFragment" />
+        <action
+            android:id="@+id/action_menuPelangganFragment_to_pelangganTelatTahunanFragment"
+            app:destination="@id/pelangganTelatTahunanFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/pelangganNunggakTahunanFragment"
+        android:name="com.linkbit.billrt.PelangganNunggakTahunanFragment"
+        android:label="Pelanggan Nunggak Tahunan"
+        tools:layout="@layout/fragment_pelanggan_nunggak_tahunan">
+        <argument
+            android:name="tahun"
+            app:argType="integer" />
+        <action
+            android:id="@+id/action_pelangganNunggakTahunanFragment_to_detailPelangganFragment"
+            app:destination="@id/detailPelangganFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/pelangganTelatTahunanFragment"
+        android:name="com.linkbit.billrt.PelangganTelatTahunanFragment"
+        android:label="Pelanggan Telat Tahunan"
+        tools:layout="@layout/fragment_pelanggan_telat">
+        <argument
+            android:name="tahun"
+            app:argType="integer" />
+        <action
+            android:id="@+id/action_pelangganTelatTahunanFragment_to_detailPelangganFragment"
+            app:destination="@id/detailPelangganFragment" />
     </fragment>
 
     <fragment
@@ -137,6 +208,9 @@
         <argument
             android:name="tahun"
             app:argType="integer" />
+        <action
+            android:id="@+id/action_pelangganTelatFragment_to_detailTagihanFragment"
+            app:destination="@id/detailTagihanFragment" />
     </fragment>
 
     <fragment
@@ -186,8 +260,8 @@
             android:id="@+id/action_pelangganAktifFragment_to_editPelangganFragment"
             app:destination="@id/editPelangganFragment" />
         <action
-            android:id="@+id/action_pelangganAktifFragment_to_pelangganAktifDetailFragment"
-            app:destination="@id/pelangganAktifDetailFragment" />
+            android:id="@+id/action_pelangganAktifFragment_to_detailPelangganFragment"
+            app:destination="@id/detailPelangganFragment" />
         <argument
             android:name="bulan"
             app:argType="integer" />
@@ -212,8 +286,8 @@
         android:label="Pelanggan Nonaktif"
         tools:layout="@layout/fragment_pelanggan_nonaktif">
         <action
-            android:id="@+id/action_pelangganNonaktifFragment_to_pelangganNonaktifDetailFragment"
-            app:destination="@id/pelangganNonaktifDetailFragment" />
+            android:id="@+id/action_pelangganNonaktifFragment_to_detailPelangganFragment"
+            app:destination="@id/detailPelangganFragment" />
         <argument
             android:name="bulan"
             app:argType="integer" />
@@ -228,8 +302,8 @@
         android:label="Pelanggan Isolir"
         tools:layout="@layout/fragment_pelanggan_isolir">
         <action
-            android:id="@+id/action_pelangganIsolirFragment_to_pelangganIsolirDetailFragment"
-            app:destination="@id/pelangganIsolirDetailFragment" />
+            android:id="@+id/action_pelangganIsolirFragment_to_detailPelangganFragment"
+            app:destination="@id/detailPelangganFragment" />
         <argument
             android:name="bulan"
             app:argType="integer" />
@@ -239,12 +313,34 @@
     </fragment>
 
     <fragment
+        android:id="@+id/detailPelangganFragment"
+        android:name="com.linkbit.billrt.DetailPelangganFragment"
+        android:label="Detail Pelanggan"
+        tools:layout="@layout/fragment_detail_pelanggan">
+        <argument
+            android:name="pelangganId"
+            app:argType="string" />
+        <action
+            android:id="@+id/action_detailPelangganFragment_to_bayarTagihanFragment"
+            app:destination="@id/bayarTagihanFragment" />
+        <action
+            android:id="@+id/action_detailPelangganFragment_to_editPelangganFragment"
+            app:destination="@id/editPelangganFragment" />
+    </fragment>
+
+    <fragment
         android:id="@+id/pelangganAktifDetailFragment"
         android:name="com.linkbit.billrt.PelangganAktifDetailFragment"
         android:label="Detail Pelanggan Aktif">
         <argument
             android:name="pelangganId"
             app:argType="string" />
+        <action
+            android:id="@+id/action_pelangganAktifDetailFragment_to_bayarTagihanFragment"
+            app:destination="@id/bayarTagihanFragment" />
+        <action
+            android:id="@+id/action_pelangganAktifDetailFragment_to_editPelangganFragment"
+            app:destination="@id/editPelangganFragment" />
     </fragment>
 
     <fragment
@@ -275,11 +371,8 @@
             android:defaultValue="true"
             app:argType="boolean" />
         <action
-            android:id="@+id/action_pelangganFragment_to_pelangganAktifDetailFragment"
-            app:destination="@id/pelangganAktifDetailFragment" />
-        <action
-            android:id="@+id/action_pelangganFragment_to_pelangganNonaktifDetailFragment"
-            app:destination="@id/pelangganNonaktifDetailFragment" />
+            android:id="@+id/action_pelangganFragment_to_detailPelangganFragment"
+            app:destination="@id/detailPelangganFragment" />
     </fragment>
 
     <fragment
@@ -390,7 +483,32 @@
         <action
             android:id="@+id/action_mikrotikAccountsFragment_to_mikrotikMenuFragment"
             app:destination="@id/mikrotikMenuFragment" />
+        <action
+            android:id="@+id/action_mikrotikAccountsFragment_to_mikrotikAddAccountFragment"
+            app:destination="@id/mikrotikAddAccountFragment" />
+        <action
+            android:id="@+id/action_mikrotikAccountsFragment_to_mikrotikBillingFragment"
+            app:destination="@id/mikrotikBillingFragment" />
     </fragment>
+
+    <fragment
+        android:id="@+id/mikrotikBillingFragment"
+        android:name="com.linkbit.billrt.MikrotikBillingFragment"
+        android:label="Billing Pelanggan"
+        tools:layout="@layout/fragment_mikrotik_billing">
+        <argument
+            android:name="routerId"
+            app:argType="integer" />
+        <action
+            android:id="@+id/action_mikrotikBillingFragment_to_detailPelangganFragment"
+            app:destination="@id/detailPelangganFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/mikrotikAddAccountFragment"
+        android:name="com.linkbit.billrt.MikrotikAddAccountFragment"
+        android:label="Tambah MikroTik"
+        tools:layout="@layout/fragment_mikrotik_add_account" />
 
     <fragment
         android:id="@+id/mikrotikMenuFragment"
@@ -407,14 +525,28 @@
             android:id="@+id/action_mikrotikMenuFragment_to_pelangganOfflineFragment"
             app:destination="@id/pelangganOfflineFragment" />
         <action
-            android:id="@+id/action_mikrotikMenuFragment_to_auditUserFragment"
-            app:destination="@id/auditUserFragment" />
-        <action
             android:id="@+id/action_mikrotikMenuFragment_to_tambahPppoeFragment"
             app:destination="@id/tambahPppoeFragment" />
         <action
             android:id="@+id/action_mikrotikMenuFragment_to_daftarSecretFragment"
             app:destination="@id/daftarSecretFragment" />
+        <action
+            android:id="@+id/action_mikrotikMenuFragment_to_auditUserGlobalFragment"
+            app:destination="@id/auditUserGlobalFragment" />
+        <action
+            android:id="@+id/action_mikrotikMenuFragment_to_syncMikrotikFragment"
+            app:destination="@id/syncMikrotikFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/syncMikrotikFragment"
+        android:name="com.linkbit.billrt.SyncMikrotikFragment"
+        android:label="Sync MikroTik"
+        tools:layout="@layout/fragment_sync_mikrotik">
+        <argument
+            android:name="routerId"
+            android:defaultValue="0"
+            app:argType="integer" />
     </fragment>
 
     <fragment
@@ -423,12 +555,6 @@
         <action
             android:id="@+id/action_mapMenuFragment_to_mapPelangganFragment"
             app:destination="@id/mapPelangganFragment" />
-        <action
-            android:id="@+id/action_mapMenuFragment_to_gantiLokasiFragment"
-            app:destination="@id/gantiLokasiFragment" />
-        <action
-            android:id="@+id/action_mapMenuFragment_to_odpMapFragment"
-            app:destination="@id/odpMapFragment" />
     </fragment>
 
     <fragment
@@ -438,16 +564,6 @@
     <fragment
         android:id="@+id/rekapTercatatFragment"
         android:name="com.linkbit.billrt.RekapTercatatFragment" />
-
-    <fragment
-        android:id="@+id/updateLokasiPelangganFragment"
-        android:name="com.linkbit.billrt.UpdateLokasiPelangganFragment"
-        android:label="Update Lokasi Pelanggan"
-        tools:layout="@layout/fragment_update_lokasi_pelanggan">
-        <action
-            android:id="@+id/action_updateLokasiPelangganFragment_to_updateFotoLokasiFragment"
-            app:destination="@id/updateFotoLokasiFragment" />
-    </fragment>
 
     <fragment
         android:id="@+id/topRedamanFragment"
@@ -460,27 +576,6 @@
         <action
             android:id="@+id/action_topRedamanFragment_to_pencarianCepatFragment"
             app:destination="@id/pencarianCepatFragment" />
-    </fragment>
-
-    <fragment
-        android:id="@+id/mikrotikSummaryFragment"
-        android:name="com.linkbit.billrt.MikrotikSummaryFragment"
-        android:label="Mikrotik Summary">
-        <argument
-            android:name="routerId"
-            app:argType="integer" />
-        <action
-            android:id="@+id/action_mikrotikSummaryFragment_to_auditUserFragment"
-            app:destination="@id/auditUserFragment" />
-    </fragment>
-
-    <fragment
-        android:id="@+id/auditUserFragment"
-        android:name="com.linkbit.billrt.AuditUserFragment"
-        android:label="Audit User">
-        <argument
-            android:name="routerId"
-            app:argType="integer" />
     </fragment>
 
     <fragment
@@ -499,60 +594,7 @@
         android:id="@+id/nav_maps"
         android:name="com.linkbit.billrt.PencarianPelangganFragment"
         android:label="Pencarian Pelanggan"
-        tools:layout="@layout/fragment_pencarian_pelanggan">
-        <action
-            android:id="@+id/action_pencarianPelangganFragment_to_gantiLokasiFragment"
-            app:destination="@id/gantiLokasiFragment" />
-    </fragment>
-
-    <fragment
-        android:id="@+id/gantiLokasiFragment"
-        android:name="com.linkbit.billrt.GantiLokasiFragment"
-        android:label="Ganti Lokasi"
-        tools:layout="@layout/fragment_ganti_lokasi">
-        <action
-            android:id="@+id/action_gantiLokasiFragment_to_updateFotoLokasiFragment"
-            app:destination="@id/updateFotoLokasiFragment" />
-    </fragment>
-
-    <fragment
-        android:id="@+id/updateFotoLokasiFragment"
-        android:name="com.linkbit.billrt.UpdateFotoLokasiFragment"
-        android:label="Update Foto &amp; Lokasi">
-        <argument
-            android:name="id_pelanggan"
-            app:argType="string" />
-        <argument
-            android:name="nama_pelanggan"
-            app:argType="string" />
-        <action
-            android:id="@+id/action_updateFotoLokasiFragment_to_konfirmasiUpdateFragment"
-            app:destination="@id/konfirmasiUpdateFragment" />
-    </fragment>
-
-    <fragment
-        android:id="@+id/konfirmasiUpdateFragment"
-        android:name="com.linkbit.billrt.KonfirmasiUpdateFragment"
-        android:label="Konfirmasi Update">
-        <argument
-            android:name="id_pelanggan"
-            app:argType="string" />
-        <argument
-            android:name="nama_pelanggan"
-            app:argType="string" />
-        <argument
-            android:name="image_url"
-            app:argType="string" />
-        <argument
-            android:name="latitude"
-            app:argType="float" />
-        <argument
-            android:name="longitude"
-            app:argType="float" />
-        <argument
-            android:name="alamat"
-            app:argType="string" />
-    </fragment>
+        tools:layout="@layout/fragment_pencarian_pelanggan" />
 
     <fragment
         android:id="@+id/tambahPelangganFragment"
@@ -702,6 +744,29 @@
         <argument
             android:name="tahun"
             app:argType="integer" />
+        <action
+            android:id="@+id/action_pelangganLunasFragment_to_pembayaranDetailFragment"
+            app:destination="@id/pembayaranDetailFragment" />
+        <action
+            android:id="@+id/action_pelangganLunasFragment_to_cetakNotaFragment"
+            app:destination="@id/cetakNotaFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/cetakNotaFragment"
+        android:name="com.linkbit.billrt.CetakNotaFragment"
+        android:label="Cetak Nota"
+        tools:layout="@layout/fragment_cetak_nota">
+        <argument
+            android:name="pelanggan_item"
+            app:argType="com.linkbit.billrt.model.PelangganLunasItem"
+            app:nullable="true"
+            android:defaultValue="@null" />
+        <argument
+            android:name="nota_data"
+            app:argType="com.linkbit.billrt.model.NotaData"
+            app:nullable="true"
+            android:defaultValue="@null" />
     </fragment>
 
     <fragment
@@ -736,6 +801,92 @@
         <action
             android:id="@+id/action_pembukuanFragment_to_laporanTahunanFragment"
             app:destination="@id/laporanTahunanFragment" />
+        <action
+            android:id="@+id/action_pembukuanFragment_to_pemasukanLainFragment"
+            app:destination="@id/pemasukanLainFragment" />
+        <action
+            android:id="@+id/action_pembukuanFragment_to_pengeluaranListFragment"
+            app:destination="@id/pengeluaranListFragment" />
+        <action
+            android:id="@+id/action_pembukuanFragment_to_customerFragment"
+            app:destination="@id/customerFragment" />
+        <action
+            android:id="@+id/action_pembukuanFragment_to_kasFragment"
+            app:destination="@id/kasFragment" />
+        <action
+            android:id="@+id/action_pembukuanFragment_to_rekapTunggakanFragment"
+            app:destination="@id/rekapTunggakanFragment" />
+        <action
+            android:id="@+id/action_pembukuanFragment_to_rekapTercatatFragment"
+            app:destination="@id/rekapTercatatFragment" />
+        <action
+            android:id="@+id/action_pembukuanFragment_to_setoranFragment"
+            app:destination="@id/setoranFragment" />
+        <action
+            android:id="@+id/action_pembukuanFragment_to_historiCatatFragment"
+            app:destination="@id/historiCatatFragment" />
+        <action
+            android:id="@+id/action_pembukuanFragment_to_validasiPeriodeFragment"
+            app:destination="@id/validasiPeriodeFragment" />
+        <action
+            android:id="@+id/action_pembukuanFragment_to_transaksiPemasukanFragment"
+            app:destination="@id/transaksiPemasukanFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/transaksiPemasukanFragment"
+        android:name="com.linkbit.billrt.TransaksiPemasukanFragment"
+        android:label="Transaksi Pemasukan"
+        tools:layout="@layout/fragment_transaksi_pemasukan">
+        <argument
+            android:name="bulan"
+            app:argType="integer" />
+        <argument
+            android:name="tahun"
+            app:argType="integer" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/pengeluaranListFragment"
+        android:name="com.linkbit.billrt.PengeluaranListFragment"
+        android:label="Daftar Pengeluaran"
+        tools:layout="@layout/fragment_pengeluaran_list">
+        <action
+            android:id="@+id/action_pengeluaranListFragment_to_pengeluaranFormFragment"
+            app:destination="@id/pengeluaranFormFragment" />
+        <argument
+            android:name="kategori"
+            android:defaultValue="@null"
+            app:argType="string"
+            app:nullable="true" />
+        <argument
+            android:name="bulan"
+            android:defaultValue="0"
+            app:argType="integer" />
+        <argument
+            android:name="tahun"
+            android:defaultValue="0"
+            app:argType="integer" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/pengeluaranFormFragment"
+        android:name="com.linkbit.billrt.PengeluaranFormFragment"
+        android:label="Form Pengeluaran"
+        tools:layout="@layout/fragment_pengeluaran_form">
+        <argument
+            android:name="pengeluaranItem"
+            app:argType="com.linkbit.billrt.model.PengeluaranItem"
+            app:nullable="true"
+            android:defaultValue="@null" />
+        <argument
+            android:name="bulan"
+            android:defaultValue="0"
+            app:argType="integer" />
+        <argument
+            android:name="tahun"
+            android:defaultValue="0"
+            app:argType="integer" />
     </fragment>
 
     <fragment
@@ -755,5 +906,124 @@
         android:name="com.linkbit.billrt.LaporanTahunanFragment"
         android:label="Laporan Tahunan"
         tools:layout="@layout/fragment_laporan_tahunan" />
+
+    <fragment
+        android:id="@+id/pemasukanLainFragment"
+        android:name="com.linkbit.billrt.PemasukanLainFragment"
+        android:label="Pemasukan Lain"
+        tools:layout="@layout/fragment_pemasukan_lain" />
+
+    <fragment
+        android:id="@+id/bayarTagihanFragment"
+        android:name="com.linkbit.billrt.BayarTagihanFragment"
+        android:label="Bayar Tagihan"
+        tools:layout="@layout/fragment_bayar_tagihan">
+        <argument
+            android:name="pelangganId"
+            app:argType="string" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/pembayaranDetailFragment"
+        android:name="com.linkbit.billrt.PembayaranDetailFragment"
+        android:label="Detail Pembayaran"
+        tools:layout="@layout/fragment_pembayaran_detail">
+        <argument
+            android:name="tagihanId"
+            app:argType="string" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/billStatementFragment"
+        android:name="com.linkbit.billrt.BillStatementFragment"
+        android:label="Bill Statement"
+        tools:layout="@layout/fragment_bill_statement">
+        <action
+            android:id="@+id/action_billStatementFragment_to_exportStatementFragment"
+            app:destination="@id/exportStatementFragment" />
+        <action
+            android:id="@+id/action_billStatementFragment_to_collectionStatementFragment"
+            app:destination="@id/collectionStatementFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/collectionStatementFragment"
+        android:name="com.linkbit.billrt.CollectionStatementFragment"
+        android:label="Collection Statement"
+        tools:layout="@layout/fragment_collection_statement">
+        <argument
+            android:name="bulan"
+            app:argType="integer" />
+        <argument
+            android:name="tahun"
+            app:argType="integer" />
+        <action
+            android:id="@+id/action_collectionStatementFragment_to_exportCollectionFragment"
+            app:destination="@id/exportCollectionFragment" />
+        <action
+            android:id="@+id/action_collectionStatementFragment_to_detailCollectionFragment"
+            app:destination="@id/detailCollectionFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/detailTagihanFragment"
+        android:name="com.linkbit.billrt.DetailTagihanFragment"
+        android:label="Detail Tagihan"
+        tools:layout="@layout/fragment_detail_tagihan">
+        <argument
+            android:name="invoice_id"
+            app:argType="string" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/exportStatementFragment"
+        android:name="com.linkbit.billrt.ExportStatementFragment"
+        android:label="Export Statement"
+        tools:layout="@layout/fragment_export_statement">
+        <argument
+            android:name="bulan"
+            app:argType="integer" />
+        <argument
+            android:name="tahun"
+            app:argType="integer" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/exportCollectionFragment"
+        android:name="com.linkbit.billrt.ExportCollectionFragment"
+        android:label="Export Collection"
+        tools:layout="@layout/fragment_export_collection">
+        <argument
+            android:name="bulan"
+            app:argType="integer" />
+        <argument
+            android:name="tahun"
+            app:argType="integer" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/auditUserGlobalFragment"
+        android:name="com.linkbit.billrt.AuditUserGlobalFragment"
+        android:label="Audit User Global"
+        tools:layout="@layout/fragment_audit_user_global" />
+
+    <fragment
+        android:id="@+id/detailCollectionFragment"
+        android:name="com.linkbit.billrt.DetailCollectionFragment"
+        android:label="Detail Collection"
+        tools:layout="@layout/fragment_detail_collection">
+        <argument
+            android:name="idUserPencatat"
+            app:argType="integer" />
+        <argument
+            android:name="namaCollector"
+            app:argType="string" />
+        <argument
+            android:name="bulan"
+            app:argType="integer" />
+        <argument
+            android:name="tahun"
+            app:argType="integer" />
+    </fragment>
 
 </navigation>

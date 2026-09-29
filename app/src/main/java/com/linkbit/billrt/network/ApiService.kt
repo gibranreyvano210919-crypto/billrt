@@ -3,20 +3,16 @@ package com.linkbit.billrt.network
 import com.google.gson.annotations.SerializedName
 import com.linkbit.billrt.DetailBayarResponse
 import com.linkbit.billrt.PelangganListResponse
+import com.linkbit.billrt.PelangganResponse
 import com.linkbit.billrt.WilayahPelangganNestedResponse
 import com.linkbit.billrt.model.*
+import com.linkbit.billrt.UpdateTeleponRequest
+import com.linkbit.billrt.UpdateMacRequest
 import retrofit2.Call
-import retrofit2.http.Body
-import retrofit2.http.GET
-import retrofit2.http.POST
-import retrofit2.http.Query
+import retrofit2.http.*
 
-/**
- * Interface Retrofit terpusat untuk semua endpoint aplikasi.
- */
 interface ApiService {
 
-    // region Pencarian & Pelanggan Umum
     @GET("billrt/api/api_radius.php")
     fun searchAutocomplete(@Query("search") searchQuery: String): Call<SearchAutoCompleteResponse>
 
@@ -32,13 +28,26 @@ interface ApiService {
     @GET("billrt/api/index.php?tabel=semua_pelanggan_lokasi")
     fun getSemuaPelanggan(): Call<PelangganListResponse>
 
-    @GET("billrt/api/api_tagihan.php?tabel=data_pelanggan")
+    @GET("http://112.78.170.196:8890/billrt/api/api_tagihan.php?tabel=data_pelanggan")
     fun getDataPelanggan(
         @Query("search") search: String? = null,
         @Query("id_wilayah") idWilayah: Int? = null,
         @Query("filter_tipe") filterTipe: String? = "semua",
-        @Query("status_aktif") statusAktif: String? = "semua"
+        @Query("status_aktif") statusAktif: String? = "semua",
+        @Query("id_pelanggan") idPelanggan: String? = null
     ): Call<DashboardResponse>
+
+    @GET("http://112.78.170.196:8890/billrt/api/api_tagihan.php?tabel=data_pelanggan_cepat")
+    fun getDataPelangganCepat(
+        @Query("search") search: String? = null,
+        @Query("id_wilayah") idWilayah: Int? = null
+    ): Call<PelangganResponse>
+
+    @GET("billrt/api/api_pelanggan.php")
+    fun getPelangganDetailV2(
+        @Query("tabel") tabel: String = "apidetailpelanggan",
+        @Query("id_pelanggan") idPelanggan: String
+    ): Call<PelangganDetailV2Response>
 
     @GET("billrt/api/index.php?tabel=pelanggan_baru")
     fun getPelangganBaru(
@@ -58,17 +67,52 @@ interface ApiService {
     @GET("billrt/api/index.php?tabel=master_teknisi_list")
     suspend fun getTeknisi(): TeknisiResponse
 
-    // endregion
+    @FormUrlEncoded
+    @POST("billrt/api/api_tagihan.php?tabel=isolir_pelanggan")
+    fun isolirPelanggan(
+        @Field("id_pelanggan") idPelanggan: String
+    ): Call<StandardResponse>
 
-    // region Fitur MikroTik
+    @FormUrlEncoded
+    @POST("billrt/api/api_tagihan.php?tabel=nonaktif_pelanggan")
+    fun nonaktifPelanggan(
+        @Field("id_pelanggan") idPelanggan: String
+    ): Call<StandardResponse>
+
+    @POST("billrt/api/api_pelanggan.php")
+    fun updateTeleponPelanggan(
+        @Query("tabel") tabel: String = "update_telepon_pelanggan",
+        @Query("id_pelanggan") idPelanggan: String,
+        @Body request: UpdateTeleponRequest
+    ): Call<StandardResponse>
+
+    @POST("billrt/api/api_pelanggan.php")
+    fun updateMacAddress(
+        @Query("id_pelanggan") idPelanggan: String,
+        @Body request: UpdateMacRequest,
+        @Query("tabel") tabel: String = "update_mac_pelanggan"
+    ): Call<StandardResponse>
+
     @GET("billrt/api/apimikrotik.php?tabel=mikrotik_accounts")
     fun getMikrotikAccounts(): Call<MikrotikAccountsResponse>
 
-    @GET("billrt/api/index.php?tabel=audit_user")
-    fun getAuditUser(@Query("id") routerId: Int): Call<AuditUserResponse>
-    // endregion
+    @GET("billrt/api/apimikrotik.php?tabel=mikrotik_account_get")
+    fun getMikrotikAccountDetail(
+        @Query("id_router") idRouter: Int
+    ): Call<MikrotikAccountDetailResponse>
 
-    // region Catatan & Kas
+    @FormUrlEncoded
+    @POST("billrt/api/apimikrotik.php?tabel=mikrotik_account_edit")
+    fun editMikrotikAccount(
+        @Field("id") id: Int,
+        @Field("router_name") routerName: String,
+        @Field("ip_address") ipAddress: String,
+        @Field("username") username: String,
+        @Field("password") password: String?,
+        @Field("port") port: Int,
+        @Field("owner_id") ownerId: Int
+    ): Call<StandardResponse>
+
     @POST("billrt/api/index.php?tabel=tambah_catatan")
     fun tambahCatatan(
         @Query("bulan") bulan: Int,
@@ -81,6 +125,7 @@ interface ApiService {
 
     @GET("billrt/api/index.php?tabel=catatan_tagihan")
     fun getCatatanTagihan(
+        @Query("id_teknisi") idTeknisi: String,
         @Query("bulan") bulan: Int,
         @Query("tahun") tahun: Int
     ): Call<CatatanTagihanResponse>
@@ -100,9 +145,7 @@ interface ApiService {
         @Query("id_wilayah") idWilayah: Int? = 0,
         @Query("id_teknisi") idTeknisi: Int? = 0
     ): RekapTunggakanLanjutanResponse
-    // endregion
 
-    // region Setoran
     @GET("billrt/api/index.php?tabel=riwayat_setoran")
     fun getRiwayatSetoran(
         @Query("bulan") bulan: Int,
@@ -118,12 +161,9 @@ interface ApiService {
 
     @POST("billrt/api/index.php?tabel=hapus_setoran")
     fun hapusSetoran(@Body request: HapusSetoranRequest): Call<StandardResponse>
-    // endregion
 
-    // region Pembayaran
     @GET("billrt/api/api_tagihan.php?tabel=detail_bayar_v2")
     suspend fun getDetailBayar(@Query("invoice") invoiceId: String): DetailBayarResponse
-    // endregion
 }
 
 data class RekapTunggakanLanjutanResponse(

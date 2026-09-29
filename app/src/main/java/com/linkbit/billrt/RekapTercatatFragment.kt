@@ -62,8 +62,8 @@ class RekapTercatatFragment : BaseFragment() {
     }
 
     private fun setupSpinners() {
-        // Month Spinner
-        val months = DateFormatSymbols().months
+        // Month Spinner - Pastikan tidak ada null dan ambil hanya 12 bulan
+        val months = DateFormatSymbols().months.filterNotNull().take(12)
         val monthAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, months)
         monthAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         binding.spinnerBulan.adapter = monthAdapter
@@ -77,7 +77,7 @@ class RekapTercatatFragment : BaseFragment() {
         }
 
         // Year Spinner
-        val years = (2020..selectedYear + 5).toList().map { it.toString() }
+        val years = (2020..selectedYear + 5).map { it.toString() }
         val yearAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, years)
         yearAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         binding.spinnerTahun.adapter = yearAdapter
@@ -161,7 +161,7 @@ class RekapTercatatFragment : BaseFragment() {
     }
 }
 
-// Adapters for the RecyclerViews
+// Adapters code follows... (keep existing adapter classes)
 class RekapTercatatAdapter(
     private var rekapList: List<RekapTercatatMingguan>,
     private val onShareClick: (RekapTercatatMingguan) -> Unit
@@ -202,12 +202,14 @@ class RekapTercatatAdapter(
             binding.ivExpandArrow.rotation = if (isExpanded) 180f else 0f
 
             binding.headerMinggu.setOnClickListener {
+                val position = adapterPosition
+                if (position == RecyclerView.NO_POSITION) return@setOnClickListener
                 if (isExpanded) {
-                    expandedPosition.remove(adapterPosition)
+                    expandedPosition.remove(position)
                 } else {
-                    expandedPosition.add(adapterPosition)
+                    expandedPosition.add(position)
                 }
-                notifyItemChanged(adapterPosition)
+                notifyItemChanged(position)
             }
 
             binding.btnShareWhatsapp.setOnClickListener { onShareClick(rekapMingguan) }

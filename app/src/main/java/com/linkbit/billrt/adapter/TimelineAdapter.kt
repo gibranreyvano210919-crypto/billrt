@@ -19,7 +19,7 @@ class TimelineAdapter(
     }
 
     override fun onBindViewHolder(holder: TimelineViewHolder, position: Int) {
-        holder.bind(timelineItems[position])
+        holder.bind(timelineItems[position], position == timelineItems.size - 1)
     }
 
     override fun getItemCount(): Int = timelineItems.size
@@ -30,21 +30,38 @@ class TimelineAdapter(
     }
 
     inner class TimelineViewHolder(private val binding: ItemTimelineBinding) : RecyclerView.ViewHolder(binding.root) {
-        fun bind(item: TimelineItem) {
+        fun bind(item: TimelineItem, isLast: Boolean) {
             binding.tvTitle.text = item.title
-            binding.tvSubtitle.text = item.subtitle
+            binding.tvSubtitle.visibility = View.GONE
             binding.tvDate.text = item.dateDisplay
             binding.tvStatus.text = item.statusText
-            binding.tvDescription.text = item.description
+            binding.tvDescription.visibility = View.GONE
+
+            if (!item.adminPencatat.isNullOrEmpty()) {
+                binding.tvAdmin.text = "Pencatat: ${item.adminPencatat}"
+                binding.tvAdmin.visibility = View.VISIBLE
+            } else {
+                binding.tvAdmin.visibility = View.GONE
+            }
+
+            // Sembunyikan garis timeline vertikal dan divider horizontal untuk item terakhir
+            binding.line.visibility = if (isLast) View.GONE else View.VISIBLE
+            binding.dividerLine.visibility = if (isLast) View.GONE else View.VISIBLE
 
             var statusColor = Color.GRAY
             try {
                 statusColor = Color.parseColor(item.dotColor)
             } catch (e: IllegalArgumentException) {
-                // Parsing error, use default gray
+                // Parsing error
             }
 
-            binding.dot.setBackgroundColor(statusColor)
+            val dotBackground = binding.dot.background
+            if (dotBackground is GradientDrawable) {
+                dotBackground.setColor(statusColor)
+            } else {
+                binding.dot.setBackgroundColor(statusColor)
+            }
+
             val statusBackground = binding.tvStatus.background
             if (statusBackground is GradientDrawable) {
                 statusBackground.setColor(statusColor)

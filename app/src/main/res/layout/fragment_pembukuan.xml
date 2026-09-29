@@ -1,331 +1,259 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/app_background"
     tools:context=".PembukuanFragment">
 
-    <LinearLayout
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="16dp">
+        android:background="@color/purple_500"
+        app:elevation="0dp">
 
-        <!-- Pemasukkan -->
-        <com.google.android.material.card.MaterialCardView
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:layout_marginTop="8dp"
+            app:navigationIcon="@drawable/ic_arrow_back"
+            app:navigationIconTint="@android:color/white"
+            app:title="Pembukuan"
+            app:titleTextColor="@android:color/white" />
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            app:cardCornerRadius="8dp"
-            app:cardElevation="4dp">
+            android:orientation="vertical"
+            android:padding="16dp">
 
-            <LinearLayout
+            <!-- Filter Periode -->
+            <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="16dp">
+                android:layout_marginBottom="16dp"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="4dp">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="8dp"
-                    android:text="Pemasukkan"
-                    android:textAppearance="?attr/textAppearanceHeadline6" />
-
-                <GridLayout
+                <LinearLayout
+                    android:id="@+id/btn_pilih_periode"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:columnCount="2">
+                    android:background="?attr/selectableItemBackground"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:gravity="center"
+                    android:orientation="horizontal"
+                    android:padding="12dp">
+
+                    <ImageView
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:src="@drawable/ic_calendar_month"
+                        app:tint="?attr/colorPrimary" />
 
                     <TextView
-                        android:id="@+id/tv_transaksi_cash"
-                        style="@style/PembukuanItem"
-                        android:text="Transaksi Cash" />
+                        android:id="@+id/tv_periode"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="12dp"
+                        android:text="Mei 2026"
+                        android:textAppearance="?attr/textAppearanceSubtitle1"
+                        android:textStyle="bold" />
 
-                    <TextView
-                        android:id="@+id/tv_transaksi_online"
-                        style="@style/PembukuanItem"
-                        android:text="Transaksi Online" />
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_marginStart="8dp"
+                        android:src="@drawable/ic_arrow_down" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
 
-                    <TextView
-                        android:id="@+id/tv_total_pemasukkan_lain"
-                        style="@style/PembukuanItem"
-                        android:text="Total Pemasukkan Lain2" />
-                </GridLayout>
-
-            </LinearLayout>
-        </com.google.android.material.card.MaterialCardView>
-
-        <!-- Pengeluaran -->
-        <com.google.android.material.card.MaterialCardView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            app:cardCornerRadius="8dp"
-            app:cardElevation="4dp">
-
-            <LinearLayout
+            <!-- Pemasukkan Section -->
+            <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="16dp">
+                android:layout_marginBottom="16dp"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="4dp">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="8dp"
-                    android:text="Pengeluaran"
-                    android:textAppearance="?attr/textAppearanceHeadline6" />
-
-                <GridLayout
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:columnCount="2">
+                    android:orientation="vertical"
+                    android:padding="16dp">
 
                     <TextView
-                        android:id="@+id/tv_gaji_karyawan"
-                        style="@style/PembukuanItem"
-                        android:text="Gaji Karyawan" />
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        android:text="Pemasukkan"
+                        android:textAppearance="?attr/textAppearanceHeadline6" />
 
-                    <TextView
-                        android:id="@+id/tv_pasang_baru"
-                        style="@style/PembukuanItem"
-                        android:text="Pasang Baru" />
+                    <GridLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:columnCount="2">
 
-                    <TextView
-                        android:id="@+id/tv_perbaikan_alat"
-                        style="@style/PembukuanItem"
-                        android:text="Perbaikan Alat" />
+                        <LinearLayout
+                            android:id="@+id/btn_transaksi_cash"
+                            style="@style/PembukuanItem"
+                            android:orientation="vertical"
+                            android:padding="8dp">
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Transaksi Cash"
+                                android:textSize="12sp" />
+                            <TextView
+                                android:id="@+id/tv_val_cash"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Rp 0"
+                                android:textStyle="bold"
+                                android:textColor="@color/design_default_color_primary"/>
+                        </LinearLayout>
 
-                    <TextView
-                        android:id="@+id/tv_bayar_bandwidth"
-                        style="@style/PembukuanItem"
-                        android:text="Bayar Bandwith" />
+                        <LinearLayout
+                            android:id="@+id/btn_transaksi_online"
+                            style="@style/PembukuanItem"
+                            android:orientation="vertical"
+                            android:padding="8dp">
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Transaksi Online"
+                                android:textSize="12sp" />
+                            <TextView
+                                android:id="@+id/tv_val_online"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Rp 0"
+                                android:textStyle="bold"
+                                android:textColor="@color/design_default_color_primary"/>
+                        </LinearLayout>
 
-                    <TextView
-                        android:id="@+id/tv_bayar_kang_tagih"
-                        style="@style/PembukuanItem"
-                        android:text="Bayar Kang Tagih" />
+                        <LinearLayout
+                            android:id="@+id/btn_pemasukkan_lain"
+                            style="@style/PembukuanItem"
+                            android:orientation="vertical"
+                            android:padding="8dp">
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Setoran"
+                                android:textSize="12sp" />
+                            <TextView
+                                android:id="@+id/tv_val_pemasukan_lain"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Rp 0"
+                                android:textStyle="bold"
+                                android:textColor="@color/design_default_color_primary"/>
+                        </LinearLayout>
 
-                    <TextView
-                        android:id="@+id/tv_listrik_pdam_pulsa"
-                        style="@style/PembukuanItem"
-                        android:text="Listrik / PDAM / Pulsa" />
+                        <LinearLayout
+                            android:id="@+id/btn_selisih"
+                            style="@style/PembukuanItem"
+                            android:orientation="vertical"
+                            android:padding="8dp">
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Selisih"
+                                android:textSize="12sp" />
+                            <TextView
+                                android:id="@+id/tv_val_selisih"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Rp 0"
+                                android:textStyle="bold"
+                                android:textColor="@color/red"/>
+                        </LinearLayout>
+                    </GridLayout>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
 
-                    <TextView
-                        android:id="@+id/tv_bayar_marketing"
-                        style="@style/PembukuanItem"
-                        android:text="Bayar Marketing" />
-
-                    <TextView
-                        android:id="@+id/tv_lain_lain"
-                        style="@style/PembukuanItem"
-                        android:text="Lain lain" />
-                </GridLayout>
-
-            </LinearLayout>
-        </com.google.android.material.card.MaterialCardView>
-
-        <!-- Menu Laporan & Catatan (Dipindahkan dari Beranda) -->
-        <com.google.android.material.card.MaterialCardView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            app:cardCornerRadius="8dp"
-            app:cardElevation="4dp">
-
-            <LinearLayout
+            <!-- Pengeluaran Section -->
+            <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="16dp">
+                android:layout_marginBottom="16dp"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="4dp">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="8dp"
-                    android:text="Laporan &amp; Catatan"
-                    android:textAppearance="?attr/textAppearanceHeadline6" />
-
-                <GridLayout
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:columnCount="3"
-                    android:padding="4dp">
+                    android:orientation="vertical"
+                    android:padding="16dp">
 
-                    <!-- Menu Riwayat Tunggakan -->
-                    <LinearLayout
-                        android:id="@+id/card_riwayat_tunggakan"
-                        style="@style/MenuLainLayout"
-                        android:layout_columnWeight="1">
-                        <ImageView
-                            style="@style/MenuLainIcon"
-                            android:src="@drawable/ic_tunggakan"
-                            app:tint="@color/card_tunggakan" />
-                        <TextView
-                            style="@style/MenuLainText"
-                            android:text="Riwayat Tunggakan" />
-                    </LinearLayout>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        android:text="Pengeluaran"
+                        android:textAppearance="?attr/textAppearanceHeadline6" />
 
-                    <!-- Menu Kas -->
-                    <LinearLayout
-                        android:id="@+id/card_kas"
-                        style="@style/MenuLainLayout"
-                        android:layout_columnWeight="1">
-                        <ImageView
-                            style="@style/MenuLainIcon"
-                            android:src="@drawable/ic_cash"
-                            app:tint="@color/card_kas" />
-                        <TextView
-                            style="@style/MenuLainText"
-                            android:text="Kas" />
-                    </LinearLayout>
+                    <GridLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:columnCount="2">
 
-                    <!-- Menu Rekap Tunggakan -->
-                    <LinearLayout
-                        android:id="@+id/card_rekap_tunggakan"
-                        style="@style/MenuLainLayout"
-                        android:layout_columnWeight="1">
-                        <ImageView
-                            style="@style/MenuLainIcon"
-                            android:src="@drawable/ic_tunggakan"
-                            app:tint="@color/card_tunggakan" />
-                        <TextView
-                            style="@style/MenuLainText"
-                            android:text="Tunggakan" />
-                    </LinearLayout>
+                        <LinearLayout android:id="@+id/btn_gaji_karyawan" style="@style/PembukuanItem" android:orientation="vertical" android:padding="8dp">
+                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Gaji Karyawan" android:textSize="12sp" />
+                            <TextView android:id="@+id/val_gaji_karyawan" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Rp 0" android:textStyle="bold" android:textColor="@color/design_default_color_error"/>
+                        </LinearLayout>
 
-                    <!-- Menu Rekap Tercatat -->
-                    <LinearLayout
-                        android:id="@+id/card_rekap_tercatat"
-                        style="@style/MenuLainLayout"
-                        android:layout_columnWeight="1">
-                        <ImageView
-                            style="@style/MenuLainIcon"
-                            android:src="@drawable/ic_tercatat"
-                            app:tint="@color/card_tercatat" />
-                        <TextView
-                            style="@style/MenuLainText"
-                            android:text="Tercatat" />
-                    </LinearLayout>
+                        <LinearLayout android:id="@+id/btn_pasang_baru" style="@style/PembukuanItem" android:orientation="vertical" android:padding="8dp">
+                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Pasang Baru" android:textSize="12sp" />
+                            <TextView android:id="@+id/val_pasang_baru" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Rp 0" android:textStyle="bold" android:textColor="@color/design_default_color_error"/>
+                        </LinearLayout>
 
-                    <!-- Menu Setoran -->
-                    <LinearLayout
-                        android:id="@+id/card_setoran"
-                        style="@style/MenuLainLayout"
-                        android:layout_columnWeight="1">
-                        <ImageView
-                            style="@style/MenuLainIcon"
-                            android:src="@drawable/ic_setoran"
-                            app:tint="@color/card_setoran" />
-                        <TextView
-                            style="@style/MenuLainText"
-                            android:text="Setoran" />
-                    </LinearLayout>
+                        <LinearLayout android:id="@+id/btn_perbaikan_alat" style="@style/PembukuanItem" android:orientation="vertical" android:padding="8dp">
+                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Perbaikan Alat" android:textSize="12sp" />
+                            <TextView android:id="@+id/val_perbaikan_alat" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Rp 0" android:textStyle="bold" android:textColor="@color/design_default_color_error"/>
+                        </LinearLayout>
 
-                    <!-- Menu Histori Catat -->
-                    <LinearLayout
-                        android:id="@+id/card_histori_catat"
-                        style="@style/MenuLainLayout"
-                        android:layout_columnWeight="1">
-                        <ImageView
-                            style="@style/MenuLainIcon"
-                            android:src="@drawable/ic_history"
-                            app:tint="@color/card_histori_catat" />
-                        <TextView
-                            style="@style/MenuLainText"
-                            android:text="Histori Catat" />
-                    </LinearLayout>
+                        <LinearLayout android:id="@+id/btn_bayar_bandwidth" style="@style/PembukuanItem" android:orientation="vertical" android:padding="8dp">
+                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Bayar Bandwith" android:textSize="12sp" />
+                            <TextView android:id="@+id/val_bayar_bandwidth" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Rp 0" android:textStyle="bold" android:textColor="@color/design_default_color_error"/>
+                        </LinearLayout>
 
-                    <!-- Menu Validasi Periode -->
-                    <LinearLayout
-                        android:id="@+id/card_validasi_periode"
-                        style="@style/MenuLainLayout"
-                        android:layout_columnWeight="1">
-                        <ImageView
-                            style="@style/MenuLainIcon"
-                            android:src="@drawable/ic_validate"
-                            app:tint="@color/card_validasi" />
-                        <TextView
-                            style="@style/MenuLainText"
-                            android:text="Validasi Periode" />
-                    </LinearLayout>
+                        <LinearLayout android:id="@+id/btn_bayar_kang_tagih" style="@style/PembukuanItem" android:orientation="vertical" android:padding="8dp">
+                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Bayar Kang Tagih" android:textSize="12sp" />
+                            <TextView android:id="@+id/val_bayar_kang_tagih" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Rp 0" android:textStyle="bold" android:textColor="@color/design_default_color_error"/>
+                        </LinearLayout>
 
-                </GridLayout>
+                        <LinearLayout android:id="@+id/btn_listrik_pdam_pulsa" style="@style/PembukuanItem" android:orientation="vertical" android:padding="8dp">
+                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Listrik / PDAM / Pulsa" android:textSize="12sp" />
+                            <TextView android:id="@+id/val_listrik_pdam_pulsa" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Rp 0" android:textStyle="bold" android:textColor="@color/design_default_color_error"/>
+                        </LinearLayout>
 
-            </LinearLayout>
-        </com.google.android.material.card.MaterialCardView>
+                        <LinearLayout android:id="@+id/btn_bayar_marketing" style="@style/PembukuanItem" android:orientation="vertical" android:padding="8dp">
+                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Bayar Marketing" android:textSize="12sp" />
+                            <TextView android:id="@+id/val_bayar_marketing" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Rp 0" android:textStyle="bold" android:textColor="@color/design_default_color_error"/>
+                        </LinearLayout>
 
-        <!-- Menu Lain -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            android:text="Menu Lain"
-            android:textAppearance="?attr/textAppearanceHeadline6" />
+                        <LinearLayout android:id="@+id/btn_lain_lain" style="@style/PembukuanItem" android:orientation="vertical" android:padding="8dp">
+                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Lain lain" android:textSize="12sp" />
+                            <TextView android:id="@+id/val_lain_lain" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Rp 0" android:textStyle="bold" android:textColor="@color/design_default_color_error"/>
+                        </LinearLayout>
+                    </GridLayout>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
 
-        <GridLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:columnCount="4">
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
 
-            <LinearLayout
-                android:id="@+id/menu_uang_di_admin"
-                style="@style/MenuLainLayout"
-                android:layout_columnWeight="1">
-
-                <ImageView
-                    style="@style/MenuLainIcon"
-                    android:src="@drawable/ic_uang_admin" />
-
-                <TextView
-                    style="@style/MenuLainText"
-                    android:text="Uang di Admin" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/menu_semua_pembukuan"
-                style="@style/MenuLainLayout"
-                android:layout_columnWeight="1">
-
-                <ImageView
-                    style="@style/MenuLainIcon"
-                    android:src="@drawable/ic_semua_pembukuan" />
-
-                <TextView
-                    style="@style/MenuLainText"
-                    android:text="Semua Pembukuan" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/menu_pembayaran_rv_admin"
-                style="@style/MenuLainLayout"
-                android:layout_columnWeight="1">
-
-                <ImageView
-                    style="@style/MenuLainIcon"
-                    android:src="@drawable/ic_pembayaran_rv_admin" />
-
-                <TextView
-                    style="@style/MenuLainText"
-                    android:text="Pemb. Rv Admin" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/menu_rangkuman_keuangan"
-                style="@style/MenuLainLayout"
-                android:layout_columnWeight="1">
-
-                <ImageView
-                    style="@style/MenuLainIcon"
-                    android:src="@drawable/ic_rangkuman_keuangan" />
-
-                <TextView
-                    style="@style/MenuLainText"
-                    android:text="Rangkuman Keuangan" />
-            </LinearLayout>
-
-        </GridLayout>
-    </LinearLayout>
-</androidx.core.widget.NestedScrollView>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -16,14 +16,15 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.gms.location.LocationServices
-import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.gson.Gson
 import com.linkbit.billrt.adapter.PelangganSearchAdapter
 import com.linkbit.billrt.adapter.WilayahFilterAdapter
 import com.linkbit.billrt.databinding.BottomSheetFilterWilayahBinding
+import com.linkbit.billrt.databinding.BottomSheetMapToolsBinding
 import com.linkbit.billrt.databinding.DialogPelangganSearchBinding
 import com.linkbit.billrt.databinding.FragmentMapPelangganBinding
 import com.linkbit.billrt.model.StandardResponse
@@ -31,6 +32,7 @@ import com.mapbox.geojson.Point
 import com.mapbox.maps.CameraOptions
 import com.mapbox.maps.MapView
 import com.mapbox.maps.Style
+import com.mapbox.maps.plugin.animation.flyTo
 import com.mapbox.maps.plugin.annotation.annotations
 import com.mapbox.maps.plugin.annotation.generated.*
 import com.mapbox.maps.plugin.gestures.addOnMapClickListener
@@ -86,8 +88,11 @@ class MapPelangganFragment : BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        
+        applyWindowInsets(binding.appBarLayout)
+        setupToolbar()
+        
         mapView = binding.mapView
-        setupBottomSheet()
         setupSearchView()
         fetchMapData()
         checkLocationPermissionAndCenter()
@@ -97,38 +102,53 @@ class MapPelangganFragment : BaseFragment() {
         }
     }
 
-    private fun setupBottomSheet() {
-        val bottomSheetBehavior = BottomSheetBehavior.from(binding.bottomSheet)
+    private fun setupToolbar() {
+        binding.toolbar.setNavigationOnClickListener {
+            findNavController().navigateUp()
+        }
 
-        binding.fabTools.setOnClickListener {
-            if (bottomSheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED) {
-                bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
-            } else {
-                bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
+        binding.toolbar.setOnMenuItemClickListener { item ->
+            when (item.itemId) {
+                R.id.action_tools -> {
+                    showMapToolsBottomSheet()
+                    true
+                }
+                else -> false
             }
         }
+    }
 
-        binding.buttonFilterWilayah.setOnClickListener {
+    private fun showMapToolsBottomSheet() {
+        val dialog = BottomSheetDialog(requireContext())
+        val sheetBinding = BottomSheetMapToolsBinding.inflate(layoutInflater)
+        dialog.setContentView(sheetBinding.root)
+
+        sheetBinding.buttonFilterWilayah.setOnClickListener {
+            dialog.dismiss()
             showWilayahFilterBottomSheet()
-            bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
         }
 
-        binding.buttonAddLocation.setOnClickListener { 
+        sheetBinding.buttonAddLocation.setOnClickListener {
+            dialog.dismiss()
             showSearchPelangganDialog()
-            bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
         }
-        binding.buttonMeasure.setOnClickListener { 
+
+        sheetBinding.buttonMeasure.setOnClickListener {
+            dialog.dismiss()
             toggleManualPolylineMode()
-            bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
         }
-        binding.buttonClearMeasure.setOnClickListener { 
+
+        sheetBinding.buttonClearMeasure.setOnClickListener {
+            dialog.dismiss()
             clearManualPolyline()
-            bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
         }
-        binding.buttonChangeStyle.setOnClickListener {
+
+        sheetBinding.buttonChangeStyle.setOnClickListener {
+            dialog.dismiss()
             showMapStyleDialog()
-            bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
         }
+
+        dialog.show()
     }
 
     private fun showWilayahFilterBottomSheet() {
@@ -184,20 +204,27 @@ class MapPelangganFragment : BaseFragment() {
     }
 
     private fun setupSearchView() {
-        binding.searchViewMap.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-            override fun onQueryTextSubmit(query: String?): Boolean {
-                searchRunnable?.let { searchHandler.removeCallbacks(it) }
-                handleSearch(query)
-                return true
-            }
+        binding.toolbar.inflateMenu(R.menu.menu_map_pelanggan)
+        val searchItem = binding.toolbar.menu.findItem(R.id.action_search)
+        val searchView = searchItem?.actionView as? SearchView
 
-            override fun onQueryTextChange(newText: String?): Boolean {
-                searchRunnable?.let { searchHandler.removeCallbacks(it) }
-                searchRunnable = Runnable { handleSearch(newText) }
-                searchHandler.postDelayed(searchRunnable!!, 800)
-                return true
-            }
-        })
+        searchView?.apply {
+            queryHint = "Cari pelanggan atau koordinat..."
+            setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+                override fun onQueryTextSubmit(query: String?): Boolean {
+                    searchRunnable?.let { searchHandler.removeCallbacks(it) }
+                    handleSearch(query)
+                    return true
+                }
+
+                override fun onQueryTextChange(newText: String?): Boolean {
+                    searchRunnable?.let { searchHandler.removeCallbacks(it) }
+                    searchRunnable = Runnable { handleSearch(newText) }
+                    searchHandler.postDelayed(searchRunnable!!, 1000)
+                    return true
+                }
+            })
+        }
     }
 
     private fun handleSearch(query: String?) {
@@ -208,10 +235,10 @@ class MapPelangganFragment : BaseFragment() {
                 val lng = parts[1].toDoubleOrNull()
                 if (lat != null && lng != null && lat in -90.0..90.0 && lng in -180.0..180.0) {
                     val point = Point.fromLngLat(lng, lat)
-                    mapView?.getMapboxMap()?.setCamera(
+                    mapView?.getMapboxMap()?.flyTo(
                         CameraOptions.Builder()
                             .center(point)
-                            .zoom(17.0)
+                            .zoom(18.0)
                             .build()
                     )
                     manualPointsAnnotationManager?.deleteAll()
@@ -228,8 +255,8 @@ class MapPelangganFragment : BaseFragment() {
             }
         }
 
-        manualPointsAnnotationManager?.deleteAll()
-        filterMapData(query)
+        // Search for customer name via API
+        fetchMapData(query)
     }
 
     private fun toggleManualPolylineMode() {
@@ -270,14 +297,14 @@ class MapPelangganFragment : BaseFragment() {
         fusedClient.lastLocation.addOnSuccessListener { loc ->
             loc?.let {
                 val point = Point.fromLngLat(it.longitude, it.latitude)
-                mapView?.getMapboxMap()?.setCamera(CameraOptions.Builder().center(point).zoom(14.0).build())
+                mapView?.getMapboxMap()?.flyTo(CameraOptions.Builder().center(point).zoom(14.0).build())
             }
         }
     }
 
-    private fun fetchMapData() {
+    private fun fetchMapData(cari: String? = null) {
         binding.progressBar.visibility = View.VISIBLE
-        apiService.getWilayahPelangganNested().enqueue(object : Callback<WilayahPelangganNestedResponse> {
+        apiService.getWilayahPelangganNested(cari).enqueue(object : Callback<WilayahPelangganNestedResponse> {
             override fun onResponse(call: Call<WilayahPelangganNestedResponse>, response: Response<WilayahPelangganNestedResponse>) {
                 if (!isAdded || _binding == null) return
                 binding.progressBar.visibility = View.GONE
@@ -297,8 +324,34 @@ class MapPelangganFragment : BaseFragment() {
                         }
                     }
                     setupMap(allPelangganList)
+                    
+                    // Fokus kamera jika ada kata kunci pencarian
+                    if (!cari.isNullOrBlank()) {
+                        if (allPelangganList.isNotEmpty()) {
+                            // Ambil pelanggan pertama yang memiliki koordinat
+                            val found = allPelangganList.firstOrNull { it.lat != null && it.lng != null }
+                            if (found != null) {
+                                val point = Point.fromLngLat(found.lng!!, found.lat!!)
+                                // Gunakan flyTo untuk fokus yang lebih halus dan dalam (highlight)
+                                mapView?.getMapboxMap()?.flyTo(
+                                    CameraOptions.Builder()
+                                        .center(point)
+                                        .zoom(18.5)
+                                        .build()
+                                )
+                                Toast.makeText(context, "Ditemukan: ${found.nama}", Toast.LENGTH_SHORT).show()
+                                // Otomatis tampilkan detail untuk hasil tunggal atau pertama
+                                showPelangganDetailDialog(found)
+                            } else {
+                                Toast.makeText(context, "Pelanggan ditemukan, namun koordinat belum diatur", Toast.LENGTH_LONG).show()
+                            }
+                        } else {
+                            // Warning jika hasil pencarian kosong (Tidak ditemukan)
+                            Toast.makeText(context, "⚠️ Pelanggan '$cari' tidak ditemukan", Toast.LENGTH_LONG).show()
+                        }
+                    }
                 } else {
-                    Toast.makeText(context, "Gagal memuat data: ${body?.message}", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, "Gagal memuat data: ${body?.message ?: "Terjadi kesalahan"}", Toast.LENGTH_SHORT).show()
                 }
             }
 
@@ -311,32 +364,20 @@ class MapPelangganFragment : BaseFragment() {
         })
     }
 
-    private fun filterMapData(query: String?) {
-        val filteredList = if (query.isNullOrBlank()) {
-            allPelangganList
-        } else {
-            val lowerCaseQuery = query.lowercase()
-            allPelangganList.filter { 
-                it.nama.lowercase().contains(lowerCaseQuery) 
-            }
-        }
-        setupMap(filteredList)
-    }
-
     private fun setupMap(pelangganList: List<PelangganMapData>) {
         val styleUri = mapStyles[currentStyleIndex].second
         mapView?.getMapboxMap()?.loadStyleUri(styleUri) { style ->
-            val locationIcon = bitmapFromVector(requireContext(), android.R.drawable.ic_menu_mylocation)
+            val locationIcon = bitmapFromVector(requireContext(), R.drawable.ic_marker_pelanggan)
             if (locationIcon != null) {
                 style.addImage("location_icon", locationIcon)
             }
 
             val annotationApi = mapView?.annotations
-            pointAnnotationManager?.deleteAll()
             
             if (pointAnnotationManager == null) {
                 pointAnnotationManager = annotationApi?.createPointAnnotationManager()
             }
+            pointAnnotationManager?.deleteAll()
 
             if (lineAnnotationManager == null) {
                  lineAnnotationManager = annotationApi?.createPolylineAnnotationManager()
@@ -354,8 +395,10 @@ class MapPelangganFragment : BaseFragment() {
                         .withTextColor(Color.YELLOW)
                         .withTextSize(12.0)
                         .withTextAnchor(com.mapbox.maps.extension.style.layers.properties.generated.TextAnchor.TOP)
-                        .withTextOffset(listOf(0.0, 2.0))
+                        .withTextOffset(listOf(0.0, 0.5))
                         .withIconImage("location_icon")
+                        .withIconSize(0.7)
+                        .withIconAnchor(com.mapbox.maps.extension.style.layers.properties.generated.IconAnchor.BOTTOM)
                         .withData(Gson().toJsonTree(p))
                 } else null
             }
@@ -364,7 +407,11 @@ class MapPelangganFragment : BaseFragment() {
 
             pointAnnotationManager?.addClickListener(OnPointAnnotationClickListener { annotation ->
                 if (currentMode != MapMode.MOVE_ANNOTATION) {
-                    handlePointClick(annotation)
+                    val json = annotation.getData()
+                    if (json != null && json.isJsonObject) {
+                        val pData = Gson().fromJson(json, PelangganMapData::class.java)
+                        showPelangganDetailDialog(pData, annotation)
+                    }
                 }
                 true
             })
@@ -399,20 +446,22 @@ class MapPelangganFragment : BaseFragment() {
         return R * c
     }
 
-    private fun handlePointClick(annotation: PointAnnotation) {
-        val json = annotation.getData()
-        if (json != null && json.isJsonObject) {
-            val pData = Gson().fromJson(json, PelangganMapData::class.java)
-
-            AlertDialog.Builder(requireContext())
-                .setTitle("Detail Pelanggan")
-                .setMessage("ID: ${pData.id}\nNama: ${pData.nama}\nWilayah: ${pData.namaWilayah}\nKoordinat: ${pData.lat}, ${pData.lng}")
-                .setPositiveButton("OK", null)
-                .setNeutralButton("Pindah") { _, _ ->
+    private fun showPelangganDetailDialog(pData: PelangganMapData, annotation: PointAnnotation? = null) {
+        AlertDialog.Builder(requireContext())
+            .setTitle("Detail Pelanggan")
+            .setMessage("ID: ${pData.id}\nNama: ${pData.nama}\nWilayah: ${pData.namaWilayah}\nKoordinat: ${pData.lat}, ${pData.lng}")
+            .setPositiveButton("OK", null)
+            .setNeutralButton("Pindah") { _, _ ->
+                if (annotation != null) {
                     startMoveMode(annotation)
+                } else {
+                    // Jika dialog muncul dari pencarian dan kita ingin pindah, 
+                    // mode pindah butuh objek annotation asli dari manager.
+                    // Untuk saat ini kita batasi pindah hanya dari klik marker langsung.
+                    Toast.makeText(context, "Gunakan marker di peta untuk memindahkan", Toast.LENGTH_SHORT).show()
                 }
-                .show()
-        }
+            }
+            .show()
     }
 
     private fun startMoveMode(annotation: PointAnnotation) {

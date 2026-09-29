@@ -1,27 +1,50 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:padding="16dp">
 
+    <!-- Handle Bottom Sheet untuk menandakan bisa ditarik -->
+    <View
+        android:layout_width="40dp"
+        android:layout_height="4dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="16dp"
+        android:background="#D1D1D1" />
+
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Filter Berdasarkan Wilayah"
+        android:text="Pilih Wilayah"
         android:textAppearance="@style/TextAppearance.AppCompat.Large"
-        android:gravity="center"/>
+        android:gravity="center"
+        android:textStyle="bold"
+        android:paddingBottom="8dp"/>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#EEEEEE"
+        android:layout_marginBottom="8dp"/>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rv_wilayah_filter"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"/>
+        android:layout_marginTop="8dp"
+        android:minHeight="100dp"
+        android:overScrollMode="never" />
 
     <Button
         android:id="@+id/button_show_all"
+        style="@style/Widget.MaterialComponents.Button.TextButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Tampilkan Semua Wilayah"/>
+        android:layout_marginTop="16dp"
+        android:text="Tampilkan Semua Wilayah"
+        android:textAllCaps="false"
+        android:textColor="?attr/colorPrimary"/>
 
 </LinearLayout>

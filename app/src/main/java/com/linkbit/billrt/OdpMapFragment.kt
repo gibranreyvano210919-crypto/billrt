@@ -12,9 +12,11 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.navigation.fragment.findNavController
+import androidx.navigation.ui.setupWithNavController
 import com.google.gson.Gson
-import com.google.gson.JsonObject
 import com.google.gson.reflect.TypeToken
 import com.linkbit.billrt.databinding.FragmentOdpMapBinding
 import com.linkbit.billrt.model.StandardResponse
@@ -64,10 +66,21 @@ class OdpMapFragment : BaseFragment() {
         super.onViewCreated(view, savedInstanceState)
         mapView = binding.mapViewOdp
 
+        val appBarLayout = binding.toolbarOdpMap.parent as? View
+        appBarLayout?.let { applyWindowInsets(it) }
+
+        setupToolbar()
+
         binding.fabSaveCablePath.setOnClickListener { showSaveConfirmationDialog() }
         binding.fabCancelEdit.setOnClickListener { cancelEditMode() }
 
         fetchOdpData()
+    }
+
+    private fun setupToolbar() {
+        (activity as? AppCompatActivity)?.setSupportActionBar(binding.toolbarOdpMap)
+        binding.toolbarOdpMap.setupWithNavController(findNavController())
+        binding.toolbarOdpMap.title = "Peta ODP & Jalur Kabel"
     }
 
     private fun fetchOdpData() {

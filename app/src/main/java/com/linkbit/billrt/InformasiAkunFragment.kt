@@ -5,10 +5,11 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.Fragment
+import androidx.appcompat.app.AppCompatActivity
+import androidx.navigation.fragment.findNavController
 import com.linkbit.billrt.databinding.FragmentInformasiAkunBinding
 
-class InformasiAkunFragment : Fragment() {
+class InformasiAkunFragment : BaseFragment() {
 
     private var _binding: FragmentInformasiAkunBinding? = null
     private val binding get() = _binding!!
@@ -23,6 +24,9 @@ class InformasiAkunFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        applyWindowInsets(binding.appBarLayout)
+        setupToolbar()
 
         // Get user info from SharedPreferences
         val sharedPreferences = requireActivity().getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
@@ -48,6 +52,17 @@ class InformasiAkunFragment : Fragment() {
         }
 
         binding.tvConfigInfo.text = configInfo
+    }
+
+    private fun setupToolbar() {
+        (activity as? AppCompatActivity)?.setSupportActionBar(binding.toolbar)
+        (activity as? AppCompatActivity)?.supportActionBar?.apply {
+            title = "Informasi Akun"
+            setDisplayHomeAsUpEnabled(true)
+        }
+        binding.toolbar.setNavigationOnClickListener {
+            findNavController().navigateUp()
+        }
     }
 
     override fun onDestroyView() {

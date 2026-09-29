@@ -7,11 +7,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.Toast
-import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.linkbit.billrt.databinding.FragmentTambahPelangganBinding
-import com.linkbit.billrt.model.StandardResponse
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -25,9 +23,12 @@ class TambahPelangganFragment : BaseFragment() {
     private val binding get() = _binding!!
 
     private val viewModel: TambahPelangganViewModel by activityViewModels()
+    private lateinit var sessionManager: SessionManager
 
     private var paketList = listOf<Paket>()
     private var wilayahList = listOf<Wilayah>()
+    private var routerList = listOf<MikrotikAccount>()
+    private var loadingCounter = 0
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -39,10 +40,21 @@ class TambahPelangganFragment : BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        sessionManager = SessionManager(requireContext())
 
+        // Sinkronisasi Insets agar toolbar tidak menabrak status bar
+        applyWindowInsets(binding.appBarLayout)
+
+        setupToolbar()
         setupInitialData()
         setupListeners()
-        fetchPaketAndWilayah()
+        fetchAllData()
+    }
+
+    private fun setupToolbar() {
+        binding.toolbar.setNavigationOnClickListener {
+            findNavController().popBackStack()
+        }
     }
 
     private fun setupInitialData() {
@@ -56,14 +68,7 @@ class TambahPelangganFragment : BaseFragment() {
     private fun setupListeners() {
         binding.btnPilihInstallationDate.setOnClickListener { showDatePickerDialog(dateType = DateType.INSTALLATION) }
         binding.btnPilihTglDaftar.setOnClickListener { showDatePickerDialog(dateType = DateType.REGISTER) }
-        binding.btnPilihTglExpired.setOnClickListener { showDatePickerDialog(dateType = DateType.EXPIRED) }
         binding.btnSimpan.setOnClickListener { attemptSave() }
-    }
-
-    private enum class DateType {
-        INSTALLATION,
-        REGISTER,
-        EXPIRED
     }
 
     private fun showDatePickerDialog(dateType: DateType) {
@@ -82,10 +87,6 @@ class TambahPelangganFragment : BaseFragment() {
                         binding.tvTglDaftar.text = selectedDate
                         viewModel.tglDaftar.value = selectedDate
                     }
-                    DateType.EXPIRED -> {
-                        binding.tvTglExpired.text = selectedDate
-                        viewModel.tglExpired.value = selectedDate
-                    }
                 }
             },
             calendar.get(Calendar.YEAR),
@@ -94,25 +95,36 @@ class TambahPelangganFragment : BaseFragment() {
         ).show()
     }
 
-    private fun fetchPaketAndWilayah() {
+    private enum class DateType {
+        INSTALLATION,
+        REGISTER
+    }
+
+    private fun fetchAllData() {
+        loadingCounter = 3
         setLoading(true)
+
         // Fetch Paket
         apiService.getPaket().enqueue(object : Callback<PaketResponse> {
             override fun onResponse(call: Call<PaketResponse>, response: Response<PaketResponse>) {
-                if (response.isSuccessful && response.body()?.data != null) {
-                    paketList = response.body()!!.data!!
-                    val paketNames = paketList.map { it.nama_paket }
-                    val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, paketNames)
-                    adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-                    binding.spinnerPaket.adapter = adapter
-                } else {
-                    Toast.makeText(context, "Gagal memuat data paket", Toast.LENGTH_SHORT).show()
+                if (!isAdded) return
+                if (response.isSuccessful && response.body() != null) {
+                    val body = response.body()!!
+                    if (body.status && body.data != null) {
+                        paketList = body.data!!
+                        val paketDisplay = paketList.map { 
+                            val name = it.nama_paket ?: "Paket Unknown"
+                            val price = it.hargaFormat ?: "Rp ${String.format("%,.0f", it.harga)}"
+                            "$name - $price"
+                        }
+                        val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, paketDisplay)
+                        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                        binding.spinnerPaket.adapter = adapter
+                    }
                 }
                 checkIfLoadingComplete()
             }
-
             override fun onFailure(call: Call<PaketResponse>, t: Throwable) {
-                Toast.makeText(context, "Error: ${t.message}", Toast.LENGTH_SHORT).show()
                 checkIfLoadingComplete()
             }
         })
@@ -120,26 +132,46 @@ class TambahPelangganFragment : BaseFragment() {
         // Fetch Wilayah
         apiService.getWilayah().enqueue(object : Callback<WilayahResponse> {
             override fun onResponse(call: Call<WilayahResponse>, response: Response<WilayahResponse>) {
-                if (response.isSuccessful && response.body()?.data != null) {
-                    wilayahList = response.body()!!.data!!
-                    val wilayahNames = wilayahList.map { it.nama_wilayah }
-                    val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, wilayahNames)
-                    adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-                    binding.spinnerWilayah.adapter = adapter
-                } else {
-                    Toast.makeText(context, "Gagal memuat data wilayah", Toast.LENGTH_SHORT).show()
+                if (!isAdded) return
+                if (response.isSuccessful && response.body() != null) {
+                    val body = response.body()!!
+                    if (body.status && body.data != null) {
+                        wilayahList = body.data!!
+                        val wilayahNames = wilayahList.map { it.nama_wilayah ?: "Wilayah Unknown" }
+                        val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, wilayahNames)
+                        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                        binding.spinnerWilayah.adapter = adapter
+                    }
                 }
                 checkIfLoadingComplete()
             }
-
             override fun onFailure(call: Call<WilayahResponse>, t: Throwable) {
-                Toast.makeText(context, "Error: ${t.message}", Toast.LENGTH_SHORT).show()
+                checkIfLoadingComplete()
+            }
+        })
+
+        // Fetch Routers
+        apiService.getMikrotikAccounts().enqueue(object : Callback<MikrotikAccountsResponse> {
+            override fun onResponse(call: Call<MikrotikAccountsResponse>, response: Response<MikrotikAccountsResponse>) {
+                if (!isAdded) return
+                if (response.isSuccessful && response.body() != null) {
+                    val body = response.body()!!
+                    if (body.status && body.data != null) {
+                        routerList = body.data!!
+                        val routerNames = routerList.map { it.routerName ?: "Router Unknown" }
+                        val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, routerNames)
+                        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                        binding.spinnerRouter.adapter = adapter
+                    }
+                }
+                checkIfLoadingComplete()
+            }
+            override fun onFailure(call: Call<MikrotikAccountsResponse>, t: Throwable) {
                 checkIfLoadingComplete()
             }
         })
     }
 
-    private var loadingCounter = 2
     private fun checkIfLoadingComplete() {
         loadingCounter--
         if (loadingCounter <= 0) {
@@ -178,6 +210,11 @@ class TambahPelangganFragment : BaseFragment() {
             isValid = false
         }
 
+        if (binding.spinnerRouter.selectedItemPosition < 0 || routerList.isEmpty()) {
+            Toast.makeText(context, "Pilih router terlebih dahulu", Toast.LENGTH_SHORT).show()
+            isValid = false
+        }
+
         return isValid
     }
 
@@ -191,37 +228,45 @@ class TambahPelangganFragment : BaseFragment() {
 
         val selectedPaket = paketList[binding.spinnerPaket.selectedItemPosition]
         val selectedWilayah = wilayahList[binding.spinnerWilayah.selectedItemPosition]
+        val selectedRouter = routerList[binding.spinnerRouter.selectedItemPosition]
+        val currentUserId = sessionManager.getUserId()?.toIntOrNull()
 
         val request = SimpanPelangganRequest(
-            idPelanggan = null, // Selalu null untuk pelanggan baru
+            idPelanggan = null, 
             namaPelanggan = binding.etNamaPelanggan.text.toString().trim(),
             alamatPelanggan = binding.etAlamat.text.toString().trim(),
             teleponPelanggan = binding.etTelepon.text.toString().trim(),
             idPaket = selectedPaket.id_paket,
             idWilayah = selectedWilayah.id_wilayah,
+            idRouter = selectedRouter.id,
             mikrotikUsername = binding.etMikrotikUsername.text.toString().trim(),
-            mikrotikPassword = binding.etMikrotikPassword.text.toString(), // Password tidak di-trim
+            mikrotikPassword = binding.etMikrotikPassword.text.toString().takeIf { it.isNotBlank() } ?: "12345",
             installationDate = viewModel.installationDate.value,
             tglDaftar = viewModel.tglDaftar.value,
             macAddress = null,
+            localIp = null,
             latitude = null,
             longitude = null,
-            tglExpired = viewModel.tglExpired.value
+            tglExpired = null,
+            idUser = currentUserId
         )
 
-        apiService.tambahPelanggan(request).enqueue(object : Callback<StandardResponse> {
-            override fun onResponse(call: Call<StandardResponse>, response: Response<StandardResponse>) {
+        apiService.tambahPelanggan(request).enqueue(object : Callback<TambahPelangganResponse> {
+            override fun onResponse(call: Call<TambahPelangganResponse>, response: Response<TambahPelangganResponse>) {
                 setLoading(false)
-                if (response.isSuccessful && response.body()?.status == true) {
-                    Toast.makeText(context, "Pelanggan baru berhasil ditambahkan!", Toast.LENGTH_SHORT).show()
+                val body = response.body()
+                if (response.isSuccessful && body?.status == true) {
+                    val syncMsg = body.mikrotikSync?.message ?: ""
+                    val successMsg = "${body.message}\n$syncMsg".trim()
+                    Toast.makeText(context, successMsg, Toast.LENGTH_LONG).show()
                     findNavController().popBackStack()
                 } else {
-                    val errorMsg = response.body()?.message ?: "Terjadi kesalahan yang tidak diketahui."
+                    val errorMsg = body?.message ?: "Terjadi kesalahan yang tidak diketahui."
                     Toast.makeText(context, "Gagal menambahkan: $errorMsg", Toast.LENGTH_LONG).show()
                 }
             }
 
-            override fun onFailure(call: Call<StandardResponse>, t: Throwable) {
+            override fun onFailure(call: Call<TambahPelangganResponse>, t: Throwable) {
                 setLoading(false)
                 Toast.makeText(context, "Error koneksi: ${t.message}", Toast.LENGTH_LONG).show()
             }

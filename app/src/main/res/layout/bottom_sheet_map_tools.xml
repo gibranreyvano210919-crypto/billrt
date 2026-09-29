@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_bottom_sheet_white"
+    android:orientation="vertical"
+    android:padding="20dp">
+
+    <!-- Handle Bar -->
+    <View
+        android:layout_width="40dp"
+        android:layout_height="4dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="16dp"
+        android:background="#DEDEDE" />
+
+    <!-- Header -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:layout_marginBottom="16dp">
+
+        <ImageView
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="@drawable/bg_circle_primary_light"
+            android:contentDescription="@null"
+            android:padding="10dp"
+            android:src="@drawable/ic_map"
+            app:tint="?attr/colorPrimary" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Peralatan Peta"
+                android:textColor="#1E293B"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:text="Fitur pemetaan dan pengukuran lokasi"
+                android:textColor="#64748B"
+                android:textSize="13sp" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginBottom="16dp"
+        android:background="#E2E8F0" />
+
+    <!-- 1. Filter Wilayah -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/button_filter_wilayah"
+        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
+        android:backgroundTint="#EFF6FF"
+        android:gravity="start|center_vertical"
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="14dp"
+        android:text="Filter Wilayah"
+        android:textAllCaps="false"
+        android:textColor="#1D4ED8"
+        android:textSize="15sp"
+        android:textStyle="bold"
+        app:cornerRadius="12dp"
+        app:icon="@drawable/ic_filter_list"
+        app:iconPadding="12dp"
+        app:iconTint="#1D4ED8"
+        app:strokeColor="#BFDBFE"
+        app:strokeWidth="1dp" />
+
+    <!-- 2. Tambah Lokasi Pelanggan -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/button_add_location"
+        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
+        android:backgroundTint="#F0FDF4"
+        android:gravity="start|center_vertical"
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="14dp"
+        android:text="Tambah Lokasi Pelanggan"
+        android:textAllCaps="false"
+        android:textColor="#15803D"
+        android:textSize="15sp"
+        android:textStyle="bold"
+        app:cornerRadius="12dp"
+        app:icon="@drawable/ic_location_pin"
+        app:iconPadding="12dp"
+        app:iconTint="#15803D"
+        app:strokeColor="#BBF7D0"
+        app:strokeWidth="1dp" />
+
+    <!-- 3. Ukur Jarak -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/button_measure"
+        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
+        android:backgroundTint="#FAF5FF"
+        android:gravity="start|center_vertical"
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="14dp"
+        android:text="Ukur Jarak Line / Kabel"
+        android:textAllCaps="false"
+        android:textColor="#7E22CE"
+        android:textSize="15sp"
+        android:textStyle="bold"
+        app:cornerRadius="12dp"
+        app:icon="@drawable/ic_compass"
+        app:iconPadding="12dp"
+        app:iconTint="#7E22CE"
+        app:strokeColor="#E9D5FF"
+        app:strokeWidth="1dp" />
+
+    <!-- 4. Hapus Pengukuran -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/button_clear_measure"
+        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
+        android:backgroundTint="#FEF2F2"
+        android:gravity="start|center_vertical"
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="14dp"
+        android:text="Hapus Hasil Pengukuran"
+        android:textAllCaps="false"
+        android:textColor="#B91C1C"
+        android:textSize="15sp"
+        android:textStyle="bold"
+        app:cornerRadius="12dp"
+        app:icon="@drawable/ic_delete"
+        app:iconPadding="12dp"
+        app:iconTint="#B91C1C"
+        app:strokeColor="#FECACA"
+        app:strokeWidth="1dp" />
+
+    <!-- 5. Ganti Gaya Peta -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/button_change_style"
+        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:backgroundTint="#FFFBEB"
+        android:gravity="start|center_vertical"
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="14dp"
+        android:text="Ganti Gaya Tampilan Peta"
+        android:textAllCaps="false"
+        android:textColor="#B45309"
+        android:textSize="15sp"
+        android:textStyle="bold"
+        app:cornerRadius="12dp"
+        app:icon="@drawable/ic_layers"
+        app:iconPadding="12dp"
+        app:iconTint="#B45309"
+        app:strokeColor="#FDE68A"
+        app:strokeWidth="1dp" />
+
+</LinearLayout>

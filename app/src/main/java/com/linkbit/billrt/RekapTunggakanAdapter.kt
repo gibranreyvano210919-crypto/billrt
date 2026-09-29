@@ -34,7 +34,7 @@ class RekapTunggakanAdapter(
 
     inner class ViewHolder(private val binding: ItemRekapTunggakanWilayahBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(rekap: RekapTunggakanWilayah) {
-            binding.tvNamaWilayahTunggakan.text = "${rekap.namaWilayah} (${rekap.jumlah})"
+            binding.tvNamaWilayahTunggakan.text = "${rekap.nama_wilayah} (${rekap.jumlah})"
 
             val isExpanded = expandedPosition.contains(adapterPosition)
             binding.llPelangganTunggakan.visibility = if (isExpanded) View.VISIBLE else View.GONE
@@ -57,8 +57,8 @@ class RekapTunggakanAdapter(
             val inflater = LayoutInflater.from(itemView.context)
             rekap.pelanggan.forEach { pelanggan ->
                 val view = inflater.inflate(R.layout.item_rekap_tunggakan_pelanggan, binding.llPelangganTunggakan, false)
-                view.findViewById<TextView>(R.id.tv_nama_pelanggan_tunggakan).text = pelanggan.namaPelanggan
-                view.findViewById<TextView>(R.id.tv_username_tunggakan).text = pelanggan.mikrotikUsername
+                view.findViewById<TextView>(R.id.tv_nama_pelanggan_tunggakan).text = pelanggan.nama_pelanggan
+                view.findViewById<TextView>(R.id.tv_username_tunggakan).text = pelanggan.mikrotik_username
                 binding.llPelangganTunggakan.addView(view)
             }
         }

@@ -5,13 +5,17 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
+import androidx.core.view.updatePadding
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.color.MaterialColors
 import com.linkbit.billrt.adapter.DaftarSecretAdapter
 import com.linkbit.billrt.databinding.FragmentDaftarSecretBinding
 import com.linkbit.billrt.viewmodel.DaftarSecretViewModel
@@ -36,23 +40,66 @@ class DaftarSecretFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        setupSystemBarsColor()
+        
+        // Menangani agar toolbar tidak tertutup status bar dan tombol tidak tertutup navigation bar
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.updatePadding(
+                top = systemBars.top,
+                bottom = systemBars.bottom
+            )
+            insets
+        }
+
         setupToolbar()
         setupBottomSheet()
         setupRecyclerView()
-        setupSearchView()
         observeViewModel()
 
         viewModel.fetchSecrets(args.routerId)
     }
 
-    private fun setupToolbar() {
-        (activity as? AppCompatActivity)?.setSupportActionBar(binding.toolbar)
-        (activity as? AppCompatActivity)?.supportActionBar?.apply {
-            setDisplayHomeAsUpEnabled(true)
-            title = "Daftar Secret"
+    private fun setupSystemBarsColor() {
+        val window = activity?.window ?: return
+        
+        // Mengambil warna primary dari theme yang digunakan oleh toolbar
+        val colorPrimary = MaterialColors.getColor(requireContext(), com.google.android.material.R.attr.colorPrimary, android.graphics.Color.BLUE)
+        
+        // Set warna status bar dan navigation bar agar sama dengan toolbar
+        window.statusBarColor = colorPrimary
+        window.navigationBarColor = colorPrimary
+        
+        // Menyesuaikan warna ikon (gelap/terang) berdasarkan kecerahan warna primary
+        val isLightColor = MaterialColors.isColorLight(colorPrimary)
+        WindowInsetsControllerCompat(window, window.decorView).apply {
+            isAppearanceLightStatusBars = isLightColor
+            isAppearanceLightNavigationBars = isLightColor
         }
-        binding.toolbar.setNavigationOnClickListener {
-            findNavController().navigateUp()
+    }
+
+    private fun setupToolbar() {
+        binding.toolbar.apply {
+            title = "Daftar Secret"
+            setNavigationOnClickListener {
+                findNavController().navigateUp()
+            }
+            
+            // Inflate menu search ke toolbar
+            inflateMenu(R.menu.menu_search)
+            val searchItem = menu.findItem(R.id.action_search)
+            val searchView = searchItem.actionView as? SearchView
+
+            searchView?.apply {
+                queryHint = "Cari Secret..."
+                setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+                    override fun onQueryTextSubmit(query: String?): Boolean = false
+                    override fun onQueryTextChange(newText: String?): Boolean {
+                        adapter.filter(newText)
+                        return true
+                    }
+                })
+            }
         }
     }
 
@@ -61,8 +108,11 @@ class DaftarSecretFragment : BaseFragment() {
         bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED // Keep it visible
 
         binding.btnTambah.setOnClickListener {
-            val action = DaftarSecretFragmentDirections.actionDaftarSecretFragmentToTambahPppoeFragment(args.routerId)
-            findNavController().navigate(action)
+            val navController = findNavController()
+            if (navController.currentDestination?.id == R.id.daftarSecretFragment) {
+                val action = DaftarSecretFragmentDirections.actionDaftarSecretFragmentToTambahPppoeFragment(args.routerId)
+                navController.navigate(action)
+            }
         }
     }
 
@@ -72,16 +122,6 @@ class DaftarSecretFragment : BaseFragment() {
         }
         binding.rvSecrets.layoutManager = LinearLayoutManager(context)
         binding.rvSecrets.adapter = adapter
-    }
-
-    private fun setupSearchView() {
-        binding.searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-            override fun onQueryTextSubmit(query: String?): Boolean = false
-            override fun onQueryTextChange(newText: String?): Boolean {
-                adapter.filter(newText)
-                return true
-            }
-        })
     }
 
     private fun observeViewModel() {

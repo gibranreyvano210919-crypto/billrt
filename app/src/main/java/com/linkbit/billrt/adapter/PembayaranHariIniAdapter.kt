@@ -8,8 +8,10 @@ import com.linkbit.billrt.model.PembayaranHariIni
 import java.text.NumberFormat
 import java.util.Locale
 
-class PembayaranHariIniAdapter(private val list: List<PembayaranHariIni>) :
-    RecyclerView.Adapter<PembayaranHariIniAdapter.ViewHolder>() {
+class PembayaranHariIniAdapter(
+    private val list: List<PembayaranHariIni>,
+    private val userId: Int
+) : RecyclerView.Adapter<PembayaranHariIniAdapter.ViewHolder>() {
 
     inner class ViewHolder(private val binding: ItemPembayaranHariIniBinding) :
         RecyclerView.ViewHolder(binding.root) {
@@ -18,11 +20,15 @@ class PembayaranHariIniAdapter(private val list: List<PembayaranHariIni>) :
             binding.tvNamaPelanggan.text = item.namaPelanggan
             binding.tvPeriode.text = item.periode
 
-            val formatRupiah = NumberFormat.getCurrencyInstance(Locale("in", "ID"))
-            binding.tvJumlahBayar.text = formatRupiah.format(item.jumlah.toDoubleOrNull() ?: 0.0)
+            if (userId != 1) {
+                binding.tvJumlahBayar.text = "Rp ••••••"
+            } else {
+                val formatRupiah = NumberFormat.getCurrencyInstance(Locale("id", "ID"))
+                binding.tvJumlahBayar.text = formatRupiah.format(item.jumlah).replace("Rp", "Rp ")
+            }
 
             binding.tvMetodeBayar.text = item.metode
-            binding.tvWaktu.text = item.waktu
+            binding.tvWaktu.text = item.waktuSistem
         }
     }
 
@@ -37,5 +43,5 @@ class PembayaranHariIniAdapter(private val list: List<PembayaranHariIni>) :
         holder.bind(list[position])
     }
 
-    override fun getItemCount() = list.size
+    override fun getItemCount(): Int = list.size
 }

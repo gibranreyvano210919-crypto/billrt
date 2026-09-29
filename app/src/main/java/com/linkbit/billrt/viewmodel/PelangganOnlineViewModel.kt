@@ -40,12 +40,19 @@ class PelangganOnlineViewModel : ViewModel() {
         }
     }
 
-    fun kickUser(routerId: Int, userId: String) {
+    fun kickUser(routerId: Int, mikrotikUsername: String?) {
+        if (mikrotikUsername == null) {
+            _toastMessage.postValue("Gagal: Username Mikrotik tidak ditemukan")
+            return
+        }
+        
         viewModelScope.launch {
             try {
-                val response = RetrofitInstance.api.kickUser(routerId, userId)
+                // Sesuai ApiService.kt, parameter yang digunakan adalah user_id 
+                // namun nilainya diisi dengan mikrotikUsername
+                val response = RetrofitInstance.api.kickUser(routerId, mikrotikUsername)
                 if (response.isSuccessful && response.body()?.status == true) {
-                    _toastMessage.postValue("User $userId berhasil di-kick")
+                    _toastMessage.postValue("User $mikrotikUsername berhasil di-kick")
                     fetchOnlineUsers(routerId) // Refresh list
                 } else {
                     _toastMessage.postValue(response.body()?.message ?: "Gagal kick user")

@@ -30,11 +30,18 @@ class PelangganBaruAdapter(
     inner class PelangganBaruViewHolder(private val binding: ItemPelangganCardBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(pelanggan: PelangganBaru) {
             binding.tvNamaPelanggan.text = pelanggan.namaPelanggan
-            binding.tvIdPelanggan.text = pelanggan.idPelanggan
-            binding.tvAlamat.text = pelanggan.namaWilayah
-            binding.tvStatusBerlangganan.text = pelanggan.statusAktif
+            binding.tvIdPelanggan.text = "ID: ${pelanggan.idPelanggan}"
             
-            // Hide unused buttons
+            // Menampilkan Tanggal Instalasi (installation_date) sesuai output JSON
+            binding.tvAlamat.text = "Tgl Pasang: ${pelanggan.installationDate ?: "-"}"
+            
+            // Menampilkan Nama Wilayah (nama_wilayah) sesuai output JSON
+            binding.tvWilayah.text = "Wilayah: ${pelanggan.namaWilayah ?: "Tanpa Wilayah"}"
+            
+            // Menampilkan Status Aktif (status_aktif)
+            binding.tvStatusBerlangganan.text = "Status: ${pelanggan.statusAktif}"
+            
+            // Sembunyikan tombol yang tidak digunakan di list pelanggan baru
             binding.btnMenuPelanggan.visibility = View.GONE
             binding.btnLihatDetail.visibility = View.GONE
             binding.btnEdit.visibility = View.GONE

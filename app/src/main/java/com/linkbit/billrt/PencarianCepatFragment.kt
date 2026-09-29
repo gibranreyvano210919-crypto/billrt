@@ -10,16 +10,17 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
-import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.ui.setupWithNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.linkbit.billrt.databinding.FragmentPencarianCepatBinding
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-class PencarianCepatFragment : Fragment() {
+class PencarianCepatFragment : BaseFragment() {
 
     private var _binding: FragmentPencarianCepatBinding? = null
     private val binding get() = _binding!!
@@ -39,13 +40,24 @@ class PencarianCepatFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        
+        val appBarLayout = binding.toolbarPencarian.parent as? View
+        appBarLayout?.let { applyWindowInsets(it) }
+        
+        setupToolbar()
         setupRecyclerView()
         setupSearchView()
         fetchAllPelanggan()
 
-        binding.buttonRiwayatCatatan.setOnClickListener {
-            showAllPelanggan()
+        binding.swipeRefreshPencarian.setOnRefreshListener {
+            fetchAllPelanggan()
         }
+    }
+
+    private fun setupToolbar() {
+        (activity as? AppCompatActivity)?.setSupportActionBar(binding.toolbarPencarian)
+        binding.toolbarPencarian.setupWithNavController(findNavController())
+        binding.toolbarPencarian.title = ""
     }
 
     private fun setupRecyclerView() {
@@ -54,13 +66,18 @@ class PencarianCepatFragment : Fragment() {
             onCopyMacClick = { macAddress ->
                 copyToClipboard(macAddress)
             },
-            onRiwayatClick = { macAddress ->
-                val action = PencarianCepatFragmentDirections.actionPencarianCepatFragmentToRiwayatRedamanFragment(macAddress)
-                findNavController().navigate(action)
-            },
-            onRiwayatKasClick = { idPelanggan ->
-                val action = PencarianCepatFragmentDirections.actionPencarianCepatFragmentToRiwayatCatatanTagihanFragment(idPelanggan)
-                findNavController().navigate(action)
+            onItemLongClick = { pelanggan ->
+                val menuSheet = CariCepatBottomSheetFragment.newInstance(
+                    pelanggan,
+                    onBayarMultiClick = { p ->
+                        showKonfirmasiBayarMulti(p)
+                    },
+                    onHistoryClick = { p ->
+                        val historySheet = HistoryPembayaranBottomSheetFragment.newInstance(p.idPelanggan.toIntOrNull() ?: 0)
+                        historySheet.show(childFragmentManager, historySheet.tag)
+                    }
+                )
+                menuSheet.show(childFragmentManager, "CariCepatMenu")
             }
         )
         binding.rvHasilPencarian.apply {
@@ -94,14 +111,20 @@ class PencarianCepatFragment : Fragment() {
     }
 
     private fun fetchAllPelanggan() {
-        _binding?.progressBarPencarian?.visibility = View.VISIBLE
-        (activity as MainActivity).apiService.getDataPelanggan().enqueue(object : Callback<PelangganResponse> {
+        if (!binding.swipeRefreshPencarian.isRefreshing) {
+            _binding?.progressBarPencarian?.visibility = View.VISIBLE
+        }
+        binding.searchViewPencarian.isEnabled = false
+        (activity as MainActivity).apiService.getDataPelangganCepat().enqueue(object : Callback<PelangganResponse> {
             override fun onResponse(call: Call<PelangganResponse>, response: Response<PelangganResponse>) {
                 if (_binding == null) return
                 binding.progressBarPencarian.visibility = View.GONE
+                binding.swipeRefreshPencarian.isRefreshing = false
+                binding.searchViewPencarian.isEnabled = true
                 if (response.isSuccessful) {
-                    allPelanggan = response.body()?.data ?: emptyList()
-                    pencarianAdapter.updateData(emptyList()) 
+                    val body = response.body()
+                    allPelanggan = body?.data ?: emptyList()
+                    filterResults(binding.searchViewPencarian.query?.toString())
                 } else {
                     Toast.makeText(context, "Gagal memuat data pelanggan", Toast.LENGTH_SHORT).show()
                 }
@@ -110,6 +133,8 @@ class PencarianCepatFragment : Fragment() {
             override fun onFailure(call: Call<PelangganResponse>, t: Throwable) {
                 if (_binding == null) return
                 binding.progressBarPencarian.visibility = View.GONE
+                binding.swipeRefreshPencarian.isRefreshing = false
+                binding.searchViewPencarian.isEnabled = true
                 Toast.makeText(context, "Error: ${t.message}", Toast.LENGTH_SHORT).show()
             }
         })
@@ -117,30 +142,54 @@ class PencarianCepatFragment : Fragment() {
 
     private fun filterResults(query: String?) {
         if (_binding == null) return
-        if (query.isNullOrBlank() || query.length < 3) {
-            pencarianAdapter.updateData(emptyList())
-            binding.tvPencarianEmpty.text = "Ketik minimal 3 huruf untuk memulai..."
-            binding.tvPencarianEmpty.visibility = View.VISIBLE
-            return
+
+        var filteredList = allPelanggan
+
+        // Filter by Search Query (Nama, Alamat, ID, MAC Address, Username, IP)
+        if (!query.isNullOrBlank()) {
+            val q = query.trim()
+            filteredList = filteredList.filter {
+                it.nama.contains(q, ignoreCase = true) ||
+                it.alamat?.contains(q, ignoreCase = true) == true ||
+                it.idPelanggan.contains(q, ignoreCase = true) ||
+                it.macAddress?.contains(q, ignoreCase = true) == true ||
+                it.mikrotikUsername?.contains(q, ignoreCase = true) == true ||
+                it.staticIp?.contains(q, ignoreCase = true) == true
+            }
         }
 
-        val filteredList = allPelanggan.filter {
-            it.nama.contains(query, ignoreCase = true) ||
-            it.alamat?.contains(query, ignoreCase = true) == true ||
-            it.idPelanggan.contains(query, ignoreCase = true) ||
-            it.macAddress?.contains(query, ignoreCase = true) == true
-        }
-        
         pencarianAdapter.updateData(filteredList)
         binding.tvPencarianEmpty.visibility = if (filteredList.isEmpty()) View.VISIBLE else View.GONE
-        binding.tvPencarianEmpty.text = "Tidak ada hasil untuk $query"
+        binding.tvPencarianEmpty.text = if (filteredList.isEmpty()) {
+            if (!query.isNullOrBlank()) "Tidak ada hasil untuk \"$query\"" else "Data pelanggan tidak tersedia."
+        } else ""
     }
 
-    private fun showAllPelanggan() {
-        if (_binding == null) return
-        pencarianAdapter.updateData(allPelanggan)
-        binding.tvPencarianEmpty.visibility = if (allPelanggan.isEmpty()) View.VISIBLE else View.GONE
-        binding.tvPencarianEmpty.text = "Tidak ada pelanggan"
+    private fun showKonfirmasiBayarMulti(pelanggan: PelangganData) {
+        binding.progressBarPencarian.visibility = View.VISIBLE
+        apiService.getPelangganBelumBayarAll(pelanggan.idPelanggan).enqueue(object : Callback<TagihanBelumBayarResponse> {
+            override fun onResponse(call: Call<TagihanBelumBayarResponse>, response: Response<TagihanBelumBayarResponse>) {
+                if (_binding == null) return
+                binding.progressBarPencarian.visibility = View.GONE
+                if (response.isSuccessful && response.body()?.status == true) {
+                    val list = response.body()?.data
+                    if (!list.isNullOrEmpty()) {
+                        val sheet = KonfirmasiBayarMultiBottomSheetFragment.newInstance(list[0])
+                        sheet.show(childFragmentManager, "KonfirmasiBayarMultiBottomSheet")
+                    } else {
+                        Toast.makeText(context, "Data tagihan tidak ditemukan", Toast.LENGTH_SHORT).show()
+                    }
+                } else {
+                    Toast.makeText(context, "Gagal mengambil data tagihan", Toast.LENGTH_SHORT).show()
+                }
+            }
+
+            override fun onFailure(call: Call<TagihanBelumBayarResponse>, t: Throwable) {
+                if (_binding == null) return
+                binding.progressBarPencarian.visibility = View.GONE
+                Toast.makeText(context, "Error: ${t.message}", Toast.LENGTH_SHORT).show()
+            }
+        })
     }
 
     override fun onDestroyView() {

@@ -5,20 +5,24 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import com.linkbit.billrt.databinding.FragmentPembayaranDetailBinding
-import java.io.Serializable
+import com.linkbit.billrt.network.ApiClient
+import kotlinx.coroutines.launch
+import java.text.NumberFormat
+import java.util.Locale
 
 class PembayaranDetailFragment : Fragment() {
 
     private var _binding: FragmentPembayaranDetailBinding? = null
     private val binding get() = _binding!!
 
-    private var tagihan: TagihanData? = null
+    private var tagihanId: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
-            tagihan = it.getSerializable(ARG_TAGIHAN) as? TagihanData
+            tagihanId = it.getString(ARG_TAGIHAN_ID)
         }
     }
 
@@ -33,14 +37,47 @@ class PembayaranDetailFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        tagihan?.let {
-            // The following lines are causing errors and need to be fixed
-            // based on the new data structure in ApiData.kt
-
-            // binding.tvPaymentUserInfo.text = "..."
-            // binding.tvPaymentPaketName.text = it.nama_paket
-            // ... and so on for all other UI elements
+        tagihanId?.let { id ->
+            fetchDetailPembayaran(id)
         }
+    }
+
+    private fun fetchDetailPembayaran(id: String) {
+        lifecycleScope.launch {
+            try {
+                val response = ApiClient.instance.getDetailBayar(id)
+                if (response.status) {
+                    val dataJson = response.data
+                    if (response.isLunas) {
+                        // Use Gson to parse the data object if needed, or parse manually from JsonElement
+                        // For simplicity, let's assume we can map it to DetailBayarLunasData
+                        val detail = ApiClient.tagihanApiService.getDetailPelangganNew(0) // Dummy call example
+                        // In a real scenario, you'd parse response.data using Gson
+                        displayLunasDetail(dataJson)
+                    }
+                }
+            } catch (e: Exception) {
+                // Handle error
+            }
+        }
+    }
+
+    private fun displayLunasDetail(data: com.google.gson.JsonElement) {
+        val detail = com.google.gson.Gson().fromJson(data, DetailBayarLunasData::class.java)
+        
+        val localeID = Locale("in", "ID")
+        val numberFormat = NumberFormat.getCurrencyInstance(localeID).apply {
+            maximumFractionDigits = 0
+        }
+
+        binding.namaPelanggan.text = "Pelanggan: ${detail.pelanggan}"
+        binding.namaPaket.text = "Username: ${detail.username}"
+        binding.harga.text = "Nominal: ${numberFormat.format(detail.nominal)}"
+        binding.bulanTagihan.text = "Periode: ${detail.periode}"
+        binding.tahunTagihan.text = "Metode: ${detail.metode}"
+        binding.tglBayar.text = "Tgl Bayar: ${detail.tglBayar}"
+        
+        // You might want to add more fields to your layout for admin, catatan, etc.
     }
 
     override fun onDestroyView() {
@@ -49,13 +86,13 @@ class PembayaranDetailFragment : Fragment() {
     }
 
     companion object {
-        private const val ARG_TAGIHAN = "tagihan"
+        private const val ARG_TAGIHAN_ID = "tagihanId"
 
         @JvmStatic
-        fun newInstance(tagihan: TagihanData) =
+        fun newInstance(tagihanId: String) =
             PembayaranDetailFragment().apply {
                 arguments = Bundle().apply {
-                    putSerializable(ARG_TAGIHAN, tagihan as Serializable)
+                    putString(ARG_TAGIHAN_ID, tagihanId)
                 }
             }
     }

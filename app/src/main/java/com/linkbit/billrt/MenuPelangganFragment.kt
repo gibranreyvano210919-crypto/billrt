@@ -7,15 +7,8 @@ import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Toast
-import androidx.core.view.isVisible
-import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.LinearLayoutManager
-import com.linkbit.billrt.adapter.JadwalTagihanAdapter
 import com.linkbit.billrt.databinding.FragmentMenuPelangganBinding
-import com.linkbit.billrt.network.PelangganBaruResponse
-import com.linkbit.billrt.viewmodel.JadwalTagihanViewModel
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -25,10 +18,6 @@ class MenuPelangganFragment : BaseFragment() {
 
     private var _binding: FragmentMenuPelangganBinding? = null
     private val binding get() = _binding!!
-
-    private lateinit var jadwalViewModel: JadwalTagihanViewModel
-    private lateinit var jadwalAdapterHariIni: JadwalTagihanAdapter
-    private lateinit var jadwalAdapterBesok: JadwalTagihanAdapter
 
     private var selectedMonth: Int = Calendar.getInstance().get(Calendar.MONTH) + 1
     private var selectedYear: Int = Calendar.getInstance().get(Calendar.YEAR)
@@ -44,16 +33,12 @@ class MenuPelangganFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        jadwalViewModel = ViewModelProvider(this).get(JadwalTagihanViewModel::class.java)
+        applyWindowInsets(binding.appBarLayout)
 
         setupFilterSpinners()
-        setupRecyclerViews()
-        observeJadwalViewModel()
 
         binding.swipeRefreshLayout.setOnRefreshListener {
-            fetchCounts()
-            jadwalViewModel.fetchJadwalTagihan("hari_ini")
-            jadwalViewModel.fetchJadwalTagihan("besok")
+            refreshData()
         }
 
         binding.toolbarMenuPelanggan.setNavigationOnClickListener {
@@ -61,102 +46,98 @@ class MenuPelangganFragment : BaseFragment() {
         }
 
         binding.cardPelangganAktif.setOnClickListener {
-            val action = MenuPelangganFragmentDirections.actionMenuPelangganFragmentToPelangganAktifFragment(selectedMonth, selectedYear)
-            findNavController().navigate(action)
+            if (findNavController().currentDestination?.id == R.id.menuPelangganFragment) {
+                val action = MenuPelangganFragmentDirections.actionMenuPelangganFragmentToPelangganAktifFragment(selectedMonth, selectedYear)
+                findNavController().navigate(action)
+            }
         }
 
         binding.cardPelangganNonaktif.setOnClickListener {
-            val action = MenuPelangganFragmentDirections.actionMenuPelangganFragmentToPelangganNonaktifFragment(selectedMonth, selectedYear)
-            findNavController().navigate(action)
+            if (findNavController().currentDestination?.id == R.id.menuPelangganFragment) {
+                val action = MenuPelangganFragmentDirections.actionMenuPelangganFragmentToPelangganNonaktifFragment(selectedMonth, selectedYear)
+                findNavController().navigate(action)
+            }
         }
 
         binding.cardPelangganIsolir.setOnClickListener {
-            val action = MenuPelangganFragmentDirections.actionMenuPelangganFragmentToPelangganIsolirFragment(selectedMonth, selectedYear)
-            findNavController().navigate(action)
+            if (findNavController().currentDestination?.id == R.id.menuPelangganFragment) {
+                val action = MenuPelangganFragmentDirections.actionMenuPelangganFragmentToPelangganIsolirFragment(selectedMonth, selectedYear)
+                findNavController().navigate(action)
+            }
         }
 
         binding.cardPelangganBaru.setOnClickListener {
-            val action = MenuPelangganFragmentDirections.actionMenuPelangganFragmentToPelangganBaruFragment(selectedMonth, selectedYear)
-            findNavController().navigate(action)
+            if (findNavController().currentDestination?.id == R.id.menuPelangganFragment) {
+                val action = MenuPelangganFragmentDirections.actionMenuPelangganFragmentToPelangganBaruFragment(selectedMonth, selectedYear)
+                findNavController().navigate(action)
+            }
         }
 
         binding.cardLunas.setOnClickListener {
-            val action = MenuPelangganFragmentDirections.actionMenuPelangganFragmentToPelangganLunasFragment(selectedMonth, selectedYear)
-            findNavController().navigate(action)
+            if (findNavController().currentDestination?.id == R.id.menuPelangganFragment) {
+                val action = MenuPelangganFragmentDirections.actionMenuPelangganFragmentToPelangganLunasFragment(selectedMonth, selectedYear)
+                findNavController().navigate(action)
+            }
         }
 
         binding.cardBelumBayar.setOnClickListener {
-            val action = MenuPelangganFragmentDirections.actionMenuPelangganFragmentToPelangganBelumBayarFragment(selectedMonth, selectedYear)
-            findNavController().navigate(action)
+            if (findNavController().currentDestination?.id == R.id.menuPelangganFragment) {
+                val action = MenuPelangganFragmentDirections.actionMenuPelangganFragmentToPelangganBelumBayarFragment(selectedMonth, selectedYear)
+                findNavController().navigate(action)
+            }
         }
 
         binding.cardNunggak.setOnClickListener {
-            val action = MenuPelangganFragmentDirections.actionMenuPelangganFragmentToPelangganNunggakFragment(selectedMonth, selectedYear)
-            findNavController().navigate(action)
+            if (findNavController().currentDestination?.id == R.id.menuPelangganFragment) {
+                val action = MenuPelangganFragmentDirections.actionMenuPelangganFragmentToPelangganNunggakFragment(selectedMonth, selectedYear)
+                findNavController().navigate(action)
+            }
         }
 
         binding.cardTelat.setOnClickListener {
-            val action = MenuPelangganFragmentDirections.actionMenuPelangganFragmentToPelangganTelatFragment(selectedMonth, selectedYear)
-            findNavController().navigate(action)
+            if (findNavController().currentDestination?.id == R.id.menuPelangganFragment) {
+                val action = MenuPelangganFragmentDirections.actionMenuPelangganFragmentToPelangganTelatFragment(selectedMonth, selectedYear)
+                findNavController().navigate(action)
+            }
         }
         
         binding.cardTagout.setOnClickListener {
-            val action = MenuPelangganFragmentDirections.actionMenuPelangganFragmentToPelangganTagoutFragment(selectedMonth, selectedYear)
-            findNavController().navigate(action)
+            if (findNavController().currentDestination?.id == R.id.menuPelangganFragment) {
+                val action = MenuPelangganFragmentDirections.actionMenuPelangganFragmentToPelangganTagoutFragment(selectedMonth, selectedYear)
+                findNavController().navigate(action)
+            }
+        }
+
+        binding.cardNunggakTahunan.setOnClickListener {
+            if (findNavController().currentDestination?.id == R.id.menuPelangganFragment) {
+                val action = MenuPelangganFragmentDirections.actionMenuPelangganFragmentToPelangganNunggakTahunanFragment(selectedYear)
+                findNavController().navigate(action)
+            }
+        }
+
+        binding.cardTelatTahunan.setOnClickListener {
+            if (findNavController().currentDestination?.id == R.id.menuPelangganFragment) {
+                val action = MenuPelangganFragmentDirections.actionMenuPelangganFragmentToPelangganTelatTahunanFragment(selectedYear)
+                findNavController().navigate(action)
+            }
         }
 
         binding.btnTambahPelanggan.setOnClickListener {
-            findNavController().navigate(R.id.action_menuPelangganFragment_to_tambahPelangganFragment)
+            if (findNavController().currentDestination?.id == R.id.menuPelangganFragment) {
+                findNavController().navigate(R.id.tambahPelangganFragment)
+            }
         }
 
-        fetchCounts()
-        jadwalViewModel.fetchJadwalTagihan("hari_ini")
-        jadwalViewModel.fetchJadwalTagihan("besok")
-    }
-
-    private fun setupRecyclerViews() {
-        jadwalAdapterHariIni = JadwalTagihanAdapter { Toast.makeText(context, it.namaPelanggan, Toast.LENGTH_SHORT).show() }
-        binding.rvJadwalHariIni.apply {
-            layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
-            adapter = jadwalAdapterHariIni
-        }
-
-        jadwalAdapterBesok = JadwalTagihanAdapter { Toast.makeText(context, it.namaPelanggan, Toast.LENGTH_SHORT).show() }
-        binding.rvJadwalBesok.apply {
-            layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
-            adapter = jadwalAdapterBesok
-        }
-    }
-
-    private fun observeJadwalViewModel() {
-        jadwalViewModel.jadwalHariIniList.observe(viewLifecycleOwner) { list ->
-            jadwalAdapterHariIni.submitList(list)
-        }
-
-        jadwalViewModel.jadwalBesokList.observe(viewLifecycleOwner) { list ->
-            jadwalAdapterBesok.submitList(list)
-        }
-
-        jadwalViewModel.isLoadingHariIni.observe(viewLifecycleOwner) { isLoading ->
-            binding.progressBarHariIni.isVisible = isLoading
-            binding.rvJadwalHariIni.isVisible = !isLoading
-        }
-
-        jadwalViewModel.isLoadingBesok.observe(viewLifecycleOwner) { isLoading ->
-            binding.progressBarBesok.isVisible = isLoading
-            binding.rvJadwalBesok.isVisible = !isLoading
-        }
+        refreshData()
     }
 
     private fun setupFilterSpinners() {
-        // Setup Bulan Spinner
         val bulanArray = resources.getStringArray(R.array.bulan_array)
         val bulanAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, bulanArray)
         bulanAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         binding.spinnerBulan.adapter = bulanAdapter
         binding.spinnerBulan.setSelection(selectedMonth - 1)
 
-        // Setup Tahun Spinner
         val currentYear = Calendar.getInstance().get(Calendar.YEAR)
         val years = (2020..currentYear).map { it.toString() }.reversed()
         val tahunAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, years)
@@ -168,7 +149,7 @@ class MenuPelangganFragment : BaseFragment() {
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
                 selectedMonth = binding.spinnerBulan.selectedItemPosition + 1
                 selectedYear = binding.spinnerTahun.selectedItem.toString().toInt()
-                fetchCounts()
+                refreshData()
             }
             override fun onNothingSelected(parent: AdapterView<*>?) {}
         }
@@ -177,17 +158,20 @@ class MenuPelangganFragment : BaseFragment() {
         binding.spinnerTahun.onItemSelectedListener = listener
     }
 
+    private fun refreshData() {
+        fetchCounts()
+    }
+
     private fun fetchCounts() {
         binding.swipeRefreshLayout.isRefreshing = true
-        loadCount = 0
 
-        // Fetch Rekap Status
         apiService.getRekapStatusPelanggan(selectedMonth, selectedYear).enqueue(object : Callback<RekapStatusPelangganResponse> {
             override fun onResponse(call: Call<RekapStatusPelangganResponse>, response: Response<RekapStatusPelangganResponse>) {
                 if (_binding == null || !isAdded) return
+                binding.swipeRefreshLayout.isRefreshing = false
                 if (response.isSuccessful) {
                     val rekap = response.body()?.data
-                    binding.tvCountAktif.text = rekap?.aktif?.toString() ?: "0"
+                    binding.tvCountAktif.text = rekap?.aktif ?: "0"
                     binding.tvCountIsolir.text = rekap?.isolir?.toString() ?: "0"
                     binding.tvCountNonaktif.text = rekap?.nonaktif?.toString() ?: "0"
                     binding.tvCountLunas.text = rekap?.lunas?.toString() ?: "0"
@@ -195,39 +179,18 @@ class MenuPelangganFragment : BaseFragment() {
                     binding.tvCountTagout.text = rekap?.tagout?.toString() ?: "0"
                     binding.tvCountTelat.text = rekap?.telat?.toString() ?: "0"
                     binding.tvCountNunggak.text = rekap?.totalNunggak?.toString() ?: "0"
+                    binding.tvCountNunggakTahunan.text = rekap?.nunggakTahunan?.toString() ?: "0"
+                    binding.tvCountTelatTahunan.text = rekap?.telatTahunan?.toString() ?: "0"
+                    binding.tvCountBaru.text = rekap?.baru?.toString() ?: "0"
                 }
-                checkIfAllCountsLoaded()
             }
 
             override fun onFailure(call: Call<RekapStatusPelangganResponse>, t: Throwable) {
                 if (_binding == null || !isAdded) return
-                checkIfAllCountsLoaded()
+                binding.swipeRefreshLayout.isRefreshing = false
+                Toast.makeText(context, "Gagal memuat rekap", Toast.LENGTH_SHORT).show()
             }
         })
-
-        // Fetch Baru Count with filter
-        apiService.getPelangganBaru(bulan = selectedMonth, tahun = selectedYear).enqueue(object : Callback<PelangganBaruResponse> {
-            override fun onResponse(call: Call<PelangganBaruResponse>, response: Response<PelangganBaruResponse>) {
-                if (_binding == null || !isAdded) return
-                if (response.isSuccessful) {
-                    binding.tvCountBaru.text = response.body()?.total?.toString() ?: "0"
-                }
-                checkIfAllCountsLoaded()
-            }
-            override fun onFailure(call: Call<PelangganBaruResponse>, t: Throwable) {
-                 if (_binding == null || !isAdded) return
-                 checkIfAllCountsLoaded()
-            }
-        })
-    }
-
-    private var loadCount = 0
-    private val totalLoads = 3 // Increased for the jadwal tagihan call
-    private fun checkIfAllCountsLoaded() {
-        loadCount++
-        if (loadCount >= totalLoads) {
-            binding.swipeRefreshLayout.isRefreshing = false
-        }
     }
 
     override fun onDestroyView() {

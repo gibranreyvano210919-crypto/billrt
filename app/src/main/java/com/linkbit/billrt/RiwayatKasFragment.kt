@@ -35,6 +35,7 @@ class RiwayatKasFragment : BaseFragment() {
     private val binding get() = _binding!!
     private lateinit var groupedAdapter: RiwayatKasGroupedAdapter
     private var originalGroupedData: List<TanggalGroup> = emptyList()
+    private lateinit var sessionManager: SessionManager
 
     private lateinit var bluetoothPermissionLauncher: ActivityResultLauncher<Array<String>>
     private var pendingPrintData: Pair<String, String>? = null
@@ -64,6 +65,7 @@ class RiwayatKasFragment : BaseFragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentRiwayatKasBinding.inflate(inflater, container, false)
+        sessionManager = SessionManager(requireContext())
         return binding.root
     }
 
@@ -79,10 +81,10 @@ class RiwayatKasFragment : BaseFragment() {
     private fun setupRecyclerView() {
         groupedAdapter = RiwayatKasGroupedAdapter(
             emptyList(),
-            onPrintClick = { tanggal -> handlePrintRequest(tanggal) },
+            onPrintClick = { groupKey -> handlePrintRequest(groupKey) },
             onDeleteClick = { catatan -> showDeleteConfirmationDialog(catatan) },
             onItemClick = { catatan -> groupedAdapter.toggleSelection(catatan.id) },
-            onSelectAllClick = { tanggal -> groupedAdapter.toggleSelectAllInGroup(tanggal) },
+            onSelectAllClick = { groupKey -> groupedAdapter.toggleSelectAllInGroup(groupKey) },
             onVerifyToggle = { catatan -> toggleVerificationStatus(catatan) }
         )
         binding.rvRiwayatKas.layoutManager = LinearLayoutManager(context)
@@ -97,7 +99,7 @@ class RiwayatKasFragment : BaseFragment() {
         }
     }
 
-    private fun handlePrintRequest(tanggal: String) {
+    private fun handlePrintRequest(groupKey: String) {
         val sharedPref = activity?.getSharedPreferences("printer_prefs", Context.MODE_PRIVATE) ?: return
         val printerAddress = sharedPref.getString("SELECTED_PRINTER_ADDRESS", null)
 
@@ -106,7 +108,7 @@ class RiwayatKasFragment : BaseFragment() {
             return
         }
 
-        val dataToPrint = formatDataForPrinting(tanggal)
+        val dataToPrint = formatDataForPrinting(groupKey)
         if (dataToPrint.isNotEmpty()) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                 val hasConnectPermission = ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_GRANTED
@@ -128,22 +130,26 @@ class RiwayatKasFragment : BaseFragment() {
         }
     }
 
-    private fun formatDataForPrinting(tanggal: String): String {
+    private fun formatDataForPrinting(groupKey: String): String {
         val sharedPref = activity?.getSharedPreferences("printer_prefs", Context.MODE_PRIVATE) ?: return ""
         val paperSize = sharedPref.getInt("PAPER_SIZE", 80)
         val separatorLength = if (paperSize == 58) 32 else 48
         val mainSeparator = "=".repeat(separatorLength)
 
-        val group = originalGroupedData.find { it.tanggal == tanggal }
+        val group = originalGroupedData.find { "${it.tanggalCatat}|${it.namaSetoran ?: ""}" == groupKey }
         if (group == null) return ""
 
-        val selectedItems = groupedAdapter.getSelectedItemsInGroup(tanggal)
+        val selectedItems = groupedAdapter.getSelectedItemsInGroup(groupKey)
         val itemsToPrint = if (selectedItems.isNotEmpty()) selectedItems else group.list
 
         if (itemsToPrint.isEmpty()) return ""
 
         val builder = StringBuilder()
-        builder.append("Laporan Catatan - $tanggal\n")
+        builder.append("Laporan Catatan - ${group.tanggalCatat}\n")
+        if (!group.namaSetoran.isNullOrEmpty()) {
+            builder.append("Setoran: ${group.namaSetoran}\n")
+        }
+        builder.append("Teknisi: ${group.namaTeknisi ?: "-"}\n")
         builder.append("$mainSeparator\n")
         itemsToPrint.forEach { 
             builder.append("Pelanggan: ${it.namaPelanggan} (ID: ${it.idPelanggan ?: "-"})\n")
@@ -257,7 +263,10 @@ class RiwayatKasFragment : BaseFragment() {
 
         val searchQuery = binding.searchViewRiwayat.query.toString()
 
-        apiService.getCatatanTagihan(search = searchQuery, bulan = bulan ?: 0, tahun = tahun ?: 0).enqueue(object : Callback<GroupedKasResponse> {
+        val idTek = sessionManager.getTeknisiId()
+        val idUser = if (idTek != -1) idTek.toString() else sessionManager.getUserId() ?: ""
+
+        apiService.getCatatanTagihan(idTeknisi = idUser, search = searchQuery, bulan = bulan ?: 0, tahun = tahun ?: 0).enqueue(object : Callback<GroupedKasResponse> {
             override fun onResponse(call: Call<GroupedKasResponse>, response: Response<GroupedKasResponse>) {
                 if (!isAdded || _binding == null) return
                 binding.swipeRefreshRiwayat.isRefreshing = false
@@ -296,6 +305,9 @@ class RiwayatKasFragment : BaseFragment() {
         for (group in groupedData) {
             flattenedList.add(RiwayatKasListItem.Header(group)) // Pass the whole group
             for (item in group.list) {
+                // Pre-fill fields needed for groupKey in adapter if needed
+                item.tanggalCatat = group.tanggalCatat
+                item.namaSetoran = group.namaSetoran ?: ""
                 flattenedList.add(RiwayatKasListItem.Item(item))
             }
         }

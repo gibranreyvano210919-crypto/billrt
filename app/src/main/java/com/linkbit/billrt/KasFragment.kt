@@ -4,11 +4,12 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.Fragment
+import androidx.appcompat.app.AppCompatActivity
+import androidx.navigation.fragment.findNavController
 import com.google.android.material.tabs.TabLayoutMediator
 import com.linkbit.billrt.databinding.FragmentKasBinding
 
-class KasFragment : Fragment() {
+class KasFragment : BaseFragment() {
 
     private var _binding: FragmentKasBinding? = null
     private val binding get() = _binding!!
@@ -23,6 +24,9 @@ class KasFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        
+        applyWindowInsets(binding.appBarLayout)
+        setupToolbar()
 
         val adapter = KasViewPagerAdapter(childFragmentManager, lifecycle)
         binding.viewPagerKas.adapter = adapter
@@ -34,6 +38,17 @@ class KasFragment : Fragment() {
                 else -> null
             }
         }.attach()
+    }
+
+    private fun setupToolbar() {
+        (activity as? AppCompatActivity)?.setSupportActionBar(binding.toolbar)
+        (activity as? AppCompatActivity)?.supportActionBar?.apply {
+            title = "Kas"
+            setDisplayHomeAsUpEnabled(true)
+        }
+        binding.toolbar.setNavigationOnClickListener {
+            findNavController().navigateUp()
+        }
     }
 
     override fun onDestroyView() {

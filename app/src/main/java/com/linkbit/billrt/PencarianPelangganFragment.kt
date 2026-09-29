@@ -16,10 +16,11 @@ import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.annotation.DrawableRes
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
-import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.ui.setupWithNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.linkbit.billrt.adapter.AutoCompleteAdapter
@@ -29,9 +30,7 @@ import com.linkbit.billrt.model.*
 import com.linkbit.billrt.network.RetrofitClient
 import com.mapbox.geojson.Point
 import com.mapbox.maps.CameraOptions
-import com.mapbox.maps.EdgeInsets
 import com.mapbox.maps.MapView
-import com.mapbox.maps.Style
 import com.mapbox.maps.plugin.animation.flyTo
 import com.mapbox.maps.plugin.annotation.annotations
 import com.mapbox.maps.plugin.annotation.generated.PointAnnotationOptions
@@ -40,7 +39,7 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-class PencarianPelangganFragment : Fragment() {
+class PencarianPelangganFragment : BaseFragment() {
 
     private var _binding: FragmentPencarianPelangganBinding? = null
     private val binding get() = _binding!!
@@ -61,13 +60,13 @@ class PencarianPelangganFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         mapView = binding.mapView
 
+        val appBarLayout = binding.toolbarPencarianPelanggan.parent as? View
+        appBarLayout?.let { applyWindowInsets(it) }
+
+        setupToolbar()
         setupResultRecyclerView()
         setupAutoCompleteRecyclerView()
         mapView?.getMapboxMap()?.loadStyleUri("mapbox://styles/mapbox/satellite-streets-v12")
-
-        binding.gantiLokasiButton.setOnClickListener {
-            findNavController().navigate(R.id.action_pencarianPelangganFragment_to_gantiLokasiFragment)
-        }
 
         binding.searchEditText.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
@@ -89,6 +88,12 @@ class PencarianPelangganFragment : Fragment() {
                 searchHandler.postDelayed(searchRunnable!!, 500)
             }
         })
+    }
+
+    private fun setupToolbar() {
+        (activity as? AppCompatActivity)?.setSupportActionBar(binding.toolbarPencarianPelanggan)
+        binding.toolbarPencarianPelanggan.setupWithNavController(findNavController())
+        binding.toolbarPencarianPelanggan.title = "Pencarian Pelanggan"
     }
 
     private fun setupResultRecyclerView() {
@@ -175,7 +180,6 @@ class PencarianPelangganFragment : Fragment() {
         binding.statusLayout.isVisible = isError
         if (isError) {
             binding.statusTextView.text = errorMessage
-            binding.gantiLokasiButton.isVisible = true
             binding.pelangganRecyclerView.isVisible = false
             radiusAdapter.updateData(null, null)
             updateMarkers(null, null)

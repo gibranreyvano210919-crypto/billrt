@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.*
 import android.widget.Toast
 import androidx.appcompat.widget.SearchView
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -14,7 +13,7 @@ import com.linkbit.billrt.viewmodel.PelangganNunggakViewModel
 import java.text.NumberFormat
 import java.util.Locale
 
-class PelangganNunggakFragment : Fragment() {
+class PelangganNunggakFragment : BaseFragment() {
 
     private var _binding: FragmentPelangganNunggakBinding? = null
     private val binding get() = _binding!!
@@ -46,6 +45,9 @@ class PelangganNunggakFragment : Fragment() {
 
         viewModel = ViewModelProvider(this).get(PelangganNunggakViewModel::class.java)
 
+        // Sinkronisasi Insets agar toolbar tidak menabrak status bar
+        applyWindowInsets(binding.appBarLayout)
+        
         setupToolbar()
         setupRecyclerView()
         observeViewModel()
@@ -96,10 +98,6 @@ class PelangganNunggakFragment : Fragment() {
         viewModel.pelangganList.observe(viewLifecycleOwner) { pelangganList ->
             nunggakAdapter.submitList(pelangganList)
             binding.swipeRefreshLayout.isRefreshing = false
-
-            val totalTunggakan = pelangganList.sumOf { it.total_tunggakan.toDouble() }
-            val format = NumberFormat.getCurrencyInstance(Locale("in", "ID"))
-            binding.tvTotalTunggakan.text = format.format(totalTunggakan)
         }
 
         viewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->

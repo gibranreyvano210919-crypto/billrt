@@ -32,6 +32,7 @@ class TambahPppoeFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        applyWindowInsets(binding.toolbar)
         setupToolbar()
         setupClickListeners()
         observeViewModel()

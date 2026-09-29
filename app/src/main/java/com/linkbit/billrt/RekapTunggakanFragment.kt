@@ -154,9 +154,9 @@ class RekapTunggakanFragment : BaseFragment() {
 
     private fun shareToWhatsApp(rekapWilayah: RekapTunggakanWilayah) {
         val builder = StringBuilder()
-        builder.append("*REKAP TUNGGAKAN - ${rekapWilayah.namaWilayah}*\n\n")
+        builder.append("*REKAP TUNGGAKAN - ${rekapWilayah.nama_wilayah}*\n\n")
         rekapWilayah.pelanggan.forEach { pelanggan ->
-            builder.append("- ${pelanggan.namaPelanggan} (${pelanggan.mikrotikUsername})\n")
+            builder.append("- ${pelanggan.nama_pelanggan} (${pelanggan.mikrotik_username})\n")
         }
 
         val intent = Intent(Intent.ACTION_SEND).apply {
@@ -205,9 +205,9 @@ class RekapTunggakanFragment : BaseFragment() {
 
     private fun formatDataForPrinting(rekap: RekapTunggakanWilayah): String {
         val builder = StringBuilder()
-        builder.append("REKAP ( ${rekap.namaWilayah.uppercase()} )\n")
+        builder.append("REKAP ( ${rekap.nama_wilayah.uppercase()} )\n")
         rekap.pelanggan.forEach { pelanggan ->
-            builder.append("- ${pelanggan.namaPelanggan} (${pelanggan.mikrotikUsername})\n")
+            builder.append("- ${pelanggan.nama_pelanggan} (${pelanggan.mikrotik_username})\n")
         }
         
         builder.append("\n\n\n\n")

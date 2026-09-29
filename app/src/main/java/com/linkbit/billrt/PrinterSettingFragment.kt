@@ -19,15 +19,16 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
-import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.linkbit.billrt.databinding.FragmentPrinterSettingBinding
 import java.io.IOException
 import java.util.UUID
 
 @SuppressLint("MissingPermission") // Permissions are handled by the fragment
-class PrinterSettingFragment : Fragment() {
+class PrinterSettingFragment : BaseFragment() {
 
     private var _binding: FragmentPrinterSettingBinding? = null
     private val binding get() = _binding!!
@@ -90,6 +91,8 @@ class PrinterSettingFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        applyWindowInsets(binding.appBarLayout)
+        setupToolbar()
         setupRecyclerView()
         setupBluetoothSwitch()
         setupPaperSizeChips()
@@ -103,6 +106,17 @@ class PrinterSettingFragment : Fragment() {
         
         val stateFilter = IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED)
         requireActivity().registerReceiver(bluetoothStateReceiver, stateFilter)
+    }
+
+    private fun setupToolbar() {
+        (activity as? AppCompatActivity)?.setSupportActionBar(binding.toolbar)
+        (activity as? AppCompatActivity)?.supportActionBar?.apply {
+            title = "Pengaturan Printer"
+            setDisplayHomeAsUpEnabled(true)
+        }
+        binding.toolbar.setNavigationOnClickListener {
+            findNavController().navigateUp()
+        }
     }
 
     private fun setupRecyclerView() {
@@ -274,8 +288,12 @@ class PrinterSettingFragment : Fragment() {
             }
         }
         
-        requireActivity().unregisterReceiver(scanReceiver)
-        requireActivity().unregisterReceiver(bluetoothStateReceiver)
+        try {
+            requireActivity().unregisterReceiver(scanReceiver)
+            requireActivity().unregisterReceiver(bluetoothStateReceiver)
+        } catch (e: Exception) {
+            // Receiver not registered
+        }
         _binding = null
     }
 }

@@ -53,12 +53,19 @@ class LunasBottomSheetFragment : BottomSheetDialogFragment() {
             itemClickListener?.onItemClick("cetak")
             dismiss()
         }
+
+        binding.actionRiwayatPembayaran.setOnClickListener {
+            itemClickListener?.onItemClick("riwayat")
+            dismiss()
+        }
     }
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
         if (parentFragment is ItemClickListener) {
             itemClickListener = parentFragment as ItemClickListener
+        } else if (context is ItemClickListener) {
+            itemClickListener = context
         }
     }
 

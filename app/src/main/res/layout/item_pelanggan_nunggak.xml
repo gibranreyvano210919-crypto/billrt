@@ -4,14 +4,15 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="8dp"
+    android:layout_marginHorizontal="8dp"
+    android:layout_marginVertical="3dp"
     app:cardCornerRadius="8dp"
-    app:cardElevation="4dp">
+    app:cardElevation="2dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="16dp">
+        android:padding="8dp">
 
         <TextView
             android:id="@+id/tv_nama_pelanggan"
@@ -20,52 +21,104 @@
             android:layout_marginEnd="8dp"
             android:ellipsize="end"
             android:maxLines="1"
-            android:textAppearance="?attr/textAppearanceListItem"
+            android:textSize="14sp"
             android:textStyle="bold"
+            android:fontFamily="sans-serif-medium"
             app:layout_constraintEnd_toStartOf="@+id/tv_total_piutang"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            tools:text="Nama Pelanggan Yang Sangat Panjang Sekali" />
+            tools:text="Nama Pelanggan" />
 
         <TextView
             android:id="@+id/tv_total_piutang"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textAppearance="?attr/textAppearanceListItem"
-            android:textStyle="bold"
+            android:textSize="14sp"
+            android:textColor="@color/design_default_color_error"
+            android:fontFamily="sans-serif-black"
             app:layout_constraintBaseline_toBaselineOf="@+id/tv_nama_pelanggan"
             app:layout_constraintEnd_toEndOf="parent"
-            tools:text="Rp 1.000.000" />
+            tools:text="Rp 100.000" />
 
         <TextView
             android:id="@+id/tv_wilayah"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:textAppearance="?attr/textAppearanceBody2"
+            android:layout_marginTop="2dp"
+            android:textSize="12sp"
+            android:textColor="?android:attr/textColorSecondary"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/tv_nama_pelanggan"
-            tools:text="Wilayah" />
+            tools:text="Wilayah: Depok" />
 
         <TextView
             android:id="@+id/tv_username"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:textAppearance="?attr/textAppearanceBody2"
+            android:layout_marginTop="1dp"
+            android:textSize="12sp"
+            android:textColor="?android:attr/textColorSecondary"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/tv_wilayah"
-            tools:text="Username" />
+            tools:text="User: maimunadepok" />
+
+        <View
+            android:id="@+id/divider"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="4dp"
+            android:background="?android:attr/dividerVertical"
+            android:alpha="0.1"
+            app:layout_constraintTop_toBottomOf="@+id/tv_username" />
 
         <TextView
-            android:id="@+id/tv_installation_date"
-            android:layout_width="wrap_content"
+            android:id="@+id/tv_jatuh_tempo"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
-            android:textAppearance="?attr/textAppearanceCaption"
+            android:textSize="11sp"
+            app:layout_constraintEnd_toStartOf="@+id/tv_riwayat_bayar"
+            app:layout_constraintHorizontal_weight="1"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tv_username"
-            tools:text="Installation Date: 2023-12-12" />
+            app:layout_constraintTop_toBottomOf="@+id/divider"
+            tools:text="Jatuh Tempo: Tgl 28" />
+
+        <TextView
+            android:id="@+id/tv_riwayat_bayar"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:textSize="11sp"
+            android:gravity="end"
+            app:layout_constraintBaseline_toBaselineOf="@+id/tv_jatuh_tempo"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_weight="1"
+            app:layout_constraintStart_toEndOf="@+id/tv_jatuh_tempo"
+            tools:text="Terakhir Bayar: 28/02/2026" />
+
+        <TextView
+            android:id="@+id/tv_periode"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:textSize="11sp"
+            android:textColor="@color/design_default_color_primary"
+            app:layout_constraintEnd_toStartOf="@+id/tv_admin"
+            app:layout_constraintHorizontal_weight="1"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tv_jatuh_tempo"
+            tools:text="Periode: 3/2026" />
+
+        <TextView
+            android:id="@+id/tv_admin"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:textSize="11sp"
+            android:gravity="end"
+            app:layout_constraintBaseline_toBaselineOf="@+id/tv_periode"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_weight="1"
+            app:layout_constraintStart_toEndOf="@+id/tv_periode"
+            tools:text="Admin: riski" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

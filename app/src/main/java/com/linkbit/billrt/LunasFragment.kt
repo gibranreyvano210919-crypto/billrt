@@ -8,6 +8,7 @@ import android.widget.Toast
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.linkbit.billrt.adapter.LunasAdapter
@@ -15,7 +16,7 @@ import com.linkbit.billrt.databinding.FragmentLunasBinding
 import com.linkbit.billrt.model.PelangganLunasItem
 import com.linkbit.billrt.viewmodel.LunasViewModel
 
-class LunasFragment : Fragment(), LunasBottomSheetFragment.ItemClickListener {
+class LunasFragment : BaseFragment(), LunasBottomSheetFragment.ItemClickListener {
 
     private var _binding: FragmentLunasBinding? = null
     private val binding get() = _binding!!
@@ -47,6 +48,9 @@ class LunasFragment : Fragment(), LunasBottomSheetFragment.ItemClickListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        // Sinkronisasi Insets agar toolbar tidak menabrak status bar
+        applyWindowInsets(binding.appBarLayout)
+
         viewModel = ViewModelProvider(this).get(LunasViewModel::class.java)
 
         setupRecyclerView()
@@ -63,7 +67,7 @@ class LunasFragment : Fragment(), LunasBottomSheetFragment.ItemClickListener {
             }
 
             override fun onQueryTextChange(newText: String?): Boolean {
-                viewModel.fetchPelangganLunas(bulan, tahun, newText.orEmpty())
+                viewModel.fetchPelangganLunas(bulan, tahun, search = newText.orEmpty())
                 return true
             }
         })
@@ -91,7 +95,7 @@ class LunasFragment : Fragment(), LunasBottomSheetFragment.ItemClickListener {
         }
 
         viewModel.toastMessage.observe(viewLifecycleOwner) { message ->
-            if (message.isNotBlank()) {
+            if (!message.isNullOrBlank()) {
                 Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
             }
         }
@@ -138,7 +142,14 @@ class LunasFragment : Fragment(), LunasBottomSheetFragment.ItemClickListener {
                 }
             }
             "cetak" -> {
-                Toast.makeText(context, "Cetak pembayaran untuk ${selectedPelanggan?.namaPelanggan}", Toast.LENGTH_SHORT).show()
+                selectedPelanggan?.let { pelanggan ->
+                    val bundle = Bundle().apply {
+                        putSerializable("pelanggan_item", pelanggan)
+                    }
+                    findNavController().navigate(R.id.action_global_cetakNotaFragment, bundle)
+                } ?: run {
+                    Toast.makeText(context, "Silakan pilih pelanggan terlebih dahulu", Toast.LENGTH_SHORT).show()
+                }
             }
         }
     }

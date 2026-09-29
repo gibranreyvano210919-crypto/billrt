@@ -76,6 +76,10 @@ class PeriodeTagihanFragment : Fragment() {
         viewModel.errorMessage.observe(viewLifecycleOwner) { errorMessage ->
             Toast.makeText(context, errorMessage, Toast.LENGTH_SHORT).show()
         }
+
+        viewModel.generateResult.observe(viewLifecycleOwner) { result ->
+            Toast.makeText(context, result.message, Toast.LENGTH_LONG).show()
+        }
     }
 
     private fun convertBulanStringToInt(bulan: String): Int {

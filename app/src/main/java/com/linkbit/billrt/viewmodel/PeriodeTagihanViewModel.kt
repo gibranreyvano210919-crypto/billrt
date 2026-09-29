@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.linkbit.billrt.model.GenerateTagihanResponse
 import com.linkbit.billrt.model.PeriodeTagihan
 import com.linkbit.billrt.network.ApiClient
 import kotlinx.coroutines.launch
@@ -19,6 +20,9 @@ class PeriodeTagihanViewModel : ViewModel() {
     private val _errorMessage = MutableLiveData<String>()
     val errorMessage: LiveData<String> = _errorMessage
 
+    private val _generateResult = MutableLiveData<GenerateTagihanResponse>()
+    val generateResult: LiveData<GenerateTagihanResponse> = _generateResult
+
     fun fetchPeriodeTagihan() {
         _isLoading.value = true
         viewModelScope.launch {
@@ -31,6 +35,23 @@ class PeriodeTagihanViewModel : ViewModel() {
                 }
             } catch (e: Exception) {
                 _errorMessage.value = "Terjadi kesalahan: ${e.message}"
+            } finally {
+                _isLoading.value = false
+            }
+        }
+    }
+
+    fun generateTagihan(bulan: Int, tahun: Int) {
+        _isLoading.value = true
+        viewModelScope.launch {
+            try {
+                val response = ApiClient.tagihanApiService.generateTagihan(bulan, tahun)
+                _generateResult.value = response
+                if (response.status) {
+                    fetchPeriodeTagihan() // Refresh list after generation
+                }
+            } catch (e: Exception) {
+                _errorMessage.value = "Terjadi kesalahan saat generate: ${e.message}"
             } finally {
                 _isLoading.value = false
             }

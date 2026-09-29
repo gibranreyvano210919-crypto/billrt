@@ -7,6 +7,8 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.linkbit.billrt.databinding.ItemCatatanKasBinding
 import com.linkbit.billrt.databinding.ItemHeaderTanggalKasBinding
+import java.text.NumberFormat
+import java.util.Locale
 
 sealed class RiwayatKasListItem {
     data class Header(val group: TanggalGroup) : RiwayatKasListItem()
@@ -15,10 +17,10 @@ sealed class RiwayatKasListItem {
 
 class RiwayatKasGroupedAdapter(
     private var items: List<RiwayatKasListItem>,
-    private val onPrintClick: (String) -> Unit,
+    private val onPrintClick: (String) -> Unit, // Changed: now passes a groupKey
     private val onDeleteClick: (CatatanKasItem) -> Unit,
     private val onItemClick: (CatatanKasItem) -> Unit,
-    private val onSelectAllClick: (String) -> Unit,
+    private val onSelectAllClick: (String) -> Unit, // Changed: now passes a groupKey
     private val onVerifyToggle: (CatatanKasItem) -> Unit
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
@@ -67,13 +69,21 @@ class RiwayatKasGroupedAdapter(
         }
         notifyDataSetChanged()
     }
+
+    private fun getGroupKey(item: CatatanKasItem): String {
+        return "${item.tanggalCatat}|${item.namaSetoran}"
+    }
+
+    private fun getGroupKey(group: TanggalGroup): String {
+        return "${group.tanggalCatat}|${group.namaSetoran ?: ""}"
+    }
     
-    fun toggleSelectAllInGroup(tanggal: String) {
+    fun toggleSelectAllInGroup(groupKey: String) {
         val groupItemIds = items.filterIsInstance<RiwayatKasListItem.Item>()
-                                .filter { it.catatan.id.toString() == tanggal }
+                                .filter { getGroupKey(it.catatan) == groupKey }
                                 .map { it.catatan.id }
         
-        val allSelected = groupItemIds.all { selectedItems.contains(it) }
+        val allSelected = groupItemIds.isNotEmpty() && groupItemIds.all { selectedItems.contains(it) }
         
         if (allSelected) {
             selectedItems.removeAll(groupItemIds)
@@ -83,9 +93,9 @@ class RiwayatKasGroupedAdapter(
         notifyDataSetChanged()
     }
 
-    fun getSelectedItemsInGroup(tanggal: String): List<CatatanKasItem> {
+    fun getSelectedItemsInGroup(groupKey: String): List<CatatanKasItem> {
         val groupItems = items.filterIsInstance<RiwayatKasListItem.Item>()
-                              .filter { it.catatan.id.toString() == tanggal }
+                              .filter { getGroupKey(it.catatan) == groupKey }
                               .map { it.catatan }
         return groupItems.filter { selectedItems.contains(it.id) }
     }
@@ -101,16 +111,19 @@ class RiwayatKasGroupedAdapter(
             val verifiedCount = group.list.count { it.verified == 1 }
             val unverifiedCount = group.list.size - verifiedCount
 
-            binding.tvHeaderTanggal.text = group.tanggal
-            binding.tvHeaderSummary.text = "V:${verifiedCount}, U:${unverifiedCount}"
+            binding.tvHeaderTanggal.text = group.tanggalCatat
+            binding.tvNamaSetoran.text = group.namaSetoran ?: "-"
             
-            // Format and display the daily technician rekap
-            val rekapHarianText = group.rekapTeknisiHarian.joinToString(", ") { "${it.nama}: ${it.jumlah}" }
-            binding.tvRekapHarian.text = rekapHarianText
-            binding.tvRekapHarian.visibility = if (rekapHarianText.isNotEmpty()) View.VISIBLE else View.GONE
+            val totalNominalFormatted = NumberFormat.getCurrencyInstance(Locale("in", "ID")).format(group.totalNominal)
+            binding.tvHeaderSummary.text = "V:${verifiedCount}, U:${unverifiedCount} | $totalNominalFormatted"
+            
+            // Show technician name for the setoran
+            binding.tvRekapHarian.text = "Teknisi: ${group.namaTeknisi ?: "-"}"
+            binding.tvRekapHarian.visibility = View.VISIBLE
 
-            binding.btnSelectAll.setOnClickListener { onSelectAllClick(group.tanggal) }
-            binding.btnPrintTanggal.setOnClickListener { onPrintClick(group.tanggal) }
+            val groupKey = getGroupKey(group)
+            binding.btnSelectAll.setOnClickListener { onSelectAllClick(groupKey) }
+            binding.btnPrintTanggal.setOnClickListener { onPrintClick(groupKey) }
         }
     }
 

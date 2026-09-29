@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     tools:context=".BerandaFragment">
 
-    <!-- Konten Utama, disembunyikan pada awalnya -->
+    <!-- Konten Utama -->
     <androidx.core.widget.NestedScrollView
         android:id="@+id/main_content_scrollview"
         android:layout_width="match_parent"
@@ -19,341 +19,464 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
+            <!-- Header Modern -->
             <RelativeLayout
+                android:id="@+id/header_gradient"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="16dp">
+                android:padding="24dp"
+                android:background="@drawable/bg_gradient_home"
+                android:elevation="4dp"
+                android:paddingBottom="48dp">
 
-                <TextView
-                    android:id="@+id/tv_welcome"
+                <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:orientation="vertical"
                     android:layout_alignParentStart="true"
-                    android:text="Selamat Datang!"
-                    android:textSize="18sp" />
+                    android:layout_toStartOf="@id/layout_icons"
+                    android:layout_marginEnd="16dp">
 
-                <TextView
-                    android:id="@+id/tv_date_time"
+                    <TextView
+                        android:id="@+id/tv_welcome_label"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Selamat Datang,"
+                        android:textColor="@color/white"
+                        android:textSize="14sp"
+                        android:alpha="0.8" />
+
+                    <TextView
+                        android:id="@+id/tv_welcome"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Administrator"
+                        android:textColor="@color/white"
+                        android:textSize="24sp"
+                        android:textStyle="bold" />
+
+                    <View
+                        android:layout_width="40dp"
+                        android:layout_height="3dp"
+                        android:layout_marginTop="8dp"
+                        android:background="@color/teal_200" />
+
+                    <TextView
+                        android:id="@+id/tv_date_time"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:text="Senin, 25 Januari 2026"
+                        android:textColor="@color/white"
+                        android:textSize="14sp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/layout_icons"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_below="@id/tv_welcome"
-                    android:layout_alignParentStart="true"
-                    tools:text="Senin, 25 Januari 2026" />
+                    android:layout_alignParentEnd="true"
+                    android:layout_alignParentTop="true"
+                    android:orientation="horizontal">
+
+                    <!-- Satu Ikon Lonceng Saja untuk Transaksi Lain -->
+                    <ImageView
+                        android:id="@+id/iv_transaksi_lain"
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:src="@drawable/ic_notification"
+                        app:tint="@color/white"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:padding="4dp" />
+
+                </LinearLayout>
 
             </RelativeLayout>
 
+            <!-- Card Menu & Income/Expense -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="16dp"
-                android:layout_marginTop="16dp"
-                app:cardCornerRadius="8dp"
-                app:cardElevation="4dp">
+                android:layout_marginTop="-24dp"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="8dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:paddingStart="16dp"
-                        android:paddingTop="16dp"
-                        android:paddingEnd="16dp"
-                        android:text="Menu Utama"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Headline" />
-
-                    <GridLayout
+                    <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:columnCount="3"
-                        android:padding="4dp">
+                        android:orientation="vertical"
+                        android:padding="16dp">
 
-                        <!-- Menu Pelanggan -->
-                        <LinearLayout
-                            android:id="@+id/card_user"
-                            android:layout_width="0dp"
+                        <TextView
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_columnWeight="1"
-                            android:orientation="vertical"
-                            android:gravity="center_horizontal"
-                            android:clickable="true"
-                            android:focusable="true"
-                            android:padding="8dp"
-                            android:background="?android:attr/selectableItemBackground">
+                            android:text="Menu Utama"
+                            android:textStyle="bold"
+                            android:textSize="16sp"
+                            android:textAppearance="@style/TextAppearance.AppCompat.Headline" />
 
-                            <com.google.android.material.card.MaterialCardView
-                                android:layout_width="64dp"
-                                android:layout_height="64dp"
-                                app:cardCornerRadius="16dp"
-                                app:cardElevation="4dp"
-                                app:cardBackgroundColor="@color/card_pelanggan">
-                                <ImageView
-                                    android:layout_width="32dp"
-                                    android:layout_height="32dp"
-                                    android:src="@drawable/ic_user"
-                                    app:tint="@android:color/white"
-                                    android:layout_gravity="center"/>
-                            </com.google.android.material.card.MaterialCardView>
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Pelanggan"
-                                android:layout_marginTop="8dp"
-                                android:textAppearance="@style/TextAppearance.MaterialComponents.Caption"
-                                android:gravity="center"
-                                android:maxLines="2"
-                                android:ellipsize="end"/>
-                        </LinearLayout>
-
-                        <!-- Menu Smart OLT -->
-                        <LinearLayout
-                            android:id="@+id/card_olt"
-                            android:layout_width="0dp"
+                        <GridLayout
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_columnWeight="1"
-                            android:orientation="vertical"
-                            android:gravity="center_horizontal"
-                            android:clickable="true"
-                            android:focusable="true"
-                            android:padding="8dp"
-                            android:background="?android:attr/selectableItemBackground">
+                            android:columnCount="3"
+                            android:layout_marginTop="8dp">
 
-                            <com.google.android.material.card.MaterialCardView
-                                android:layout_width="64dp"
-                                android:layout_height="64dp"
-                                app:cardCornerRadius="16dp"
-                                app:cardElevation="4dp"
-                                app:cardBackgroundColor="@color/card_olt">
-                                <ImageView
-                                    android:layout_width="32dp"
-                                    android:layout_height="32dp"
-                                    android:src="@drawable/ic_olt"
-                                    app:tint="@android:color/white"
-                                    android:layout_gravity="center"/>
-                            </com.google.android.material.card.MaterialCardView>
-
-                            <TextView
-                                android:layout_width="wrap_content"
+                            <LinearLayout
+                                android:id="@+id/card_user"
+                                android:layout_width="0dp"
                                 android:layout_height="wrap_content"
-                                android:text="Smart OLT"
-                                android:layout_marginTop="8dp"
-                                android:textAppearance="@style/TextAppearance.MaterialComponents.Caption"
-                                android:gravity="center"
-                                android:maxLines="2"
-                                android:ellipsize="end"/>
-                        </LinearLayout>
+                                android:layout_columnWeight="1"
+                                android:orientation="vertical"
+                                android:gravity="center_horizontal"
+                                android:clickable="true"
+                                android:focusable="true"
+                                android:padding="8dp"
+                                android:background="?android:attr/selectableItemBackground">
+                                <com.google.android.material.card.MaterialCardView
+                                    android:layout_width="56dp"
+                                    android:layout_height="56dp"
+                                    app:cardCornerRadius="14dp"
+                                    app:cardElevation="0dp"
+                                    app:cardBackgroundColor="@color/card_pelanggan">
+                                    <ImageView
+                                        android:layout_width="32dp"
+                                        android:layout_height="32dp"
+                                        android:src="@drawable/pelanggan"
+                                        android:layout_gravity="center"/>
+                                </com.google.android.material.card.MaterialCardView>
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Pelanggan"
+                                    android:layout_marginTop="8dp"
+                                    android:textSize="12sp" />
+                            </LinearLayout>
 
-                        <!-- Menu Mikrotik -->
-                        <LinearLayout
-                            android:id="@+id/card_mikrotik"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_columnWeight="1"
-                            android:orientation="vertical"
-                            android:gravity="center_horizontal"
-                            android:clickable="true"
-                            android:focusable="true"
-                            android:padding="8dp"
-                            android:background="?android:attr/selectableItemBackground">
-
-                            <com.google.android.material.card.MaterialCardView
-                                android:layout_width="64dp"
-                                android:layout_height="64dp"
-                                app:cardCornerRadius="16dp"
-                                app:cardElevation="4dp"
-                                app:cardBackgroundColor="@color/card_mikrotik">
-                                <ImageView
-                                    android:layout_width="32dp"
-                                    android:layout_height="32dp"
-                                    android:src="@drawable/ic_router"
-                                    app:tint="@android:color/white"
-                                    android:layout_gravity="center"/>
-                            </com.google.android.material.card.MaterialCardView>
-
-                            <TextView
-                                android:layout_width="wrap_content"
+                            <LinearLayout
+                                android:id="@+id/card_olt"
+                                android:layout_width="0dp"
                                 android:layout_height="wrap_content"
-                                android:text="Mikrotik"
-                                android:layout_marginTop="8dp"
-                                android:textAppearance="@style/TextAppearance.MaterialComponents.Caption"
-                                android:gravity="center"
-                                android:maxLines="2"
-                                android:ellipsize="end"/>
-                        </LinearLayout>
+                                android:layout_columnWeight="1"
+                                android:orientation="vertical"
+                                android:gravity="center_horizontal"
+                                android:clickable="true"
+                                android:focusable="true"
+                                android:padding="8dp"
+                                android:background="?android:attr/selectableItemBackground">
+                                <com.google.android.material.card.MaterialCardView
+                                    android:layout_width="56dp"
+                                    android:layout_height="56dp"
+                                    app:cardCornerRadius="14dp"
+                                    app:cardElevation="0dp"
+                                    app:cardBackgroundColor="@color/card_olt">
+                                    <ImageView
+                                        android:layout_width="32dp"
+                                        android:layout_height="32dp"
+                                        android:src="@drawable/smartolt"
+                                        android:layout_gravity="center"/>
+                                </com.google.android.material.card.MaterialCardView>
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Smart OLT"
+                                    android:layout_marginTop="8dp"
+                                    android:textSize="12sp" />
+                            </LinearLayout>
 
-                        <!-- Menu Maps -->
-                        <LinearLayout
-                            android:id="@+id/card_map"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_columnWeight="1"
-                            android:orientation="vertical"
-                            android:gravity="center_horizontal"
-                            android:clickable="true"
-                            android:focusable="true"
-                            android:padding="8dp"
-                            android:background="?android:attr/selectableItemBackground">
-
-                            <com.google.android.material.card.MaterialCardView
-                                android:layout_width="64dp"
-                                android:layout_height="64dp"
-                                app:cardCornerRadius="16dp"
-                                app:cardElevation="4dp"
-                                app:cardBackgroundColor="@color/card_maps">
-                                <ImageView
-                                    android:layout_width="32dp"
-                                    android:layout_height="32dp"
-                                    android:src="@drawable/ic_map"
-                                    app:tint="@android:color/white"
-                                    android:layout_gravity="center"/>
-                            </com.google.android.material.card.MaterialCardView>
-
-                            <TextView
-                                android:layout_width="wrap_content"
+                            <LinearLayout
+                                android:id="@+id/card_mikrotik"
+                                android:layout_width="0dp"
                                 android:layout_height="wrap_content"
-                                android:text="Maps"
-                                android:layout_marginTop="8dp"
-                                android:textAppearance="@style/TextAppearance.MaterialComponents.Caption"
-                                android:gravity="center"
-                                android:maxLines="2"
-                                android:ellipsize="end"/>
-                        </LinearLayout>
+                                android:layout_columnWeight="1"
+                                android:orientation="vertical"
+                                android:gravity="center_horizontal"
+                                android:clickable="true"
+                                android:focusable="true"
+                                android:padding="8dp"
+                                android:background="?android:attr/selectableItemBackground">
+                                <com.google.android.material.card.MaterialCardView
+                                    android:layout_width="56dp"
+                                    android:layout_height="56dp"
+                                    app:cardCornerRadius="14dp"
+                                    app:cardElevation="0dp"
+                                    app:cardBackgroundColor="@color/card_mikrotik">
+                                    <ImageView
+                                        android:layout_width="32dp"
+                                        android:layout_height="32dp"
+                                        android:src="@drawable/mikrotik"
+                                        android:layout_gravity="center"/>
+                                </com.google.android.material.card.MaterialCardView>
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Mikrotik"
+                                    android:layout_marginTop="8dp"
+                                    android:textSize="12sp" />
+                            </LinearLayout>
 
-                        <!-- Menu Pembukuan -->
-                        <LinearLayout
-                            android:id="@+id/card_pembukuan"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_columnWeight="1"
-                            android:orientation="vertical"
-                            android:gravity="center_horizontal"
-                            android:clickable="true"
-                            android:focusable="true"
-                            android:padding="8dp"
-                            android:background="?android:attr/selectableItemBackground">
-
-                            <com.google.android.material.card.MaterialCardView
-                                android:layout_width="64dp"
-                                android:layout_height="64dp"
-                                app:cardCornerRadius="16dp"
-                                app:cardElevation="4dp"
-                                app:cardBackgroundColor="@color/card_pembukuan">
-                                <ImageView
-                                    android:layout_width="32dp"
-                                    android:layout_height="32dp"
-                                    android:src="@drawable/ic_pembukuan"
-                                    app:tint="@android:color/white"
-                                    android:layout_gravity="center"/>
-                            </com.google.android.material.card.MaterialCardView>
-
-                            <TextView
-                                android:layout_width="wrap_content"
+                            <LinearLayout
+                                android:id="@+id/card_map"
+                                android:layout_width="0dp"
                                 android:layout_height="wrap_content"
-                                android:text="Pembukuan"
-                                android:layout_marginTop="8dp"
-                                android:textAppearance="@style/TextAppearance.MaterialComponents.Caption"
-                                android:gravity="center"
-                                android:maxLines="2"
-                                android:ellipsize="end"/>
-                        </LinearLayout>
+                                android:layout_columnWeight="1"
+                                android:orientation="vertical"
+                                android:gravity="center_horizontal"
+                                android:clickable="true"
+                                android:focusable="true"
+                                android:padding="8dp"
+                                android:background="?android:attr/selectableItemBackground">
+                                <com.google.android.material.card.MaterialCardView
+                                    android:layout_width="56dp"
+                                    android:layout_height="56dp"
+                                    app:cardCornerRadius="14dp"
+                                    app:cardElevation="0dp"
+                                    app:cardBackgroundColor="@color/card_maps">
+                                    <ImageView
+                                        android:layout_width="32dp"
+                                        android:layout_height="32dp"
+                                        android:src="@drawable/map"
+                                        android:layout_gravity="center"/>
+                                </com.google.android.material.card.MaterialCardView>
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Maps"
+                                    android:layout_marginTop="8dp"
+                                    android:textSize="12sp" />
+                            </LinearLayout>
 
-                    </GridLayout>
-                </LinearLayout>
+                            <LinearLayout
+                                android:id="@+id/card_pembukuan"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_columnWeight="1"
+                                android:orientation="vertical"
+                                android:gravity="center_horizontal"
+                                android:clickable="true"
+                                android:focusable="true"
+                                android:padding="8dp"
+                                android:background="?android:attr/selectableItemBackground">
+                                <com.google.android.material.card.MaterialCardView
+                                    android:layout_width="56dp"
+                                    android:layout_height="56dp"
+                                    app:cardCornerRadius="14dp"
+                                    app:cardElevation="0dp"
+                                    app:cardBackgroundColor="@color/card_pembukuan">
+                                    <ImageView
+                                        android:layout_width="32dp"
+                                        android:layout_height="32dp"
+                                        android:src="@drawable/pembukuan"
+                                        android:layout_gravity="center"/>
+                                </com.google.android.material.card.MaterialCardView>
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Pembukuan"
+                                    android:layout_marginTop="8dp"
+                                    android:textSize="12sp" />
+                            </LinearLayout>
 
-            </com.google.android.material.card.MaterialCardView>
+                            <LinearLayout
+                                android:id="@+id/card_monitor_olt"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_columnWeight="1"
+                                android:orientation="vertical"
+                                android:gravity="center_horizontal"
+                                android:clickable="true"
+                                android:focusable="true"
+                                android:padding="8dp"
+                                android:background="?android:attr/selectableItemBackground">
+                                <com.google.android.material.card.MaterialCardView
+                                    android:layout_width="56dp"
+                                    android:layout_height="56dp"
+                                    app:cardCornerRadius="14dp"
+                                    app:cardElevation="0dp"
+                                    app:cardBackgroundColor="@color/card_olt_monitor">
+                                    <ImageView
+                                        android:layout_width="32dp"
+                                        android:layout_height="32dp"
+                                        android:src="@drawable/monitor_olt"
+                                        android:layout_gravity="center"/>
+                                </com.google.android.material.card.MaterialCardView>
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="OLT Monitor"
+                                    android:layout_marginTop="8dp"
+                                    android:textSize="12sp" />
+                            </LinearLayout>
 
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="16dp"
-                app:cardElevation="4dp"
-                app:cardCornerRadius="8dp">
+                        </GridLayout>
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical">
+                    </LinearLayout>
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:paddingStart="16dp"
-                        android:paddingTop="16dp"
-                        android:paddingEnd="16dp"
-                        android:text="Notifikasi Terbaru"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Headline" />
-
-                    <androidx.recyclerview.widget.RecyclerView
-                        android:id="@+id/rv_notifikasi_beranda"
+                    <View
                         android:layout_width="match_parent"
-                        android:layout_height="200dp"
-                        android:padding="8dp"
-                        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                        tools:listitem="@layout/item_notifikasi"
-                        tools:itemCount="10" />
+                        android:layout_height="1dp"
+                        android:background="#EEEEEE"
+                        android:layout_marginHorizontal="16dp"/>
 
-                    <Button
-                        android:id="@+id/btn_lihat_semua_notifikasi"
-                        style="@style/Widget.AppCompat.Button.Borderless.Colored"
-                        android:layout_width="wrap_content"
+                    <!-- Income/Expense Summary -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="end"
-                        android:layout_marginEnd="8dp"
-                        android:text="Lihat Semua" />
+                        android:orientation="horizontal"
+                        android:padding="16dp"
+                        android:weightSum="2">
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Pemasukan"
+                                android:textSize="12sp"
+                                android:textColor="@color/black"
+                                android:alpha="0.6"/>
+                            <TextView
+                                android:id="@+id/tvTotalIncome"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Rp 0"
+                                android:textSize="16sp"
+                                android:textStyle="bold"
+                                android:textColor="@color/teal_700"/>
+                        </LinearLayout>
+
+                        <View
+                            android:layout_width="1dp"
+                            android:layout_height="match_parent"
+                            android:background="#EEEEEE"
+                            android:layout_marginHorizontal="8dp"/>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Pengeluaran"
+                                android:textSize="12sp"
+                                android:textColor="@color/black"
+                                android:alpha="0.6"/>
+                            <TextView
+                                android:id="@+id/tvTotalExpense"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Rp 0"
+                                android:textSize="16sp"
+                                android:textStyle="bold"
+                                android:textColor="@color/red_soft"/>
+                        </LinearLayout>
+
+                    </LinearLayout>
 
                 </LinearLayout>
-
             </com.google.android.material.card.MaterialCardView>
 
-            <com.google.android.material.card.MaterialCardView
+            <!-- Aktivitas Notifikasi -->
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginEnd="16dp"
-                android:layout_marginBottom="16dp"
-                app:cardElevation="4dp"
-                app:cardCornerRadius="8dp">
+                android:orientation="vertical"
+                android:paddingHorizontal="16dp"
+                android:layout_marginTop="24dp">
 
-                <LinearLayout
+                <RelativeLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical">
-
+                    android:layout_height="wrap_content">
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:paddingStart="16dp"
-                        android:paddingTop="16dp"
-                        android:paddingEnd="16dp"
+                        android:text="Aktivitas Mikrotik"
+                        android:textStyle="bold"
+                        android:textSize="16sp"
+                        android:textColor="@color/black"/>
+                    <TextView
+                        android:id="@+id/btnLihatSemuaNotifikasi"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:text="Lihat Semua"
+                        android:textSize="12sp"
+                        android:textColor="@color/primary_blue"
+                        android:textStyle="bold"
+                        android:background="?attr/selectableItemBackground"
+                        android:padding="4dp"/>
+                </RelativeLayout>
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rvNotifikasiBeranda"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    tools:listitem="@layout/item_notifikasi" />
+
+            </LinearLayout>
+
+            <!-- Pembayaran Hari Ini -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingHorizontal="16dp"
+                android:layout_marginTop="24dp"
+                android:layout_marginBottom="24dp">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
                         android:text="Pembayaran Hari Ini"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Headline" />
+                        android:textStyle="bold"
+                        android:textSize="16sp"
+                        android:textColor="@color/black"/>
+                    <TextView
+                        android:id="@+id/btnLihatSemuaPembayaran"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:text="Lihat Semua"
+                        android:textSize="12sp"
+                        android:textColor="@color/primary_blue"
+                        android:textStyle="bold"
+                        android:background="?attr/selectableItemBackground"
+                        android:padding="4dp"/>
+                </RelativeLayout>
 
-                    <androidx.recyclerview.widget.RecyclerView
-                        android:id="@+id/rv_pembayaran_hari_ini"
-                        android:layout_width="match_parent"
-                        android:layout_height="200dp"
-                        android:padding="8dp"
-                        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                        tools:listitem="@layout/item_pembayaran_hari_ini"
-                        tools:itemCount="10" />
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rvPembayaranHariIni"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    tools:listitem="@layout/item_pembayaran_hari_ini" />
 
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
+            </LinearLayout>
 
         </LinearLayout>
-
     </androidx.core.widget.NestedScrollView>
 
-    <!-- Indikator Loading -->
     <ProgressBar
         android:id="@+id/loading_progress_bar"
-        style="?android:attr/progressBarStyleLarge"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:visibility="visible" />
+        android:visibility="gone" />
 
 </FrameLayout>

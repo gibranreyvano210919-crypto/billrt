@@ -1,28 +1,109 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:background="@drawable/bg_bottom_sheet_white"
     android:orientation="vertical"
-    android:padding="16dp">
+    android:padding="20dp">
 
-    <TextView
-        android:id="@+id/tv_batal_tagout"
+    <!-- Handle Bar -->
+    <View
+        android:layout_width="40dp"
+        android:layout_height="4dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="16dp"
+        android:background="#DEDEDE" />
+
+    <!-- Header -->
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="16dp"
-        android:text="Batal Tagout"
-        android:drawableStart="@android:drawable/ic_menu_close_clear_cancel"
-        android:drawablePadding="16dp"
-        android:textAppearance="?attr/textAppearanceSubtitle1" />
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:layout_marginBottom="16dp">
 
+        <ImageView
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="@drawable/bg_circle_primary_light"
+            android:contentDescription="@null"
+            android:padding="10dp"
+            android:src="@drawable/ic_tunggakan"
+            app:tint="#D97706" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Menu Pelanggan Tagout"
+                android:textColor="#1E293B"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:text="Pilih tindakan yang ingin dilakukan"
+                android:textColor="#64748B"
+                android:textSize="13sp" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginBottom="16dp"
+        android:background="#E2E8F0" />
+
+    <!-- Option 1: Konfirmasi Pembayaran -->
     <TextView
         android:id="@+id/tv_konfirmasi_bayar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="16dp"
+        android:layout_marginBottom="10dp"
+        android:background="@drawable/bg_button_success_light"
+        android:clickable="true"
+        android:drawableStart="@drawable/ic_pay"
+        android:drawablePadding="12dp"
+        android:drawableTint="#166534"
+        android:focusable="true"
+        android:gravity="center_vertical"
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="14dp"
         android:text="Konfirmasi Pembayaran"
-        android:drawableStart="@android:drawable/ic_input_add"
-        android:drawablePadding="16dp"
-        android:textAppearance="?attr/textAppearanceSubtitle1" />
+        android:textColor="#166534"
+        android:textSize="15sp"
+        android:textStyle="bold"
+        app:drawableStartCompat="@drawable/ic_pay"
+        app:drawableTint="#166534" />
+
+    <!-- Option 2: Batal Tagout -->
+    <TextView
+        android:id="@+id/tv_batal_tagout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_button_warning_light"
+        android:clickable="true"
+        android:drawableStart="@drawable/ic_close"
+        android:drawablePadding="12dp"
+        android:drawableTint="#92400E"
+        android:focusable="true"
+        android:gravity="center_vertical"
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="14dp"
+        android:text="Batal Tagout"
+        android:textColor="#92400E"
+        android:textSize="15sp"
+        android:textStyle="bold"
+        app:drawableStartCompat="@drawable/ic_close"
+        app:drawableTint="#92400E" />
 
 </LinearLayout>

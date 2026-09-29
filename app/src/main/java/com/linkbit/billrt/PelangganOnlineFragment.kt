@@ -37,6 +37,8 @@ class PelangganOnlineFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        applyWindowInsets(binding.appBarLayout)
+        
         setupToolbar()
         setupRecyclerView()
         setupSearchView()
@@ -104,7 +106,8 @@ class PelangganOnlineFragment : BaseFragment() {
             .setTitle("Kick User")
             .setMessage("Anda yakin ingin kick ${user.name}?")
             .setPositiveButton("Kick") { _, _ ->
-                viewModel.kickUser(args.routerId, user.id)
+                // PERBAIKAN: Gunakan user.name (mikrotik_username) bukan user.id
+                viewModel.kickUser(args.routerId, user.name)
             }
             .setNegativeButton("Batal", null)
             .show()
