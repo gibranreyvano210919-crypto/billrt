@@ -249,11 +249,75 @@ data class AiQueryResponse(
     val data: List<Map<String, Any>>?,
     val message: String?
 ) : Serializable
+
+data class ApiSettingItem(
+    val id: Int? = null,
+    @SerializedName("setting_key") val settingKey: String,
+    @SerializedName("setting_value") val settingValue: String?
+) : Serializable
+
+data class ApiSettingsResponse(
+    val status: Boolean,
+    val message: String? = null,
+    val data: List<ApiSettingItem>? = null
+) : Serializable
+
+data class AiModelItem(
+    val id: Int? = null,
+    @SerializedName("model_name") val modelName: String,
+    val temperature: Double? = 0.10,
+    @SerializedName("extra_params") val extraParams: String? = null,
+    @SerializedName("is_active") val isActive: Int = 0
+) : Serializable
+
+data class AiModelsResponse(
+    val status: Boolean,
+    val message: String? = null,
+    val data: List<AiModelItem>? = null
+) : Serializable
 // endregion
 
 interface ApiService {
 
-    @GET("billrt/api/api_mistral.php")
+    @GET("http://112.78.170.196:8885/billrt/api/api_settings.php")
+    fun getApiSettings(): Call<ApiSettingsResponse>
+
+    @FormUrlEncoded
+    @POST("http://112.78.170.196:8885/billrt/api/api_settings.php")
+    fun saveApiSetting(
+        @Field("id") id: Int? = null,
+        @Field("setting_key") settingKey: String,
+        @Field("setting_value") settingValue: String
+    ): Call<StandardResponse>
+
+    @FormUrlEncoded
+    @POST("http://112.78.170.196:8885/billrt/api/api_settings.php")
+    fun deleteApiSetting(
+        @Field("id") id: Int,
+        @Field("action") action: String = "delete"
+    ): Call<StandardResponse>
+
+    @GET("http://112.78.170.196:8885/billrt/api/api_settings.php?endpoint=models")
+    fun getAiModels(): Call<AiModelsResponse>
+
+    @FormUrlEncoded
+    @POST("http://112.78.170.196:8885/billrt/api/api_settings.php?endpoint=models")
+    fun saveAiModel(
+        @Field("id") id: Int? = null,
+        @Field("model_name") modelName: String,
+        @Field("temperature") temperature: Double,
+        @Field("extra_params") extraParams: String?,
+        @Field("is_active") isActive: Int
+    ): Call<StandardResponse>
+
+    @FormUrlEncoded
+    @POST("http://112.78.170.196:8885/billrt/api/api_settings.php?endpoint=models")
+    fun deleteAiModel(
+        @Field("id") id: Int,
+        @Field("action") action: String = "delete"
+    ): Call<StandardResponse>
+
+    @GET("http://112.78.170.196:8885/billrt/api/api_mistral.php")
     fun getAiQuery(@Query("tanya_ai") pertanyaan: String): Call<AiQueryResponse>
 
     @POST("billrt/api/login.php")

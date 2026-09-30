@@ -486,6 +486,7 @@
         android:layout_gravity="bottom|end"
         android:layout_margin="16dp"
         android:contentDescription="Asisten AI"
-        app:srcCompat="@drawable/ic_info" />
+        app:srcCompat="@drawable/customer_service"
+        app:tint="@null" />
 
 </FrameLayout>

@@ -1033,6 +1033,26 @@
         android:id="@+id/aiFragment"
         android:name="com.linkbit.billrt.AiFragment"
         android:label="Asisten AI"
-        tools:layout="@layout/fragment_ai" />
+        tools:layout="@layout/fragment_ai">
+        <action
+            android:id="@+id/action_aiFragment_to_aiSettingsFragment"
+            app:destination="@id/aiSettingsFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/aiSettingsFragment"
+        android:name="com.linkbit.billrt.AiSettingsFragment"
+        android:label="Pengaturan AI"
+        tools:layout="@layout/fragment_ai_settings">
+        <action
+            android:id="@+id/action_aiSettingsFragment_to_aiModelsFragment"
+            app:destination="@id/aiModelsFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/aiModelsFragment"
+        android:name="com.linkbit.billrt.AiModelsFragment"
+        android:label="Kelola Model AI"
+        tools:layout="@layout/fragment_ai_models" />
 
 </navigation>
