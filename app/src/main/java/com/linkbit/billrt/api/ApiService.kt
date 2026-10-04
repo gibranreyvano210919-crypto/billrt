@@ -245,15 +245,58 @@ data class NunggakTahunanResponse(
 data class AiQueryResponse(
     val status: Boolean,
     val mode: String?,
+    @SerializedName("session_id") val sessionId: String?,
     @SerializedName("sql_generated") val sqlGenerated: String?,
     val data: List<Map<String, Any>>?,
     val message: String?
 ) : Serializable
 
+data class AiSessionItem(
+    @SerializedName("session_id") val sessionId: String,
+    val title: String?,
+    @SerializedName("created_at") val createdAt: String?
+) : Serializable
+
+data class AiSessionListResponse(
+    val status: Boolean,
+    val sessions: List<AiSessionItem>? = null,
+    val message: String? = null
+) : Serializable
+
+data class AiHistoryItem(
+    val sender: String,
+    @SerializedName("message_text") val messageText: String?,
+    @SerializedName("sql_query") val sqlQuery: String?,
+    @SerializedName("response_data") val responseData: Any?,
+    val timestamp: Any?
+) : Serializable
+
+data class AiSessionHistoryResponse(
+    val status: Boolean,
+    @SerializedName("session_id") val sessionId: String?,
+    val history: List<AiHistoryItem>? = null,
+    val message: String? = null
+) : Serializable
+
+data class ChatTemplateItem(
+    val id: Int? = null,
+    val category: String? = null,
+    @SerializedName("question_text") val questionText: String,
+    @SerializedName("sql_query") val sqlQuery: String? = null,
+    @SerializedName("display_order") val displayOrder: Int = 0
+) : Serializable
+
+data class ChatTemplatesResponse(
+    val status: Boolean,
+    val message: String? = null,
+    val templates: List<ChatTemplateItem>? = null
+) : Serializable
+
 data class ApiSettingItem(
     val id: Int? = null,
     @SerializedName("setting_key") val settingKey: String,
-    @SerializedName("setting_value") val settingValue: String?
+    @SerializedName("setting_value") val settingValue: String?,
+    @SerializedName("is_active") val isActive: Int = 1
 ) : Serializable
 
 data class ApiSettingsResponse(
@@ -287,7 +330,8 @@ interface ApiService {
     fun saveApiSetting(
         @Field("id") id: Int? = null,
         @Field("setting_key") settingKey: String,
-        @Field("setting_value") settingValue: String
+        @Field("setting_value") settingValue: String,
+        @Field("is_active") isActive: Int = 1
     ): Call<StandardResponse>
 
     @FormUrlEncoded
@@ -318,7 +362,70 @@ interface ApiService {
     ): Call<StandardResponse>
 
     @GET("http://112.78.170.196:8885/billrt/api/api_mistral.php")
-    fun getAiQuery(@Query("tanya_ai") pertanyaan: String): Call<AiQueryResponse>
+    fun getAiQuery(
+        @Query("tanya_ai") pertanyaan: String,
+        @Query("session_id") sessionId: String? = null,
+        @Query("sql_query") sqlQuery: String? = null
+    ): Call<AiQueryResponse>
+
+    @GET
+    fun getAiQueryUrl(
+        @Url url: String,
+        @Query("tanya_ai") pertanyaan: String,
+        @Query("session_id") sessionId: String? = null,
+        @Query("sql_query") sqlQuery: String? = null
+    ): Call<AiQueryResponse>
+
+    @GET("http://112.78.170.196:8885/billrt/api/api_mistral.php?action=list_sessions")
+    fun getAiSessions(): Call<AiSessionListResponse>
+
+    @GET
+    fun getAiSessionsUrl(
+        @Url url: String,
+        @Query("action") action: String = "list_sessions"
+    ): Call<AiSessionListResponse>
+
+    @GET("http://112.78.170.196:8885/billrt/api/api_mistral.php?action=get_session_history")
+    fun getAiSessionHistory(@Query("session_id") sessionId: String): Call<AiSessionHistoryResponse>
+
+    @GET
+    fun getAiSessionHistoryUrl(
+        @Url url: String,
+        @Query("action") action: String = "get_session_history",
+        @Query("session_id") sessionId: String
+    ): Call<AiSessionHistoryResponse>
+
+    @GET
+    fun deleteAiSessionUrl(
+        @Url url: String,
+        @Query("action") action: String = "delete_session",
+        @Query("session_id") sessionId: String
+    ): Call<StandardResponse>
+
+    @GET
+    fun getChatTemplatesUrl(
+        @Url url: String,
+        @Query("action") action: String = "list_templates"
+    ): Call<ChatTemplatesResponse>
+
+    @FormUrlEncoded
+    @POST
+    fun saveChatTemplateUrl(
+        @Url url: String,
+        @Field("action") action: String = "save_template",
+        @Field("id") id: Int? = null,
+        @Field("category") category: String?,
+        @Field("question_text") questionText: String,
+        @Field("sql_query") sqlQuery: String?,
+        @Field("display_order") displayOrder: Int = 0
+    ): Call<StandardResponse>
+
+    @GET
+    fun deleteChatTemplateUrl(
+        @Url url: String,
+        @Query("action") action: String = "delete_template",
+        @Query("id") id: Int
+    ): Call<StandardResponse>
 
     @POST("billrt/api/login.php")
     fun login(@Body request: LoginRequest): Call<LoginResponse>

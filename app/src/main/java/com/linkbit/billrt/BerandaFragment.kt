@@ -58,7 +58,6 @@ class BerandaFragment : BaseFragment() {
         }
 
         binding.loadingProgressBar.visibility = View.VISIBLE
-        binding.mainContentScrollview.visibility = View.GONE
 
         setupWelcomeMessage()
         setupDateTime()
@@ -201,13 +200,11 @@ class BerandaFragment : BaseFragment() {
                 notificationAdapter.submitList(tempList.reversed())
 
                 binding.loadingProgressBar.visibility = View.GONE
-                binding.mainContentScrollview.visibility = View.VISIBLE
             }
 
             override fun onCancelled(error: DatabaseError) {
                 if (_binding != null) {
                     binding.loadingProgressBar.visibility = View.GONE
-                    binding.mainContentScrollview.visibility = View.VISIBLE
                 }
             }
         })

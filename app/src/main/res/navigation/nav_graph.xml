@@ -1047,6 +1047,9 @@
         <action
             android:id="@+id/action_aiSettingsFragment_to_aiModelsFragment"
             app:destination="@id/aiModelsFragment" />
+        <action
+            android:id="@+id/action_aiSettingsFragment_to_chatTemplatesFragment"
+            app:destination="@id/chatTemplatesFragment" />
     </fragment>
 
     <fragment
@@ -1054,5 +1057,11 @@
         android:name="com.linkbit.billrt.AiModelsFragment"
         android:label="Kelola Model AI"
         tools:layout="@layout/fragment_ai_models" />
+
+    <fragment
+        android:id="@+id/chatTemplatesFragment"
+        android:name="com.linkbit.billrt.ChatTemplatesFragment"
+        android:label="Template Pertanyaan AI"
+        tools:layout="@layout/fragment_chat_templates" />
 
 </navigation>
