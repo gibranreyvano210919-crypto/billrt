@@ -31,6 +31,8 @@ class OltDetailMonitorFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        applyWindowInsets(binding.appBarLayout)
+
         oltId = arguments?.getInt("oltId") ?: -1
 
         setupRecyclerView()

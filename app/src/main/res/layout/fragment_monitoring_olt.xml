@@ -37,7 +37,7 @@
                 android:id="@+id/rv_monitoring_olt"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:paddingTop="8dp"
+                android:paddingVertical="4dp"
                 android:clipToPadding="false"
                 tools:listitem="@layout/item_monitoring_olt" />
 
@@ -49,17 +49,20 @@
                 android:gravity="center"
                 android:orientation="vertical"
                 android:visibility="gone">
+
                 <ImageView
-                    android:layout_width="100dp"
-                    android:layout_height="100dp"
+                    android:layout_width="72dp"
+                    android:layout_height="72dp"
                     android:src="@drawable/ic_olt"
                     app:tint="@color/grey_400" />
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
                     android:text="Data OLT tidak ditemukan"
                     android:textColor="@color/grey_400"
-                    android:textSize="16sp" />
+                    android:textSize="14sp" />
             </LinearLayout>
 
         </FrameLayout>
