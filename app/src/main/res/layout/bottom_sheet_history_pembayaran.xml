@@ -154,7 +154,7 @@
                     android:layout_marginTop="2dp"
                     android:textColor="@color/purple_500"
                     android:textSize="11sp"
-                    tools:text="Pencatat Terakhir: debi (ID: 3)" />
+                    tools:text="Pencatat Terakhir: debi" />
 
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>

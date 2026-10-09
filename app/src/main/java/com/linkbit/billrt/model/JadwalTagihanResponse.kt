@@ -19,6 +19,6 @@ data class JadwalTagihanItem(
     val wilayah: String,
     val paket: String,
     val nominal: Float,
-    @SerializedName("tgl_jatuh_tempo") val tglJatuhTempo: Int,
+    @SerializedName("tgl_jatuh_tempo", alternate = ["tanggal_isolasi", "tgl_isolasi", "jatuh_tempo_tgl"]) val tglJatuhTempo: Int,
     @SerializedName("tgl_terakhir_bayar") val tglTerakhirBayar: String
 )

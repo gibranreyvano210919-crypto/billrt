@@ -46,6 +46,7 @@ data class CardJaringan(
 data class CardDetail(
     @SerializedName("tgl_daftar") val tglDaftar: String,
     @SerializedName("installation_date") val installationDate: String,
+    @SerializedName("tanggal_isolasi", alternate = ["tgl_isolasi", "tgl_jatuh_tempo", "jatuh_tempo"]) val tanggalIsolasi: String? = null,
     @SerializedName("alamat_pelanggan") val alamatPelanggan: String,
     @SerializedName("latitude") val latitude: String,
     @SerializedName("longitude") val longitude: String

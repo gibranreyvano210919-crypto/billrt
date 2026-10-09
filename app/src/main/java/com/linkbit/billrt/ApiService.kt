@@ -152,7 +152,7 @@ data class DetailBayarBelumLunasData(
     @SerializedName("tgl_instalasi") val tglInstalasi: String,
     @SerializedName("periode") val periode: String,
     @SerializedName("nominal") val nominal: Float,
-    @SerializedName("jatuh_tempo") val jatuhTempo: String,
+    @SerializedName("jatuh_tempo", alternate = ["tanggal_isolasi", "tgl_isolasi", "tgl_jatuh_tempo"]) val jatuhTempo: String,
     @SerializedName("instruksi") val instruksi: String
 ) : Serializable
 

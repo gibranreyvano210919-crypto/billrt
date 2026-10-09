@@ -15,6 +15,6 @@ data class PelangganIsolir(
     @SerializedName("alamat") val alamat: String?,
     @SerializedName("status_aktif") val statusAktif: String?,
     @SerializedName("nama_wilayah") val namaWilayah: String?,
-    @SerializedName("tgl_isolir") val tglIsolir: String?,
+    @SerializedName("tgl_isolir", alternate = ["tanggal_isolasi", "tgl_isolasi", "tgl_jatuh_tempo"]) val tglIsolir: String?,
     @SerializedName("mikrotik_username") val mikrotikUsername: String?
 )

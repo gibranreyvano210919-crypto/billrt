@@ -71,6 +71,7 @@ data class TagihanItem(
     val nama: String,
     val jumlah: Double,
     val status: String,
+    @SerializedName("jatuh_tempo", alternate = ["tanggal_isolasi", "tgl_isolasi", "tgl_jatuh_tempo"])
     val jatuh_tempo: String?,
     val tgl_bayar: String?
 ) : Serializable

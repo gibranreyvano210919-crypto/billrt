@@ -15,7 +15,7 @@ data class PelangganTelatItem(
     @SerializedName("periode_tagihan")
     val periodeTagihan: String,
     val nominal: Double,
-    @SerializedName("tgl_jatuh_tempo")
+    @SerializedName("tgl_jatuh_tempo", alternate = ["tanggal_isolasi", "tgl_isolasi", "jatuh_tempo_tgl", "jatuh_tempo"])
     val tglJatuhTempo: Int,
     @SerializedName("tgl_bayar_terakhir")
     val tglBayarTerakhir: String,

@@ -75,7 +75,6 @@ class PengaturanFragment : Fragment() {
         val bankNama = binding.etBankNama.text.toString()
         val bankAtasNama = binding.etBankAtasNama.text.toString()
         val bankNoRekening = binding.etBankNoRekening.text.toString()
-        val masaTenggang = binding.etMasaTenggang.text.toString().toIntOrNull() ?: 0
 
         ApiClient.instance.updatePengaturan(
             id = pengaturanId,
@@ -86,7 +85,7 @@ class PengaturanFragment : Fragment() {
             bank = bankNama,
             an = bankAtasNama,
             norek = bankNoRekening,
-            tenggang = masaTenggang
+            tenggang = 0
         ).enqueue(object : Callback<UpdatePengaturanResponse> {
             override fun onResponse(call: Call<UpdatePengaturanResponse>, response: Response<UpdatePengaturanResponse>) {
                 if (response.isSuccessful) {
@@ -118,7 +117,6 @@ class PengaturanFragment : Fragment() {
         binding.etBankNama.setText(data.bankNama)
         binding.etBankAtasNama.setText(data.bankAtasNama)
         binding.etBankNoRekening.setText(data.bankNoRekening)
-        binding.etMasaTenggang.setText(data.masaTenggang)
     }
 
     override fun onDestroyView() {

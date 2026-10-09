@@ -1037,6 +1037,9 @@
         <action
             android:id="@+id/action_aiFragment_to_aiSettingsFragment"
             app:destination="@id/aiSettingsFragment" />
+        <action
+            android:id="@+id/action_aiFragment_to_chatTemplatesFragment"
+            app:destination="@id/chatTemplatesFragment" />
     </fragment>
 
     <fragment

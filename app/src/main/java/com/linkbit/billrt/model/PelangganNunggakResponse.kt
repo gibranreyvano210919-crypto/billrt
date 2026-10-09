@@ -18,7 +18,7 @@ data class PelangganNunggakItem(
     @SerializedName("nama_wilayah") val nama_wilayah: String,
     @SerializedName("total_tunggakan") val total_tunggakan: Float,
     @SerializedName("periode_nunggak") val periode_nunggak: String,
-    @SerializedName("jatuh_tempo_tgl") val jatuh_tempo_tgl: Int,
+    @SerializedName("jatuh_tempo_tgl", alternate = ["tanggal_isolasi", "tgl_isolasi", "tgl_jatuh_tempo", "jatuh_tempo"]) val jatuh_tempo_tgl: Int,
     @SerializedName("tgl_bayar_terakhir") val tgl_bayar_terakhir: String,
     @SerializedName("admin_pencatat") val admin_pencatat: String
 ) : Serializable

@@ -141,12 +141,11 @@ class HistoryPembayaranBottomSheetFragment : BottomSheetDialogFragment() {
                         binding.tvInstallationDate.text = "Tgl Pasang: ${profil.installationDate ?: "-"}"
                         
                         // Menampilkan nama pencatat terakhir secara dinamis di header
-                        val latestPaid = response.data.firstOrNull { t -> t.statusTagihan == 1 }
+                        val latestPaid = response.data.firstOrNull { t -> t.isLunas() }
                         if (latestPaid != null) {
                             val name = latestPaid.namaPencatat
-                            val id = latestPaid.idUserPencatat
                             val headerText = if (!name.isNullOrEmpty() && name != "-") {
-                                if (id != null && id > 0) "Pencatat Terakhir: $name (ID: $id)" else "Pencatat Terakhir: $name"
+                                "Pencatat Terakhir: $name"
                             } else "Pencatat Terakhir: Sistem"
                             binding.tvAdminPencatat.text = headerText
                             binding.tvAdminPencatat.visibility = View.VISIBLE
@@ -179,45 +178,73 @@ class HistoryPembayaranBottomSheetFragment : BottomSheetDialogFragment() {
         }
     }
 
+    private fun formatDateOnly(dateStr: String?): String {
+        if (dateStr.isNullOrBlank()) return ""
+        val trimmed = dateStr.trim()
+        if (trimmed == "-" || trimmed.lowercase() == "null" || trimmed.startsWith("0000-00-00") || trimmed.startsWith("00-00-0000")) return ""
+
+        val datePart = if (trimmed.contains(" ")) trimmed.substringBefore(" ") else trimmed
+        return try {
+            val parts = datePart.split("-", "/")
+            if (parts.size == 3) {
+                if (parts[0].length == 4) {
+                    "${parts[2]}-${parts[1]}-${parts[0]}"
+                } else {
+                    datePart
+                }
+            } else {
+                datePart
+            }
+        } catch (_: Exception) {
+            datePart
+        }
+    }
+
     private fun mapToTimelineItem(tagihan: HistoryTagihan): TimelineItem {
         val currencyFormat = NumberFormat.getCurrencyInstance(Locale("id", "ID"))
-        val formattedAmount = currencyFormat.format(tagihan.jumlahTagihan).replace("Rp", "Rp ")
+        val formattedAmount = currencyFormat.format(tagihan.getJumlahDouble()).replace("Rp", "Rp ")
 
-        val dotColor = when (tagihan.statusTagihan) {
-            1 -> "#4CAF50" // Lunas
-            2 -> "#FF9800" // Tagout
+        val isLunas = tagihan.isLunas()
+        val isTagout = tagihan.isTagout()
+
+        val dotColor = when {
+            isLunas -> "#4CAF50" // Lunas
+            isTagout -> "#FF9800" // Tagout
             else -> "#F44336" // Belum Bayar
         }
 
-        val dateDisplay = if (tagihan.statusTagihan == 1) {
-            if (!tagihan.tanggalBayar.isNullOrEmpty()) "Dibayar: ${tagihan.tanggalBayar}" else "Lunas"
+        val formattedPaidDate = formatDateOnly(tagihan.tanggalBayar)
+
+        val dateDisplay = if (isLunas) {
+            if (formattedPaidDate.isNotEmpty()) "Dibayar: $formattedPaidDate" else "Lunas"
         } else {
-            if (!tagihan.tglJatuhTempo.isNullOrEmpty()) "Jatuh Tempo: ${tagihan.tglJatuhTempo}" else "Belum Dibayar"
+            "Belum Dibayar"
         }
 
-        // Gabungkan Nama dan ID untuk item list
-        val adminInfo = if (tagihan.statusTagihan == 1) {
+        val adminInfo = if (isLunas) {
             val name = tagihan.namaPencatat
-            val id = tagihan.idUserPencatat
-            if (!name.isNullOrEmpty() && name != "-") {
-                if (id != null && id > 0) "$name (ID: $id)" else name
-            } else null
+            if (!name.isNullOrEmpty() && name != "-") name else null
         } else null
 
-        val bulanNama = tagihan.bulanNama ?: "Bulan ${tagihan.bulanTagihan}"
-        val statusText = tagihan.statusText ?: when (tagihan.statusTagihan) {
-            1 -> "Lunas"
-            2 -> "Tagout (Ditangguhkan)"
+        val bulanAngka = tagihan.bulanTagihan?.toString()?.toIntOrNull()
+        val tahunAngka = tagihan.tahunTagihan?.toString()?.toIntOrNull()
+        val bulanNama = tagihan.bulanNama
+            ?: if (bulanAngka != null) "Bulan $bulanAngka" else ""
+        val titleText = if (tahunAngka != null && tahunAngka > 0) "$bulanNama $tahunAngka".trim() else bulanNama.ifEmpty { "Tagihan" }
+
+        val statusText = tagihan.statusText ?: when {
+            isLunas -> "Lunas"
+            isTagout -> "Tagout (Ditangguhkan)"
             else -> "Belum Bayar"
         }
         return TimelineItem(
-            title = "$bulanNama ${tagihan.tahunTagihan}",
+            title = titleText,
             subtitle = formattedAmount,
             dateDisplay = dateDisplay,
             statusText = statusText,
             dotColor = dotColor,
             description = "",
-            hasInvoice = tagihan.idTagihan != 0 && tagihan.idTagihan != "0",
+            hasInvoice = tagihan.idTagihan != null && tagihan.idTagihan.toString() != "0",
             idTagihan = tagihan.idTagihan.toString(),
             adminPencatat = adminInfo
         )

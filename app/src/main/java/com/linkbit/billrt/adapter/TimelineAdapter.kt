@@ -48,23 +48,31 @@ class TimelineAdapter(
             binding.line.visibility = if (isLast) View.GONE else View.VISIBLE
             binding.dividerLine.visibility = if (isLast) View.GONE else View.VISIBLE
 
-            var statusColor = Color.GRAY
+            var statusColor = when {
+                item.statusText.contains("Lunas", ignoreCase = true) -> Color.parseColor("#4CAF50") // Hijau
+                item.statusText.contains("Tagout", ignoreCase = true) -> Color.parseColor("#FF9800") // Orange
+                else -> Color.parseColor("#F44336") // Merah
+            }
             try {
-                statusColor = Color.parseColor(item.dotColor)
-            } catch (e: IllegalArgumentException) {
-                // Parsing error
+                if (!item.dotColor.isNullOrEmpty()) {
+                    statusColor = Color.parseColor(item.dotColor)
+                }
+            } catch (e: Exception) {
+                // Ignore parsing error
             }
 
-            val dotBackground = binding.dot.background
-            if (dotBackground is GradientDrawable) {
-                dotBackground.setColor(statusColor)
+            val dotBg = binding.dot.background?.mutate()
+            if (dotBg is GradientDrawable) {
+                dotBg.setColor(statusColor)
             } else {
                 binding.dot.setBackgroundColor(statusColor)
             }
 
-            val statusBackground = binding.tvStatus.background
-            if (statusBackground is GradientDrawable) {
-                statusBackground.setColor(statusColor)
+            val statusBg = binding.tvStatus.background?.mutate()
+            if (statusBg is GradientDrawable) {
+                statusBg.setColor(statusColor)
+            } else {
+                binding.tvStatus.setBackgroundColor(statusColor)
             }
 
             binding.tvStatus.visibility = View.VISIBLE

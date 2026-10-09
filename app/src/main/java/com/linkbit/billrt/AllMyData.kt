@@ -149,6 +149,7 @@ data class PelangganData(
     @SerializedName("id_wilayah") val idWilayah: Int?,
     @SerializedName("installation_date") val installationDate: String?,
     @SerializedName("tgl_expired") val tglExpired: String?,
+    @SerializedName("tanggal_isolasi", alternate = ["tgl_isolasi", "tgl_jatuh_tempo", "jatuh_tempo"]) val tanggalIsolasi: String? = null,
     @SerializedName("tgl_bayar_terakhir") val tglBayarTerakhir: String?,
     @SerializedName("pembayaran_terakhir") val pembayaranTerakhir: PembayaranTerakhirData? = null
 ) : Serializable
@@ -669,6 +670,7 @@ data class Card3Jaringan(
 data class Card4Detail(
     @SerializedName("tgl_daftar") val tglDaftar: String,
     @SerializedName("installation_date") val installationDate: String,
+    @SerializedName("tanggal_isolasi", alternate = ["tgl_isolasi", "tgl_jatuh_tempo", "jatuh_tempo"]) val tanggalIsolasi: String? = null,
     @SerializedName("alamat_pelanggan") val alamatPelanggan: String,
     val latitude: String,
     val longitude: String,
