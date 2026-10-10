@@ -9,17 +9,19 @@ data class PelangganTelatItem(
     val namaPelanggan: String,
     @SerializedName("mikrotik_username")
     val mikrotikUsername: String,
-    val telepon: String,
+    @SerializedName("telepon")
+    val telepon: String?,
     val wilayah: String,
     @SerializedName("periode_tagihan")
     val periodeTagihan: String,
     val nominal: Double,
-    @SerializedName("tgl_tagih")
-    val tglTagih: Int,
+    @SerializedName("tgl_jatuh_tempo", alternate = ["tanggal_isolasi", "tgl_isolasi", "jatuh_tempo_tgl", "jatuh_tempo"])
+    val tglJatuhTempo: Int,
     @SerializedName("tgl_bayar_terakhir")
     val tglBayarTerakhir: String,
-    @SerializedName("periode_bayar_terakhir")
-    val periodeBayarTerakhir: String,
-    val keterangan: String,
-    val keterangan2: String
+    @SerializedName("id_user_pencatat")
+    val idUserPencatat: Int?,
+    @SerializedName("nama_pencatat")
+    val namaPencatat: String,
+    val keterangan: String
 )

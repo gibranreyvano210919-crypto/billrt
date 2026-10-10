@@ -8,10 +8,11 @@ import android.provider.Settings
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.Fragment
+import androidx.appcompat.app.AppCompatActivity
+import androidx.navigation.fragment.findNavController
 import com.linkbit.billrt.databinding.FragmentLocationSettingBinding
 
-class LocationSettingFragment : Fragment() {
+class LocationSettingFragment : BaseFragment() {
 
     private var _binding: FragmentLocationSettingBinding? = null
     private val binding get() = _binding!!
@@ -27,12 +28,25 @@ class LocationSettingFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        applyWindowInsets(binding.appBarLayout)
+        setupToolbar()
+
         // Set a listener on the switch
         binding.switchLocation.setOnCheckedChangeListener { _, isChecked ->
             // Open location settings regardless of whether the switch is turned on or off
-            // This is the standard and safest behavior as apps cannot toggle GPS directly.
             val intent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
             startActivity(intent)
+        }
+    }
+
+    private fun setupToolbar() {
+        (activity as? AppCompatActivity)?.setSupportActionBar(binding.toolbar)
+        (activity as? AppCompatActivity)?.supportActionBar?.apply {
+            title = "Pengaturan Lokasi"
+            setDisplayHomeAsUpEnabled(true)
+        }
+        binding.toolbar.setNavigationOnClickListener {
+            findNavController().navigateUp()
         }
     }
 

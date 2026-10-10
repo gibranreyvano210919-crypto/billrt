@@ -13,7 +13,6 @@ class PelangganCheckAdapter(
     RecyclerView.Adapter<PelangganCheckAdapter.ViewHolder>() {
 
     private val selectedItems = mutableSetOf<String>()
-    private var isAuditMode = false
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val binding = ItemPelangganCheckBinding.inflate(LayoutInflater.from(parent.context), parent, false)
@@ -32,23 +31,17 @@ class PelangganCheckAdapter(
         pelanggan = newList
         notifyDataSetChanged()
     }
-
-    fun setAuditMode(isAudit: Boolean) {
-        isAuditMode = isAudit
-        if (isAudit) selectedItems.clear()
-        notifyDataSetChanged()
-    }
     
     fun getSelected(): Set<String> = selectedItems
 
     inner class ViewHolder(private val binding: ItemPelangganCheckBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(pelanggan: PelangganData) {
             binding.namaPelanggan.text = pelanggan.nama
-            binding.checkbox.visibility = if (isAuditMode) View.GONE else View.VISIBLE
+            binding.checkbox.visibility = View.VISIBLE
             
             binding.checkbox.setOnCheckedChangeListener(null) // Remove listener to prevent loops
             binding.checkbox.isChecked = selectedItems.contains(pelanggan.idPelanggan)
-            binding.checkbox.isEnabled = !isAuditMode
+            binding.checkbox.isEnabled = true
 
             binding.checkbox.setOnCheckedChangeListener { _, isChecked ->
                 if (isChecked) {

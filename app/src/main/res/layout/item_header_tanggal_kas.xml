@@ -14,13 +14,27 @@
         android:orientation="horizontal"
         android:gravity="center_vertical">
 
-        <TextView
-            android:id="@+id/tvHeaderTanggal"
+        <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:textStyle="bold"
-            tools:text="25-01-2026" />
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tvHeaderTanggal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textStyle="bold"
+                tools:text="25-01-2026" />
+
+            <TextView
+                android:id="@+id/tvNamaSetoran"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="12sp"
+                android:textStyle="italic"
+                tools:text="Setoran Pagi" />
+        </LinearLayout>
 
         <TextView
             android:id="@+id/tvHeaderSummary"

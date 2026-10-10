@@ -38,13 +38,24 @@ android {
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
-        // Token Mapbox
-        buildConfigField "String", "MAPBOX_ACCESS_TOKEN", "\"${properties.getProperty('MAPBOX_ACCESS_TOKEN', '')}\""
+        // Batasi bahasa resource hanya untuk Bahasa Indonesia & Inggris (menghapus translasi bahasa lain yang tidak dipakai)
+        resourceConfigurations += ["id", "en"]
+    }
+
+    // Pemisahan APK berdasarkan arsitektur CPU (Sangat efektif untuk library berukuran besar seperti Mapbox v11)
+    splits {
+        abi {
+            enable true
+            reset()
+            include 'arm64-v8a', 'armeabi-v7a'
+            universalApk false
+        }
     }
 
     buildTypes {
         release {
-            minifyEnabled true // Disarankan true untuk rilis agar APK lebih kecil
+            minifyEnabled true // R8 Code Shrinking & Obfuscation
+            shrinkResources true // Mengosongkan resource/gambar library yang tidak terpakai
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
@@ -93,9 +104,11 @@ dependencies {
     // Google Services
     implementation 'com.google.android.gms:play-services-location:21.0.1'
 
-    // Mapbox v11
-    implementation 'com.mapbox.maps:android:11.1.0'
-    implementation 'com.mapbox.plugin:maps-annotation:11.1.0'
+    // OpenStreetMap (osmdroid)
+    implementation 'org.osmdroid:osmdroid-android:6.1.18'
+
+    // Chart
+    implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
 
     // Utilities
     implementation 'com.google.code.gson:gson:2.9.0'
@@ -112,4 +125,78 @@ dependencies {
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
+}
+
+tasks.register('sendApkToTelegram') {
+    dependsOn 'assembleDebug'
+    doLast {
+        def apkFile = file("${layout.buildDirectory.get()}/outputs/apk/debug/app-debug.apk")
+        if (!apkFile.exists()) {
+            def tree = fileTree(dir: "${layout.buildDirectory.get()}/outputs/apk", include: "**/*.apk")
+            if (!tree.isEmpty()) {
+                apkFile = tree.files.find { it.name.contains("arm64-v8a") } ?: tree.first()
+            }
+        }
+        
+        if (apkFile.exists()) {
+            println "Mengirim APK ${apkFile.name} ke Telegram via Java HTTP..."
+            String token = "5818535303:AAE78Ew9YsjdDEjWqXW0y-NkkoZ5bGCvuzg"
+            String chatId = "5396063519"
+            String caption = "✅ Build APK Lokal Berhasil! (Billrt Lite)\n📦 File: " + apkFile.name
+
+            String boundary = "===" + System.currentTimeMillis() + "==="
+            URL url = new URL("https://api.telegram.org/bot${token}/sendDocument")
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection()
+            conn.setDoOutput(true)
+            conn.setUseCaches(false)
+            conn.setRequestMethod("POST")
+            conn.setRequestProperty("Connection", "Keep-Alive")
+            conn.setRequestProperty("Cache-Control", "no-cache")
+            conn.setRequestProperty("Content-Type", "multipart/form-data; boundary=" + boundary)
+            conn.setChunkedStreamingMode(0)
+
+            OutputStream outputStream = conn.getOutputStream()
+            PrintWriter writer = new PrintWriter(new OutputStreamWriter(outputStream, "UTF-8"), true)
+
+            // Send chat_id
+            writer.append("--" + boundary).append("\r\n")
+            writer.append("Content-Disposition: form-data; name=\"chat_id\"").append("\r\n\r\n")
+            writer.append(chatId).append("\r\n")
+
+            // Send caption
+            writer.append("--" + boundary).append("\r\n")
+            writer.append("Content-Disposition: form-data; name=\"caption\"").append("\r\n\r\n")
+            writer.append(caption).append("\r\n")
+
+            // Send file
+            writer.append("--" + boundary).append("\r\n")
+            writer.append("Content-Disposition: form-data; name=\"document\"; filename=\"" + apkFile.name + "\"").append("\r\n")
+            writer.append("Content-Type: application/vnd.android.package-archive").append("\r\n\r\n")
+            writer.flush()
+
+            FileInputStream inputStream = new FileInputStream(apkFile)
+            byte[] buffer = new byte[4096]
+            int readBytes
+            while ((readBytes = inputStream.read(buffer)) != -1) {
+                outputStream.write(buffer, 0, readBytes)
+            }
+            inputStream.close()
+            outputStream.flush()
+
+            writer.append("\r\n").flush()
+            writer.append("--" + boundary + "--").append("\r\n").flush()
+            writer.close()
+
+            int responseCode = conn.getResponseCode()
+            if (responseCode == 200) {
+                println "🎉 Berhasil mengirim APK ke Telegram!"
+            } else {
+                def errStream = conn.getErrorStream()
+                def errResp = errStream ? errStream.text : "No error stream"
+                println "❌ Gagal mengirim APK, Response Code: ${responseCode}, Response: ${errResp}"
+            }
+        } else {
+            println "❌ File APK tidak ditemukan!"
+        }
+    }
 }

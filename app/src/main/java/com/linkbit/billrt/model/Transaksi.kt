@@ -1,34 +1,45 @@
 package com.linkbit.billrt.model
 
 import com.google.gson.annotations.SerializedName
-
-data class Transaksi(
-    @SerializedName("id_pembayaran") val idPembayaran: Int,
-    @SerializedName("id_tagihan") val idTagihan: String,
-    @SerializedName("nama_pelanggan") val namaPelanggan: String,
-    @SerializedName("username") val username: String?,
-    @SerializedName("periode") val periode: String,
-    @SerializedName("tanggal") val tanggal: String,
-    @SerializedName("jumlah") val jumlah: Float,
-    @SerializedName("metode") val metode: String,
-    @SerializedName("admin") val admin: String?,
-    @SerializedName("keterangan") val keterangan: String?
-)
+import java.io.Serializable
 
 data class TransaksiResponse(
-    @SerializedName("status") val status: Boolean,
-    @SerializedName("filter") val filter: Filter,
-    @SerializedName("summary") val summary: Summary,
-    @SerializedName("data") val data: List<Transaksi>
-)
+    val status: Boolean,
+    val message: String,
+    val summary: TransaksiSummary,
+    val data: List<TransaksiItem>
+) : Serializable
 
-data class Filter(
-    @SerializedName("tgl_mulai") val tglMulai: String,
-    @SerializedName("tgl_akhir") val tglAkhir: String,
-    @SerializedName("admin_id") val adminId: Int
-)
+data class TransaksiSummary(
+    @SerializedName("total_transaksi") val totalTransaksi: Int,
+    @SerializedName("total_nominal") val totalNominal: Float,
+    @SerializedName("per_user_pencatat") val perUserPencatat: List<SummaryUserPencatat>? = null,
+    @SerializedName("per_wilayah") val perWilayah: List<SummaryWilayahTransaksi>? = null
+) : Serializable
 
-data class Summary(
+data class SummaryUserPencatat(
+    @SerializedName("id_user_pencatat") val idUserPencatat: Int,
+    @SerializedName("nama_admin") val namaAdmin: String,
     @SerializedName("total_transaksi") val totalTransaksi: Int,
     @SerializedName("total_nominal") val totalNominal: Float
-)
+) : Serializable
+
+data class SummaryWilayahTransaksi(
+    @SerializedName("id_wilayah") val idWilayah: Int?,
+    @SerializedName("nama_wilayah") val namaWilayah: String,
+    @SerializedName("total_transaksi") val totalTransaksi: Int,
+    @SerializedName("total_nominal") val totalNominal: Float
+) : Serializable
+
+data class TransaksiItem(
+    @SerializedName("id_pembayaran") val idPembayaran: Int,
+    @SerializedName("nama_pelanggan") val namaPelanggan: String,
+    val username: String,
+    val periode: String,
+    @SerializedName("jam_bayar") val jamBayar: String,
+    @SerializedName("tanggal_lengkap") val tanggalLengkap: String,
+    val jumlah: Float,
+    val metode: String,
+    val admin: String, // Nama admin pencatat dari PHP
+    val keterangan: String
+) : Serializable

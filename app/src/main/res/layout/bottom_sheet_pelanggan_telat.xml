@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_bottom_sheet_white"
+    android:orientation="vertical"
+    android:padding="20dp">
+
+    <!-- Handle Bar -->
+    <View
+        android:layout_width="40dp"
+        android:layout_height="4dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="16dp"
+        android:background="#DEDEDE" />
+
+    <!-- Header -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:layout_marginBottom="16dp">
+
+        <ImageView
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="@drawable/bg_circle_primary_light"
+            android:contentDescription="@null"
+            android:padding="10dp"
+            android:src="@drawable/ic_receipt"
+            app:tint="?attr/colorPrimary" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tv_nama_pelanggan"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="#1E293B"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                tools:text="Nama Pelanggan" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:text="Opsi Tagihan Pelanggan Telat"
+                android:textColor="#64748B"
+                android:textSize="13sp" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginBottom="16dp"
+        android:background="#E2E8F0" />
+
+    <!-- Action 1: Detail Tagihan -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_detail_tagihan"
+        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
+        android:backgroundTint="#EFF6FF"
+        android:gravity="start|center_vertical"
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="14dp"
+        android:text="Detail Tagihan"
+        android:textAllCaps="false"
+        android:textColor="#1D4ED8"
+        android:textSize="15sp"
+        android:textStyle="bold"
+        app:cornerRadius="12dp"
+        app:icon="@drawable/ic_receipt"
+        app:iconPadding="12dp"
+        app:iconTint="#1D4ED8"
+        app:strokeColor="#BFDBFE"
+        app:strokeWidth="1dp" />
+
+    <!-- Action 2: Bayar Tagihan -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_bayar_tagihan"
+        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
+        android:backgroundTint="#F0FDF4"
+        android:gravity="start|center_vertical"
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="14dp"
+        android:text="Bayar Tagihan"
+        android:textAllCaps="false"
+        android:textColor="#15803D"
+        android:textSize="15sp"
+        android:textStyle="bold"
+        app:cornerRadius="12dp"
+        app:icon="@drawable/ic_pay"
+        app:iconPadding="12dp"
+        app:iconTint="#15803D"
+        app:strokeColor="#BBF7D0"
+        app:strokeWidth="1dp" />
+
+    <!-- Action 3: Riwayat Pembayaran -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_history_pembayaran"
+        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
+        android:backgroundTint="#FAF5FF"
+        android:gravity="start|center_vertical"
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="14dp"
+        android:text="Riwayat Pembayaran"
+        android:textAllCaps="false"
+        android:textColor="#7E22CE"
+        android:textSize="15sp"
+        android:textStyle="bold"
+        app:cornerRadius="12dp"
+        app:icon="@drawable/ic_history"
+        app:iconPadding="12dp"
+        app:iconTint="#7E22CE"
+        app:strokeColor="#E9D5FF"
+        app:strokeWidth="1dp" />
+
+    <!-- Action 4: Hubungi WhatsApp -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_whatsapp"
+        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:backgroundTint="#F0FDF4"
+        android:gravity="start|center_vertical"
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="14dp"
+        android:text="Hubungi WhatsApp"
+        android:textAllCaps="false"
+        android:textColor="#166534"
+        android:textSize="15sp"
+        android:textStyle="bold"
+        app:cornerRadius="12dp"
+        app:icon="@drawable/ic_whatsapp"
+        app:iconPadding="12dp"
+        app:iconTint="#25D366"
+        app:strokeColor="#BBF7D0"
+        app:strokeWidth="1dp" />
+
+</LinearLayout>

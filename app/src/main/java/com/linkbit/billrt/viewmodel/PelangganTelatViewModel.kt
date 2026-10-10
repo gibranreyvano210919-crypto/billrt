@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.linkbit.billrt.model.PelangganTelatItem
+import com.linkbit.billrt.model.PelangganTelatTahunanItem
 import com.linkbit.billrt.network.ApiClient
 import kotlinx.coroutines.launch
 
@@ -12,6 +13,9 @@ class PelangganTelatViewModel : ViewModel() {
 
     private val _pelangganList = MutableLiveData<List<PelangganTelatItem>>()
     val pelangganList: LiveData<List<PelangganTelatItem>> get() = _pelangganList
+
+    private val _pelangganTahunanList = MutableLiveData<List<PelangganTelatTahunanItem>>()
+    val pelangganTahunanList: LiveData<List<PelangganTelatTahunanItem>> get() = _pelangganTahunanList
 
     private val _isLoading = MutableLiveData<Boolean>()
     val isLoading: LiveData<Boolean> get() = _isLoading
@@ -26,6 +30,24 @@ class PelangganTelatViewModel : ViewModel() {
                 val response = ApiClient.tagihanApiService.getPelangganTelat(bulan, tahun, search, idWilayah)
                 if (response.status) {
                     _pelangganList.value = response.data
+                } else {
+                    _toastMessage.value = response.message
+                }
+            } catch (e: Exception) {
+                _toastMessage.value = "Failed to load data: ${e.message}"
+            } finally {
+                _isLoading.value = false
+            }
+        }
+    }
+
+    fun fetchRekapTelatTahunan(tahun: Int) {
+        _isLoading.value = true
+        viewModelScope.launch {
+            try {
+                val response = ApiClient.tagihanApiService.getRekapTelatTahunan(tahun)
+                if (response.status) {
+                    _pelangganTahunanList.value = response.data
                 } else {
                     _toastMessage.value = response.message
                 }

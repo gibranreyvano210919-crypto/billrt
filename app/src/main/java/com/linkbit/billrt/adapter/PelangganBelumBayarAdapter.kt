@@ -1,5 +1,6 @@
 package com.linkbit.billrt.adapter
 
+import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
@@ -34,8 +35,28 @@ class PelangganBelumBayarAdapter(
             binding.tvInvoice.text = "Invoice: ${item.invoice ?: "-"}"
             binding.tvNominal.text = "Nominal: ${formatCurrency(item.nominal)}"
             binding.tvPeriodeTagihan.text = "Periode: ${item.bulanTagihan} ${item.tahunTagihan}"
-            binding.tvStatusTagihan.text = "Status: ${item.statusText}"
-            binding.tvPembayaranTerakhir.text = "Bayar Terakhir: ${item.tglBayarTerakhir}"
+            
+            // Tampilkan Performa Pembayaran
+            binding.tvPerformaPembayaran.text = "Performa Bayar: ${item.performaPembayaran ?: "0%"}"
+            
+            // Set warna teks performa berdasarkan nilai
+            val performa = item.performaFloat ?: 0f
+            when {
+                performa >= 80 -> binding.tvPerformaPembayaran.setTextColor(Color.parseColor("#4CAF50")) // Hijau
+                performa >= 50 -> binding.tvPerformaPembayaran.setTextColor(Color.parseColor("#FF9800")) // Orange
+                else -> binding.tvPerformaPembayaran.setTextColor(Color.parseColor("#F44336")) // Merah
+            }
+            
+            binding.tvStatusTagihan.text = item.statusText ?: "Belum Bayar"
+            // Set warna status jika mengandung kata "LUNAS"
+            if (item.statusText?.contains("LUNAS", ignoreCase = true) == true) {
+                binding.tvStatusTagihan.setTextColor(Color.parseColor("#4CAF50"))
+            } else {
+                binding.tvStatusTagihan.setTextColor(Color.parseColor("#F44336"))
+            }
+            
+            binding.tvPembayaranTerakhir.text = "Bayar Terakhir: ${item.tglBayarTerakhir ?: "-"}"
+            binding.tvPencatat.text = "Oleh: ${item.namaPencatat ?: "-"}"
         }
     }
 
@@ -43,7 +64,6 @@ class PelangganBelumBayarAdapter(
         val format = NumberFormat.getCurrencyInstance(Locale("in", "ID"))
         try {
             val formatted = format.format(amount.toDouble())
-            // Mengganti simbol Rp menjadi Rp. dan menambahkan ,- di akhir
             return formatted.replace("Rp", "Rp ").replace(",00", ",-")
         } catch (e: Exception) {
             return "Rp 0,-"

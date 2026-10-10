@@ -1,10 +1,6 @@
 package com.linkbit.billrt.adapter
 
-import android.content.res.ColorStateList
-import android.graphics.Color
-import android.graphics.drawable.Drawable
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
@@ -13,6 +9,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.linkbit.billrt.R
 import com.linkbit.billrt.databinding.ItemPelangganLunasBinding
 import com.linkbit.billrt.model.PelangganLunasItem
+import java.text.NumberFormat
+import java.util.Locale
 
 class LunasAdapter(private val onClick: (PelangganLunasItem) -> Unit) : ListAdapter<PelangganLunasItem, LunasAdapter.ViewHolder>(DiffCallback) {
 
@@ -30,25 +28,33 @@ class LunasAdapter(private val onClick: (PelangganLunasItem) -> Unit) : ListAdap
     }
 
     inner class ViewHolder(private val binding: ItemPelangganLunasBinding) : RecyclerView.ViewHolder(binding.root) {
-        private val defaultTanggalBayarBackground: Drawable? = binding.tvTanggalBayar.background
-        private val defaultTanggalBayarTextColor: ColorStateList = binding.tvTanggalBayar.textColors
-
+        
         fun bind(item: PelangganLunasItem) {
-            binding.tvNamaPelanggan.text = item.namaPelanggan.replace(" (Telat)", "")
-            binding.tvUsername.text = "Username: ${item.mikrotikUsername ?: "-"}"
-            binding.tvNominal.text = "Nominal: Rp. ${item.nominalTagihan}"
-            binding.tvTanggalBayar.text = "Tanggal Bayar: ${item.tanggalBayar ?: "-"}"
-            binding.tvKeterangan.text = "Keterangan: ${item.keterangan?.replace(" (Telat)", "") ?: "-"}"
-
-            if (item.isTelat) {
-                binding.badgeTelat.visibility = View.VISIBLE
-                binding.tvTanggalBayar.setBackgroundColor(ContextCompat.getColor(itemView.context, R.color.error))
-                binding.tvTanggalBayar.setTextColor(Color.WHITE)
-            } else {
-                binding.badgeTelat.visibility = View.GONE
-                binding.tvTanggalBayar.background = defaultTanggalBayarBackground
-                binding.tvTanggalBayar.setTextColor(defaultTanggalBayarTextColor)
+            val localeID = Locale("in", "ID")
+            val numberFormat = NumberFormat.getCurrencyInstance(localeID).apply {
+                maximumFractionDigits = 0
             }
+
+            binding.tvNamaPelanggan.text = item.namaPelanggan
+            binding.tvUsername.text = "Username: ${item.mikrotikUsername ?: "-"}"
+            binding.tvWilayah.text = "Wilayah: ${item.wilayah ?: "-"}"
+            binding.tvNominal.text = numberFormat.format(item.nominalTagihan)
+            binding.tvTanggalBayar.text = item.tanggalBayar ?: "-"
+            binding.tvPencatat.text = "Diterima oleh: ${item.namaPencatat ?: "Sistem"}"
+            binding.tvKeterangan.text = "Ket: ${item.keterangan?.takeIf { it.isNotBlank() } ?: "-"}"
+
+            val monthNames = arrayOf(
+                "Januari", "Februari", "Maret", "April", "Mei", "Juni",
+                "Juli", "Agustus", "September", "Oktober", "November", "Desember"
+            )
+            val monthName = if (item.bulanTagihan in 1..12) monthNames[item.bulanTagihan - 1] else "-"
+            binding.tvPeriode.text = "Periode: $monthName ${item.tahunTagihan}"
+
+            // Use context to get color safely
+            val primaryColor = ContextCompat.getColor(itemView.context, R.color.card_pelanggan)
+            binding.tvNominal.setTextColor(primaryColor)
+
+            binding.badgeTelat.visibility = android.view.View.GONE
         }
     }
 

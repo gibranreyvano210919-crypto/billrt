@@ -1,10 +1,7 @@
 package com.linkbit.billrt
 
-import android.content.Context
-import android.graphics.Bitmap
-import android.graphics.Canvas
+import android.R
 import android.graphics.Color
-import android.location.Location
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -12,20 +9,21 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.navigation.fragment.findNavController
+import androidx.navigation.ui.setupWithNavController
 import com.google.gson.Gson
-import com.google.gson.JsonObject
 import com.google.gson.reflect.TypeToken
 import com.linkbit.billrt.databinding.FragmentOdpMapBinding
 import com.linkbit.billrt.model.StandardResponse
-import com.mapbox.geojson.Point
-import com.mapbox.maps.MapView
-import com.mapbox.maps.Style
-import com.mapbox.maps.plugin.annotation.Annotation
-import com.mapbox.maps.plugin.annotation.annotations
-import com.mapbox.maps.plugin.annotation.generated.*
-import com.mapbox.maps.plugin.gestures.OnMapClickListener
-import com.mapbox.maps.plugin.gestures.gestures
+import org.osmdroid.events.MapEventsReceiver
+import org.osmdroid.tileprovider.tilesource.TileSourceFactory
+import org.osmdroid.util.GeoPoint
+import org.osmdroid.views.MapView
+import org.osmdroid.views.overlay.MapEventsOverlay
+import org.osmdroid.views.overlay.Marker
+import org.osmdroid.views.overlay.Polyline
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -38,22 +36,18 @@ class OdpMapFragment : BaseFragment() {
     private val binding get() = _binding!!
     private var mapView: MapView? = null
 
-    // Annotation Managers
-    private var pointAnnotationManager: PointAnnotationManager? = null
-    private var polylineAnnotationManager: PolylineAnnotationManager? = null
-    private var circleAnnotationManager: CircleAnnotationManager? = null // For edit points
-
-    // Annotation Lists
-    private var customerAnnotations = mutableListOf<PointAnnotation>()
-    private var polylineAnnotations = mutableListOf<PolylineAnnotation>()
-    private var editPointAnnotations = mutableListOf<CircleAnnotation>() // For edit points
+    // Annotation Overlays
+    private var odpMarkers = mutableListOf<Marker>()
+    private var customerMarkers = mutableListOf<Marker>()
+    private var polylineOverlays = mutableListOf<Polyline>()
+    private var editPointMarkers = mutableListOf<Marker>()
 
     // Edit Mode State
     private var isEditMode = false
     private var currentEditingPort: OdpPortWithCabling? = null
     private var currentOdp: OdpDetailData? = null
-    private var newCablePathPoints = mutableListOf<Point>()
-    private var tempPolylineAnnotation: PolylineAnnotation? = null
+    private var newCablePathPoints = mutableListOf<GeoPoint>()
+    private var tempPolylineOverlay: Polyline? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentOdpMapBinding.inflate(inflater, container, false)
@@ -63,11 +57,24 @@ class OdpMapFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         mapView = binding.mapViewOdp
+        mapView?.setTileSource(TileSourceFactory.MAPNIK)
+        mapView?.setMultiTouchControls(true)
+
+        val appBarLayout = binding.toolbarOdpMap.parent as? View
+        appBarLayout?.let { applyWindowInsets(it) }
+
+        setupToolbar()
 
         binding.fabSaveCablePath.setOnClickListener { showSaveConfirmationDialog() }
         binding.fabCancelEdit.setOnClickListener { cancelEditMode() }
 
         fetchOdpData()
+    }
+
+    private fun setupToolbar() {
+        (activity as? AppCompatActivity)?.setSupportActionBar(binding.toolbarOdpMap)
+        binding.toolbarOdpMap.setupWithNavController(findNavController())
+        binding.toolbarOdpMap.title = "Peta ODP & Jalur Kabel"
     }
 
     private fun fetchOdpData() {
@@ -94,102 +101,76 @@ class OdpMapFragment : BaseFragment() {
     }
 
     private fun setupMap(odpList: List<OdpData>) {
-        mapView?.mapboxMap?.loadStyle(Style.SATELLITE_STREETS) { style ->
-            bitmapFromVector(requireContext(), android.R.drawable.ic_dialog_map)?.let { style.addImage("odp_icon", it) }
-            bitmapFromVector(requireContext(), android.R.drawable.ic_menu_myplaces)?.let { style.addImage("customer_icon", it) }
+        val currentMapView = mapView ?: return
+        currentMapView.overlays.clear()
+        odpMarkers.clear()
 
-            val annotationApi = mapView?.annotations
-            pointAnnotationManager = annotationApi?.createPointAnnotationManager()
-            polylineAnnotationManager = annotationApi?.createPolylineAnnotationManager()
-            circleAnnotationManager = annotationApi?.createCircleAnnotationManager()
+        val odpIcon = ContextCompat.getDrawable(requireContext(), android.R.drawable.ic_dialog_map)
 
-            val odpOptionsList = odpList.mapNotNull { odp ->
-                odp.latitude?.let { lat ->
-                    odp.longitude?.let {
-                        PointAnnotationOptions()
-                            .withPoint(Point.fromLngLat(it, lat))
-                            .withIconImage("odp_icon")
-                            .withTextField(odp.namaOdp)
-                            .withTextColor(Color.WHITE)
-                            .withData(Gson().toJsonTree(odp))
-                    }
-                }
-            }
-            pointAnnotationManager?.create(odpOptionsList)
-
-            pointAnnotationManager?.addClickListener(OnPointAnnotationClickListener { annotation ->
-                if (isEditMode) return@OnPointAnnotationClickListener true
-                val jsonElement = annotation.getData() ?: return@OnPointAnnotationClickListener false
-                val jsonObject = jsonElement.asJsonObject
-
-                if (jsonObject.has("nama_odp")) { 
-                    val odpData = Gson().fromJson(jsonObject, OdpData::class.java)
-                    showOdpPortDetails(odpData)
-                } else if (jsonObject.has("port_number")) { 
-                    handleCustomerClick(annotation)
-                }
-                true
-            })
-            
-            circleAnnotationManager?.let { manager ->
-                manager.addDragListener(object : OnCircleAnnotationDragListener {
-                    override fun onAnnotationDragStarted(annotation: Annotation<*>) {
-                        Log.d("Mapbox", "Mulai menggeser titik jalur")
-                    }
-
-                    override fun onAnnotationDrag(annotation: Annotation<*>) {
-                        if (annotation is CircleAnnotation) {
-                            val indexElement = annotation.getData()?.asJsonObject?.get("edit_point_index")
-                            if (indexElement != null) {
-                                val index = indexElement.asInt
-                                
-                                if (index >= 0 && index < newCablePathPoints.size) {
-                                    newCablePathPoints[index] = annotation.point
-                                    drawTemporaryPolyline()
-                                }
+        odpList.forEach { odp ->
+            val lat = odp.latitude
+            val lng = odp.longitude
+            if (lat != null && lng != null) {
+                val point = GeoPoint(lat, lng)
+                val marker = Marker(currentMapView).apply {
+                    position = point
+                    title = odp.namaOdp
+                    icon = odpIcon
+                    setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+                    relatedObject = odp
+                    setOnMarkerClickListener { m, _ ->
+                        if (!isEditMode) {
+                            val odpData = m.relatedObject as? OdpData
+                            if (odpData != null) {
+                                showOdpPortDetails(odpData)
                             }
                         }
+                        true
                     }
-
-                    override fun onAnnotationDragFinished(annotation: Annotation<*>) {
-                        Log.d("Mapbox", "Selesai menggeser titik")
-                    }
-                })
-            }
-
-            mapView?.gestures?.addOnMapClickListener(OnMapClickListener { point ->
-                handleMapClick(point)
-                true
-            })
-
-            odpList.firstOrNull { it.latitude != null && it.longitude != null }?.let {
-                mapView?.mapboxMap?.setCamera(com.mapbox.maps.CameraOptions.Builder().center(Point.fromLngLat(it.longitude!!, it.latitude!!)).zoom(16.0).build())
+                }
+                odpMarkers.add(marker)
+                currentMapView.overlays.add(marker)
             }
         }
+
+        val mapEventsReceiver = object : MapEventsReceiver {
+            override fun singleTapConfirmedHelper(p: GeoPoint): Boolean {
+                handleMapClick(p)
+                return true
+            }
+
+            override fun longPressHelper(p: GeoPoint): Boolean {
+                return false
+            }
+        }
+        currentMapView.overlays.add(MapEventsOverlay(mapEventsReceiver))
+
+        if (odpList.isNotEmpty()) {
+            odpList.firstOrNull { it.latitude != null && it.longitude != null }?.let {
+                currentMapView.controller.setZoom(16.0)
+                currentMapView.controller.setCenter(GeoPoint(it.latitude!!, it.longitude!!))
+            }
+        }
+
+        currentMapView.invalidate()
     }
 
-    private fun calculatePathLength(points: List<Point>): Int {
+    private fun calculatePathLength(points: List<GeoPoint>): Int {
         if (points.size < 2) return 0
-        var totalDistance = 0f
+        var totalDistance = 0.0
         for (i in 0 until points.size - 1) {
-            val start = Location("")
-            start.latitude = points[i].latitude()
-            start.longitude = points[i].longitude()
-
-            val end = Location("")
-            end.latitude = points[i + 1].latitude()
-            end.longitude = points[i + 1].longitude()
-
-            totalDistance += start.distanceTo(end)
+            totalDistance += points[i].distanceToAsDouble(points[i + 1])
         }
         return totalDistance.roundToInt()
     }
 
     private fun clearCustomerAndCables() {
-        pointAnnotationManager?.delete(customerAnnotations)
-        polylineAnnotationManager?.delete(polylineAnnotations)
-        customerAnnotations.clear()
-        polylineAnnotations.clear()
+        val currentMapView = mapView ?: return
+        customerMarkers.forEach { currentMapView.overlays.remove(it) }
+        polylineOverlays.forEach { currentMapView.overlays.remove(it) }
+        customerMarkers.clear()
+        polylineOverlays.clear()
+        currentMapView.invalidate()
     }
 
     private fun showOdpPortDetails(odpData: OdpData) {
@@ -205,19 +186,19 @@ class OdpMapFragment : BaseFragment() {
 
                     clearCustomerAndCables()
 
-                    val customerOpts = mutableListOf<PointAnnotationOptions>()
-                    val polylineOpts = mutableListOf<PolylineAnnotationOptions>()
+                    val currentMapView = mapView ?: return
+                    val customerIcon = ContextCompat.getDrawable(requireContext(), R.drawable.ic_menu_myplaces)
                     val gson = Gson()
                     val pathType = object : TypeToken<List<List<Double>>>() {}.type
 
                     odpDetail.listPorts.forEach { port ->
-                        val polylinePoints = mutableListOf<Point>()
-                        odpDetail.odpLng?.let { lng -> odpDetail.odpLat?.let { lat -> polylinePoints.add(Point.fromLngLat(lng, lat)) } }
+                        val polylinePoints = mutableListOf<GeoPoint>()
+                        odpDetail.odpLng?.let { lng -> odpDetail.odpLat?.let { lat -> polylinePoints.add(GeoPoint(lat, lng)) } }
 
                         if (!port.jalurKabel.isNullOrBlank()) {
                             try {
                                 val path: List<List<Double>> = gson.fromJson(port.jalurKabel, pathType)
-                                path.forEach { if (it.size >= 2) polylinePoints.add(Point.fromLngLat(it[0], it[1])) }
+                                path.forEach { if (it.size >= 2) polylinePoints.add(GeoPoint(it[1], it[0])) }
                             } catch (e: Exception) {
                                 Log.e("OdpMapFragment", "Gagal parsing jalur_kabel JSON: ${port.jalurKabel}", e)
                             }
@@ -225,34 +206,43 @@ class OdpMapFragment : BaseFragment() {
 
                         port.custLat?.let { custLat ->
                             port.custLng?.let { custLng ->
-                                val customerPoint = Point.fromLngLat(custLng, custLat)
+                                val customerPoint = GeoPoint(custLat, custLng)
                                 polylinePoints.add(customerPoint)
 
-                                customerOpts.add(
-                                    PointAnnotationOptions()
-                                        .withPoint(customerPoint)
-                                        .withIconImage("customer_icon")
-                                        .withTextField(port.namaPelanggan ?: "Pelanggan")
-                                        .withTextColor(Color.YELLOW)
-                                        .withData(gson.toJsonTree(port))
-                                )
+                                val customerMarker = Marker(currentMapView).apply {
+                                    position = customerPoint
+                                    title = port.namaPelanggan ?: "Pelanggan"
+                                    icon = customerIcon
+                                    setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+                                    relatedObject = port
+                                    setOnMarkerClickListener { m, _ ->
+                                        val portData = m.relatedObject as? OdpPortWithCabling
+                                        if (portData != null) {
+                                            handleCustomerClick(portData)
+                                        }
+                                        true
+                                    }
+                                }
+                                customerMarkers.add(customerMarker)
+                                currentMapView.overlays.add(customerMarker)
                             }
                         }
 
                         if (polylinePoints.size > 1) {
-                            polylineOpts.add(
-                                PolylineAnnotationOptions()
-                                    .withPoints(polylinePoints)
-                                    .withLineColor(Color.parseColor("#3bb2d0"))
-                                    .withLineWidth(2.5)
-                            )
+                            val polyline = Polyline(currentMapView).apply {
+                                setPoints(polylinePoints)
+                                outlinePaint.color = Color.parseColor("#3bb2d0")
+                                outlinePaint.strokeWidth = 5f
+                                relatedObject = port
+                            }
+                            polylineOverlays.add(polyline)
+                            currentMapView.overlays.add(polyline)
                         }
                     }
 
-                    customerAnnotations = pointAnnotationManager?.create(customerOpts)?.toMutableList() ?: mutableListOf()
-                    polylineAnnotations = polylineAnnotationManager?.create(polylineOpts)?.toMutableList() ?: mutableListOf()
+                    currentMapView.invalidate()
 
-                    if (customerAnnotations.isEmpty() && isAdded) {
+                    if (customerMarkers.isEmpty() && isAdded) {
                         Toast.makeText(context, "ODP ini tidak memiliki port terhubung.", Toast.LENGTH_SHORT).show()
                     }
                 } else {
@@ -270,25 +260,20 @@ class OdpMapFragment : BaseFragment() {
         })
     }
 
-    private fun handleCustomerClick(annotation: PointAnnotation) {
-        val portJson = annotation.getData() ?: return
-        val portData = Gson().fromJson(portJson, OdpPortWithCabling::class.java)
-        
-        val existingPolyline = polylineAnnotations.find { 
-            if(it.points.isEmpty()) return@find false
-            val lastPoint = it.points.last()
-            lastPoint.latitude() == portData.custLat && lastPoint.longitude() == portData.custLng
+    private fun handleCustomerClick(portData: OdpPortWithCabling) {
+        val existingPolyline = polylineOverlays.find { 
+            if (it.actualPoints.isEmpty()) return@find false
+            val lastPoint = it.actualPoints.last()
+            lastPoint.latitude == portData.custLat && lastPoint.longitude == portData.custLng
         }
 
-        val cableLength = existingPolyline?.let { calculatePathLength(it.points) } ?: 0
+        val cableLength = existingPolyline?.let { calculatePathLength(it.actualPoints) } ?: 0
         val lengthText = if (cableLength > 0) "\nPanjang Kabel: $cableLength m" else ""
 
-        val message = "Pelanggan: ${portData.namaPelanggan}\nPort: ${portData.portNumber}$lengthText"
-        
         val options = arrayOf("Edit Jalur Kabel", "Hapus Jalur Kabel", "Cabut Layanan Port")
 
         AlertDialog.Builder(requireContext())
-            .setTitle("Opsi Port: ${portData.portNumber}")
+            .setTitle("Opsi Port: ${portData.portNumber}\nPelanggan: ${portData.namaPelanggan ?: "-"}$lengthText")
             .setItems(options) { dialog, which ->
                 when (which) {
                     0 -> startEditMode(portData)
@@ -300,7 +285,7 @@ class OdpMapFragment : BaseFragment() {
             .show()
     }
 
-    private fun handleMapClick(point: Point) {
+    private fun handleMapClick(point: GeoPoint) {
         if (isEditMode && newCablePathPoints.isNotEmpty()) {
             val newPointIndex = newCablePathPoints.size - 1
             newCablePathPoints.add(newPointIndex, point)
@@ -317,18 +302,17 @@ class OdpMapFragment : BaseFragment() {
         currentEditingPort = port
         newCablePathPoints.clear()
 
-        // Set initial path from existing polyline
-        val existingPolyline = polylineAnnotations.find { 
-            if(it.points.isEmpty()) return@find false
-            val lastPoint = it.points.last()
-            lastPoint.latitude() == port.custLat && lastPoint.longitude() == port.custLng
+        val existingPolyline = polylineOverlays.find { 
+            if (it.actualPoints.isEmpty()) return@find false
+            val lastPoint = it.actualPoints.last()
+            lastPoint.latitude == port.custLat && lastPoint.longitude == port.custLng
         }
         
-        newCablePathPoints = existingPolyline?.points?.toMutableList() ?: mutableListOf()
+        newCablePathPoints = existingPolyline?.actualPoints?.toMutableList() ?: mutableListOf()
 
-        if(newCablePathPoints.isEmpty()){
-             currentOdp?.odpLng?.let { lng -> currentOdp?.odpLat?.let { lat -> newCablePathPoints.add(Point.fromLngLat(lng, lat)) } }
-             port.custLng?.let { lng -> port.custLat?.let { lat -> newCablePathPoints.add(Point.fromLngLat(lng, lat)) } }
+        if (newCablePathPoints.isEmpty()) {
+             currentOdp?.odpLng?.let { lng -> currentOdp?.odpLat?.let { lat -> newCablePathPoints.add(GeoPoint(lat, lng)) } }
+             port.custLng?.let { lng -> port.custLat?.let { lat -> newCablePathPoints.add(GeoPoint(lat, lng)) } }
         }
 
         binding.fabSaveCablePath.visibility = View.VISIBLE
@@ -346,46 +330,60 @@ class OdpMapFragment : BaseFragment() {
     }
 
     private fun drawTemporaryPolyline() {
-        tempPolylineAnnotation?.let { polylineAnnotationManager?.delete(it) }
+        val currentMapView = mapView ?: return
+        tempPolylineOverlay?.let { currentMapView.overlays.remove(it) }
         if (newCablePathPoints.size > 1) {
-            val options = PolylineAnnotationOptions()
-                .withPoints(newCablePathPoints)
-                .withLineColor(Color.YELLOW)
-                .withLineWidth(3.0)
-            tempPolylineAnnotation = polylineAnnotationManager?.create(options)
+            tempPolylineOverlay = Polyline(currentMapView).apply {
+                setPoints(newCablePathPoints)
+                outlinePaint.color = Color.YELLOW
+                outlinePaint.strokeWidth = 6f
+            }
+            currentMapView.overlays.add(tempPolylineOverlay)
         }
         val length = calculatePathLength(newCablePathPoints)
         binding.tvCableLength.text = "Panjang Kabel: $length m"
+        currentMapView.invalidate()
     }
     
     private fun drawEditPoints() {
-        circleAnnotationManager?.delete(editPointAnnotations)
-        editPointAnnotations.clear()
+        val currentMapView = mapView ?: return
+        editPointMarkers.forEach { currentMapView.overlays.remove(it) }
+        editPointMarkers.clear()
         
-        val editPointOpts = mutableListOf<CircleAnnotationOptions>()
-        // Create draggable circles for intermediate points only
         newCablePathPoints.forEachIndexed { index, point ->
-            if (index > 0 && index < newCablePathPoints.size - 1) { // Exclude ODP and Customer points
-                editPointOpts.add(
-                    CircleAnnotationOptions()
-                        .withPoint(point)
-                        .withCircleRadius(8.0)
-                        .withCircleColor(Color.GREEN)
-                        .withCircleStrokeWidth(2.0)
-                        .withCircleStrokeColor(Color.WHITE)
-                        .withDraggable(true)
-                        .withData(Gson().toJsonTree(mapOf("edit_point_index" to index)))
-                )
+            if (index > 0 && index < newCablePathPoints.size - 1) {
+                val marker = Marker(currentMapView).apply {
+                    position = point
+                    title = "Titik $index"
+                    isDraggable = true
+                    relatedObject = index
+                    setOnMarkerDragListener(object : Marker.OnMarkerDragListener {
+                        override fun onMarkerDragStart(m: Marker?) {}
+                        override fun onMarkerDrag(m: Marker?) {
+                            val idx = m?.relatedObject as? Int ?: return
+                            val newPos = m.position
+                            if (newPos != null && idx >= 0 && idx < newCablePathPoints.size) {
+                                newCablePathPoints[idx] = newPos
+                                drawTemporaryPolyline()
+                            }
+                        }
+                        override fun onMarkerDragEnd(m: Marker?) {}
+                    })
+                }
+                editPointMarkers.add(marker)
+                currentMapView.overlays.add(marker)
             }
         }
-        editPointAnnotations = circleAnnotationManager?.create(editPointOpts)?.toMutableList() ?: mutableListOf()
+        currentMapView.invalidate()
     }
 
     private fun clearEditModeVisuals() {
-        circleAnnotationManager?.delete(editPointAnnotations)
-        editPointAnnotations.clear()
-        tempPolylineAnnotation?.let { polylineAnnotationManager?.delete(it) }
-        tempPolylineAnnotation = null
+        val currentMapView = mapView ?: return
+        editPointMarkers.forEach { currentMapView.overlays.remove(it) }
+        editPointMarkers.clear()
+        tempPolylineOverlay?.let { currentMapView.overlays.remove(it) }
+        tempPolylineOverlay = null
+        currentMapView.invalidate()
     }
 
     private fun showCabutLayananConfirmation(port: OdpPortWithCabling) {
@@ -408,7 +406,6 @@ class OdpMapFragment : BaseFragment() {
                 binding.progressBarOdp.visibility = View.GONE
                 if (response.isSuccessful && response.body()?.status == true) {
                     Toast.makeText(context, response.body()?.message ?: "Layanan berhasil dicabut.", Toast.LENGTH_SHORT).show()
-                    // Refresh map to reflect the change
                     val originalOdp = OdpData(currentOdp!!.id, currentOdp!!.namaOdp, currentOdp!!.lokasi, currentOdp!!.odpLat, currentOdp!!.odpLng, null, null, null)
                     showOdpPortDetails(originalOdp)
                 } else {
@@ -474,7 +471,7 @@ class OdpMapFragment : BaseFragment() {
         }
 
         val intermediatePoints = if (newCablePathPoints.size > 2) newCablePathPoints.subList(1, newCablePathPoints.size - 1) else emptyList()
-        val pathForJson = intermediatePoints.map { listOf(it.longitude(), it.latitude()) }
+        val pathForJson = intermediatePoints.map { listOf(it.longitude, it.latitude) }
         val jalurKabelJson = Gson().toJson(pathForJson)
 
         val request = SimpanJalurKabelRequest(odpId = currentOdp!!.id, portNumber = currentEditingPort!!.portNumber, jalurKabel = jalurKabelJson)
@@ -489,7 +486,7 @@ class OdpMapFragment : BaseFragment() {
                     Toast.makeText(context, "Gagal menyimpan: ${response.body()?.message}", Toast.LENGTH_SHORT).show()
                 }
                 cancelEditMode() 
-                showOdpPortDetails(OdpData(currentOdp!!.id, "", "", null, null, null, null, null)) // Refresh map
+                showOdpPortDetails(OdpData(currentOdp!!.id, "", "", null, null, null, null, null))
             }
 
             override fun onFailure(call: Call<StandardResponse>, t: Throwable) {
@@ -519,19 +516,18 @@ class OdpMapFragment : BaseFragment() {
         Toast.makeText(context, "Mode edit dibatalkan.", Toast.LENGTH_SHORT).show()
     }
 
-    private fun bitmapFromVector(context: Context, vectorResId: Int): Bitmap? {
-        return ContextCompat.getDrawable(context, vectorResId)?.let { vectorDrawable ->
-            vectorDrawable.setBounds(0, 0, vectorDrawable.intrinsicWidth, vectorDrawable.intrinsicHeight)
-            val bitmap = Bitmap.createBitmap(vectorDrawable.intrinsicWidth, vectorDrawable.intrinsicHeight, Bitmap.Config.ARGB_8888)
-            val canvas = Canvas(bitmap)
-            vectorDrawable.draw(canvas)
-            bitmap
-        }
+    override fun onResume() {
+        super.onResume()
+        mapView?.onResume()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        mapView?.onPause()
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
-        mapView?.onDestroy()
         _binding = null
     }
 }

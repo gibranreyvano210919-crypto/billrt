@@ -16,6 +16,8 @@ class ConfirmPaymentBottomSheetFragment : BottomSheetDialogFragment() {
     private var _binding: BottomSheetConfirmPaymentBinding? = null
     private val binding get() = _binding!!
 
+    private lateinit var sessionManager: SessionManager
+
     private var listener: ((metode: String, tanggal: String, keterangan: String) -> Unit)? = null
 
     fun setOnConfirmClickListener(listener: (metode: String, tanggal: String, keterangan: String) -> Unit) {
@@ -32,6 +34,12 @@ class ConfirmPaymentBottomSheetFragment : BottomSheetDialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        sessionManager = SessionManager(requireContext())
+        
+        // Menampilkan ID User yang sedang login
+        val userId = sessionManager.getUserId() ?: "-"
+        binding.tieIdUser.setText(userId)
 
         setupMetodePembayaran()
         setupTanggalPicker()

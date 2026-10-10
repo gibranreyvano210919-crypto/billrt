@@ -1,27 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
+    android:background="@color/app_background"
     tools:context=".PelangganAktifDetailFragment">
 
     <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/app_bar_layout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:background="@color/purple_500"
+        app:elevation="0dp">
 
         <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            app:navigationIcon="?attr/homeAsUpIndicator" />
+            android:background="@color/purple_500"
+            app:navigationIcon="@drawable/ic_arrow_back"
+            app:title="Detail Pelanggan"
+            app:titleTextColor="@android:color/white" />
 
     </com.google.android.material.appbar.AppBarLayout>
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -29,55 +36,108 @@
             android:orientation="vertical"
             android:padding="16dp">
 
-            <!-- Card 1: Data Pelanggan -->
+            <!-- Card 1: Profil Pelanggan Utama -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
-                app:cardCornerRadius="8dp"
-                app:cardElevation="4dp">
+                app:cardCornerRadius="12dp"
+                app:cardElevation="2dp">
 
-                <LinearLayout
+                <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
                     android:padding="16dp">
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Data Pelanggan"
-                        android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6" />
-
-                    <TextView
-                        android:id="@+id/tv_id_pelanggan"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        tools:text="ID Pelanggan: " />
+                    <ImageView
+                        android:id="@+id/iv_avatar"
+                        android:layout_width="56dp"
+                        android:layout_height="56dp"
+                        android:src="@drawable/ic_person"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:tint="@color/purple_500" />
 
                     <TextView
                         android:id="@+id/tv_nama_pelanggan"
-                        android:layout_width="wrap_content"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        tools:text="Nama: " />
+                        android:layout_marginStart="16dp"
+                        android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
+                        android:textStyle="bold"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@id/iv_avatar"
+                        app:layout_constraintTop_toTopOf="@id/iv_avatar"
+                        tools:text="Nama Pelanggan" />
+
+                    <TextView
+                        android:id="@+id/tv_id_pelanggan"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
+                        android:textColor="@color/grey_400"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="@id/tv_nama_pelanggan"
+                        app:layout_constraintTop_toBottomOf="@id/tv_nama_pelanggan"
+                        tools:text="ID: 123456" />
+
+                    <View
+                        android:id="@+id/divider1"
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginTop="16dp"
+                        android:background="#F0F0F0"
+                        app:layout_constraintTop_toBottomOf="@id/iv_avatar" />
+
+                    <ImageView
+                        android:id="@+id/iv_phone"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_marginTop="16dp"
+                        android:src="@drawable/ic_person"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/divider1"
+                        app:tint="@color/grey_400" />
 
                     <TextView
                         android:id="@+id/tv_telepon_pelanggan"
-                        android:layout_width="wrap_content"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        tools:text="Telepon: " />
+                        android:layout_marginStart="12dp"
+                        android:background="?attr/selectableItemBackground"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:padding="8dp"
+                        android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
+                        app:layout_constraintBottom_toBottomOf="@id/iv_phone"
+                        app:layout_constraintEnd_toStartOf="@+id/btn_whatsapp"
+                        app:layout_constraintStart_toEndOf="@id/iv_phone"
+                        app:layout_constraintTop_toTopOf="@id/iv_phone"
+                        tools:text="08123456789" />
 
-                </LinearLayout>
+                    <ImageButton
+                        android:id="@+id/btn_whatsapp"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:padding="8dp"
+                        android:scaleType="centerInside"
+                        android:src="@drawable/ic_whatsapp"
+                        app:layout_constraintBottom_toBottomOf="@id/tv_telepon_pelanggan"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="@id/tv_telepon_pelanggan" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- Card 2: Rincian Riwayat Tagihan -->
+            <!-- Card 2: Status & Pembayaran -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
-                app:cardCornerRadius="8dp"
-                app:cardElevation="4dp">
+                app:cardCornerRadius="12dp"
+                app:cardElevation="2dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -85,35 +145,64 @@
                     android:orientation="vertical"
                     android:padding="16dp">
 
-                    <TextView
-                        android:layout_width="wrap_content"
+                    <LinearLayout
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Rincian Riwayat Tagihan"
-                        android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6" />
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <ImageView
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:src="@drawable/ic_history"
+                            app:tint="@color/card_tagihan" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="12dp"
+                            android:text="Status &amp; Tagihan"
+                            android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle1"
+                            android:textStyle="bold" />
+                    </LinearLayout>
 
                     <TextView
                         android:id="@+id/tv_rekap_status"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        tools:text="Rekap Status: " />
+                        android:layout_marginTop="12dp"
+                        android:textColor="@color/black"
+                        tools:text="Rekap Status: Lunas" />
 
                     <TextView
                         android:id="@+id/tv_jumlah_nunggak"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        tools:text="Jumlah Nunggak: " />
+                        android:layout_marginTop="4dp"
+                        android:textColor="@color/card_tunggakan"
+                        android:textStyle="bold"
+                        tools:text="Jumlah Nunggak: 2 Bulan" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btn_bayar"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:padding="12dp"
+                        android:text="Bayar Tagihan Sekarang"
+                        app:cornerRadius="8dp"
+                        app:icon="@drawable/ic_cash" />
 
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- Card 3: Rincian Jaringan -->
+            <!-- Card 3: Informasi Jaringan -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
-                app:cardCornerRadius="8dp"
-                app:cardElevation="4dp">
+                app:cardCornerRadius="12dp"
+                app:cardElevation="2dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -121,78 +210,143 @@
                     android:orientation="vertical"
                     android:padding="16dp">
 
-                    <TextView
-                        android:layout_width="wrap_content"
+                    <LinearLayout
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Rincian Jaringan"
-                        android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6" />
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
 
-                    <TextView
-                        android:id="@+id/tv_username"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        tools:text="Username: " />
+                        <ImageView
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:src="@drawable/ic_router"
+                            app:tint="@color/card_mikrotik" />
 
-                    <TextView
-                        android:id="@+id/tv_status_koneksi"
-                        android:layout_width="wrap_content"
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="12dp"
+                            android:text="Informasi Jaringan"
+                            android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle1"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+
+                    <GridLayout
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        tools:text="Status Koneksi: " />
+                        android:layout_marginTop="12dp"
+                        android:columnCount="2">
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_columnWeight="1"
+                            android:orientation="vertical"
+                            android:padding="4dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Username"
+                                android:textAppearance="@style/TextAppearance.MaterialComponents.Caption" />
+
+                            <TextView
+                                android:id="@+id/tv_username"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textStyle="bold"
+                                tools:text="user_billrt" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_columnWeight="1"
+                            android:orientation="vertical"
+                            android:padding="4dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Status"
+                                android:textAppearance="@style/TextAppearance.MaterialComponents.Caption" />
+
+                            <TextView
+                                android:id="@+id/tv_status_koneksi"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textStyle="bold"
+                                tools:text="Online" />
+                        </LinearLayout>
+
+                    </GridLayout>
 
                     <TextView
                         android:id="@+id/tv_uptime"
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        tools:text="Uptime: " />
+                        android:layout_marginTop="8dp"
+                        android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
+                        tools:text="Uptime: 2d 14h" />
 
                     <TextView
                         android:id="@+id/tv_ip_aktif"
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        tools:text="IP Aktif: " />
+                        android:layout_marginTop="4dp"
+                        android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
+                        tools:text="IP: 10.10.10.5" />
 
                     <TextView
                         android:id="@+id/tv_mac_client_live"
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        tools:text="MAC Client Live: " />
-                        
+                        android:layout_marginTop="4dp"
+                        android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
+                        tools:text="MAC Client Live: -" />
+
                     <TextView
                         android:id="@+id/tv_mac_address_db"
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:gravity="center_vertical"
-                        android:drawableStart="@android:drawable/ic_menu_save"
-                        android:drawablePadding="8dp"
+                        android:layout_marginTop="8dp"
+                        android:background="?attr/selectableItemBackground"
                         android:clickable="true"
                         android:focusable="true"
-                        android:background="?attr/selectableItemBackground"
                         android:padding="8dp"
-                        tools:text="MAC Address DB: " />
+                        android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
+                        android:textColor="@color/purple_500"
+                        app:drawableStartCompat="@drawable/ic_copy"
+                        app:drawableTint="@color/purple_500"
+                        android:drawablePadding="8dp"
+                        tools:text="MAC DB: AA:BB:CC:DD" />
 
                     <TextView
                         android:id="@+id/tv_total_usage"
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        tools:text="Total Usage: " />
+                        android:layout_marginTop="4dp"
+                        android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
+                        tools:text="Total Usage: -" />
 
                     <TextView
                         android:id="@+id/tv_last_logout"
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        tools:text="Last Logout: " />
+                        android:layout_marginTop="4dp"
+                        android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
+                        tools:text="Last Logout: -" />
 
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- Card 4: Rincian Data Pelanggan -->
+            <!-- Card 4: Detail Pemasangan -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
-                app:cardCornerRadius="8dp"
-                app:cardElevation="4dp">
+                app:cardCornerRadius="12dp"
+                app:cardElevation="2dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -200,53 +354,78 @@
                     android:orientation="vertical"
                     android:padding="16dp">
 
-                    <TextView
-                        android:layout_width="wrap_content"
+                    <LinearLayout
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Rincian Data Pelanggan"
-                        android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6" />
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <ImageView
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:src="@drawable/ic_info"
+                            app:tint="@color/card_pelanggan" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="12dp"
+                            android:text="Detail Pemasangan"
+                            android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle1"
+                            android:textStyle="bold" />
+                    </LinearLayout>
 
                     <TextView
                         android:id="@+id/tv_tgl_daftar"
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        tools:text="Tanggal Daftar: " />
+                        android:layout_marginTop="12dp"
+                        android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
+                        tools:text="Tanggal Daftar: 01-01-2023" />
 
                     <TextView
                         android:id="@+id/tv_installation_date"
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        tools:text="Tanggal Instalasi: " />
+                        android:layout_marginTop="4dp"
+                        android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
+                        tools:text="Tanggal Instalasi: -" />
 
                     <TextView
                         android:id="@+id/tv_alamat_pelanggan"
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        tools:text="Alamat: " />
+                        android:layout_marginTop="4dp"
+                        android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
+                        tools:text="Alamat: -" />
 
                     <TextView
                         android:id="@+id/tv_latlong"
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        tools:text="Lokasi: " />
-                        
-                    <TextView
-                        android:id="@+id/tv_google_maps_link"
-                        android:layout_width="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
+                        tools:text="Lat/Long: -" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btn_google_maps"
+                        style="@style/Widget.MaterialComponents.Button.TextButton"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        tools:text="Google Maps: " />
+                        android:layout_marginTop="8dp"
+                        android:text="Lihat di Google Maps"
+                        app:icon="@drawable/ic_location" />
 
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- Card 5: Paket Internet -->
+            <!-- Card 5: Informasi Paket -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
-                app:cardCornerRadius="8dp"
-                app:cardElevation="4dp">
+                app:cardCornerRadius="12dp"
+                app:cardElevation="2dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -254,40 +433,64 @@
                     android:orientation="vertical"
                     android:padding="16dp">
 
-                    <TextView
-                        android:layout_width="wrap_content"
+                    <LinearLayout
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Paket Internet"
-                        android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6" />
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <ImageView
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:src="@drawable/ic_router"
+                            app:tint="@color/card_pelanggan" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="12dp"
+                            android:text="Informasi Paket"
+                            android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle1"
+                            android:textStyle="bold" />
+                    </LinearLayout>
 
                     <TextView
                         android:id="@+id/tv_nama_paket"
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        tools:text="Nama Paket: " />
+                        android:layout_marginTop="12dp"
+                        android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
+                        android:textStyle="bold"
+                        tools:text="Paket: -" />
 
                     <TextView
                         android:id="@+id/tv_harga_paket"
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        tools:text="Harga: " />
+                        android:layout_marginTop="4dp"
+                        android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
+                        tools:text="Harga: -" />
 
                     <TextView
                         android:id="@+id/tv_profile_mikrotik"
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        tools:text="Profile Mikrotik: " />
+                        android:layout_marginTop="4dp"
+                        android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
+                        tools:text="Profile Mikrotik: -" />
 
                     <TextView
                         android:id="@+id/tv_wilayah_paket"
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        tools:text="Wilayah: " />
+                        android:layout_marginTop="4dp"
+                        android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
+                        tools:text="Wilayah: -" />
 
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
-</LinearLayout>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

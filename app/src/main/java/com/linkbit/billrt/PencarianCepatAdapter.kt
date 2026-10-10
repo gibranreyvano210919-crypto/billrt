@@ -1,17 +1,15 @@
 package com.linkbit.billrt
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.linkbit.billrt.databinding.ItemPencarianCepatBinding
 
-// NOTE: This adapter now expects com.linkbit.billrt.PelangganData
-
 class PencarianCepatAdapter(
     private var items: List<PelangganData>,
     private val onCopyMacClick: (String) -> Unit,
-    private val onRiwayatClick: (String) -> Unit,
-    private val onRiwayatKasClick: (String) -> Unit
+    private val onItemLongClick: (PelangganData) -> Unit
 ) : RecyclerView.Adapter<PencarianCepatAdapter.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -34,28 +32,41 @@ class PencarianCepatAdapter(
         fun bind(item: PelangganData) {
             binding.tvNamaPelanggan.text = item.nama
             binding.tvAlamat.text = item.alamat
-            binding.tvWilayah.text = "Wilayah: ${item.namaWilayah ?: "N/A"}"
-            binding.tvMikrotikUsername.text = "Username: ${item.mikrotikUsername ?: "N/A"}"
-            binding.tvStaticIp.text = "IP: ${item.staticIp ?: "N/A"}"
-            // Make sure macAddress from the correct data class is used
+            binding.tvWilayah.text = item.namaWilayah ?: "N/A"
+            binding.tvMikrotikUsername.text = item.mikrotikUsername ?: "N/A"
+            binding.tvStaticIp.text = item.staticIp ?: "N/A"
             binding.tvMacAddress.text = item.macAddress ?: "-"
 
-            // Use the correct macAddress property
+            val pmb = item.pembayaranTerakhir
+            if (pmb != null && (!pmb.periode.isNullOrEmpty() || !pmb.tanggalBayar.isNullOrEmpty())) {
+                binding.dividerPembayaran.visibility = View.VISIBLE
+                binding.layoutPembayaranTerakhir.visibility = View.VISIBLE
+
+                // Periode
+                binding.tvPeriodeBayarTerakhir.text = "Bayar Terakhir: ${pmb.periode ?: "-"}"
+
+                // Tanggal
+                val tgl = pmb.tanggalBayar ?: "-"
+                binding.tvDetailBayarTerakhir.text = "Tanggal: $tgl"
+
+                // Pencatat
+                binding.tvPencatatBayarTerakhir.text = "Pencatat: ${pmb.namaPencatat ?: "-"}"
+            } else {
+                binding.dividerPembayaran.visibility = View.GONE
+                binding.layoutPembayaranTerakhir.visibility = View.GONE
+            }
+
             if (!item.macAddress.isNullOrEmpty()) {
                 binding.btnCopyMac.setOnClickListener { 
                     onCopyMacClick(item.macAddress)
                 }
-                binding.btnRiwayat.setOnClickListener { 
-                    onRiwayatClick(item.macAddress)
-                }
             } else {
-                // Disable buttons if there is no MAC address
                 binding.btnCopyMac.setOnClickListener(null)
-                binding.btnRiwayat.setOnClickListener(null)
             }
 
-            binding.btnRiwayatKas.setOnClickListener {
-                onRiwayatKasClick(item.idPelanggan)
+            binding.root.setOnLongClickListener {
+                onItemLongClick(item)
+                true
             }
         }
     }

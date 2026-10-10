@@ -9,7 +9,7 @@ import com.linkbit.billrt.databinding.ItemPelangganCardBinding
 class PelangganNonaktifAdapter(
     private var pelangganList: List<PelangganNonaktif>,
     private val onDetailClick: (PelangganNonaktif) -> Unit,
-    private val onMenuClick: ((PelangganNonaktif, View) -> Unit)? = null
+    private val onItemLongClick: (PelangganNonaktif) -> Unit
 ) : RecyclerView.Adapter<PelangganNonaktifAdapter.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -33,21 +33,18 @@ class PelangganNonaktifAdapter(
         fun bind(pelanggan: PelangganNonaktif) {
             binding.tvNamaPelanggan.text = pelanggan.namaPelanggan
             binding.tvIdPelanggan.text = "ID: ${pelanggan.idPelanggan}"
-            binding.tvAlamat.text = pelanggan.teleponPelanggan // Using address field to show phone
-            binding.tvWilayah.text = "Wilayah: ${pelanggan.idWilayah}"
-            binding.tvStatusBerlangganan.text = "Tgl Daftar: ${pelanggan.tglDaftar}"
+            binding.tvAlamat.text = "Alamat: ${pelanggan.alamat ?: "-"}"
+            binding.tvWilayah.text = "Wilayah: ${pelanggan.namaWilayah ?: "-"}"
+            binding.tvStatusBerlangganan.text = "Status: ${pelanggan.statusAktif ?: "Nonaktif"} | PPPoE: ${pelanggan.mikrotikUsername ?: "-"} | Telp: ${pelanggan.teleponPelanggan ?: "-"}"
 
-            binding.btnLihatDetail.setOnClickListener { onDetailClick(pelanggan) }
-
-            if (onMenuClick != null) {
-                binding.btnMenuPelanggan.visibility = View.VISIBLE
-                binding.btnMenuPelanggan.setOnClickListener { view ->
-                    onMenuClick.invoke(pelanggan, view)
-                }
-            } else {
-                binding.btnMenuPelanggan.visibility = View.GONE
+            binding.root.setOnClickListener { onDetailClick(pelanggan) }
+            binding.root.setOnLongClickListener {
+                onItemLongClick(pelanggan)
+                true
             }
             
+            binding.btnLihatDetail.setOnClickListener { onDetailClick(pelanggan) }
+            binding.btnMenuPelanggan.visibility = View.GONE
             binding.btnEdit.visibility = View.GONE
         }
     }

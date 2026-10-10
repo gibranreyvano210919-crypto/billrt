@@ -34,7 +34,7 @@ class PelangganOfflineFragment : BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
+        
         setupToolbar()
         setupRecyclerView()
         setupSearchView()
@@ -47,7 +47,7 @@ class PelangganOfflineFragment : BaseFragment() {
         (activity as? AppCompatActivity)?.setSupportActionBar(binding.toolbar)
         (activity as? AppCompatActivity)?.supportActionBar?.apply {
             setDisplayHomeAsUpEnabled(true)
-            title = "Pelanggan Offline"
+            setDisplayShowTitleEnabled(false) // Menggunakan TextView custom di XML
         }
         binding.toolbar.setNavigationOnClickListener {
             findNavController().navigateUp()
@@ -61,6 +61,15 @@ class PelangganOfflineFragment : BaseFragment() {
     }
 
     private fun setupSearchView() {
+        // Logika untuk menyembunyikan/menampilkan judul saat search dibuka
+        binding.searchView.setOnSearchClickListener {
+            binding.tvToolbarTitle.visibility = View.GONE
+        }
+        binding.searchView.setOnCloseListener {
+            binding.tvToolbarTitle.visibility = View.VISIBLE
+            false
+        }
+
         binding.searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean = false
             override fun onQueryTextChange(newText: String?): Boolean {

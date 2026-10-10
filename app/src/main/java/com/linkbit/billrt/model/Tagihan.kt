@@ -1,6 +1,7 @@
 package com.linkbit.billrt.model
 
 import com.google.gson.annotations.SerializedName
+import com.linkbit.billrt.SummaryWilayahItem
 import java.io.Serializable
 
 data class PeriodeTagihan(
@@ -21,23 +22,30 @@ data class Periode(
 // --- Model untuk Daftar Pelanggan Belum Bayar ---
 data class PelangganBelumBayarResponse(
     val status: Boolean,
-    val data: List<PelangganBelumBayarItem>?
+    val total: Int? = null,
+    val data: List<PelangganBelumBayarItem>?,
+    @SerializedName("summary_wilayah") val summaryWilayah: List<SummaryWilayahItem>? = null,
+    @SerializedName("count_wilayah") val countWilayah: Map<String, Int>? = null
 ) : Serializable
 
 data class PelangganBelumBayarItem(
     @SerializedName("id_pelanggan") override val id_pelanggan: Int,
+    @SerializedName("id_wilayah") val idWilayah: Int? = null,
     @SerializedName("nama_pelanggan") val namaPelanggan: String,
-    @SerializedName("mikrotik_username") val mikrotikUsername: String?,
-    @SerializedName("telepon_pelanggan") val teleponPelanggan: String?,
-    val wilayah: String?,
-    val invoice: String?,
-    val nominal: Float,
-    @SerializedName("status_pembayaran") val statusPembayaran: Int,
-    @SerializedName("status_text") val statusText: String?,
-    @SerializedName("catatan_tagout") val catatanTagout: String?,
-    @SerializedName("bulan_tagihan") val bulanTagihan: String?,
-    @SerializedName("tahun_tagihan") val tahunTagihan: Int?,
-    @SerializedName("tgl_bayar_terakhir") val tglBayarTerakhir: String?
+    @SerializedName("mikrotik_username") val mikrotikUsername: String? = null,
+    @SerializedName("telepon_pelanggan") val teleponPelanggan: String? = null,
+    val wilayah: String? = null,
+    val invoice: String? = null,
+    val nominal: Float = 0f,
+    @SerializedName("status_pembayaran") val statusPembayaran: Int = 0,
+    @SerializedName("status_text") val statusText: String? = null,
+    @SerializedName("catatan_tagout") val catatanTagout: String? = null,
+    @SerializedName("bulan_tagihan") val bulanTagihan: String? = null,
+    @SerializedName("tahun_tagihan") val tahunTagihan: Int? = null,
+    @SerializedName("tgl_bayar_terakhir") val tglBayarTerakhir: String? = null,
+    @SerializedName("nama_pencatat") val namaPencatat: String? = null,
+    @SerializedName("performa_pembayaran") val performaPembayaran: String? = null,
+    @SerializedName("performa_float") val performaFloat: Float? = null
 ) : Serializable, PelangganIdentifiable
 
 
@@ -63,6 +71,7 @@ data class TagihanItem(
     val nama: String,
     val jumlah: Double,
     val status: String,
+    @SerializedName("jatuh_tempo", alternate = ["tanggal_isolasi", "tgl_isolasi", "tgl_jatuh_tempo"])
     val jatuh_tempo: String?,
     val tgl_bayar: String?
 ) : Serializable

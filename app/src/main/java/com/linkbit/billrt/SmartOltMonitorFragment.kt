@@ -22,7 +22,10 @@ class SmartOltMonitorFragment : BaseFragment() {
 
     private lateinit var onuAdapter: OnuAdapter
     private var allOnuList: List<SmartOnuItem> = emptyList()
-    private var totalOltCount: Int = 0
+    
+    private var lamaProses: String? = null
+    private var totalOnline: Int = 0
+    private var totalOffline: Int = 0
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -34,11 +37,16 @@ class SmartOltMonitorFragment : BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        
+        // Sinkronisasi Insets agar toolbar tidak menabrak status bar
+        applyWindowInsets(binding.appBarLayout)
+        
         setupToolbar()
         setupRecyclerView()
         setupSearchView()
         setupSwipeRefresh()
-        fetchOltData()
+        
+        fetchHighSpeedOltData()
     }
 
     private fun setupToolbar() {
@@ -65,81 +73,81 @@ class SmartOltMonitorFragment : BaseFragment() {
 
     private fun setupSwipeRefresh() {
         binding.swipeRefreshSmartolt.setOnRefreshListener {
-            fetchOltData()
+            fetchHighSpeedOltData()
         }
     }
 
-    private fun fetchOltData() {
+    private fun fetchHighSpeedOltData() {
         binding.swipeRefreshSmartolt.isRefreshing = true
         binding.progressBarSmartolt.visibility = View.VISIBLE
-        binding.rvOltList.visibility = View.GONE
         binding.tvEmptyOlt.visibility = View.VISIBLE
-        binding.tvEmptyOlt.text = "Memuat data..."
+        binding.tvEmptyOlt.text = "Memuat data OLT (High Speed)..."
 
-        apiService.getOltData().enqueue(object : Callback<OltApiResponse> {
-            override fun onResponse(call: Call<OltApiResponse>, response: Response<OltApiResponse>) {
+        apiService.getHighSpeedOltData().enqueue(object : Callback<HighSpeedOltResponse> {
+            override fun onResponse(call: Call<HighSpeedOltResponse>, response: Response<HighSpeedOltResponse>) {
                 if (!isAdded) return
                 binding.progressBarSmartolt.visibility = View.GONE
                 binding.swipeRefreshSmartolt.isRefreshing = false
+                
                 if (response.isSuccessful) {
-                    val oltResponse = response.body()
-                    if (oltResponse != null) {
-                        totalOltCount = oltResponse.detailOlt?.size ?: 0
-                        allOnuList = oltResponse.detailOlt?.flatMap { olt ->
-                            olt.onu_list?.map { onuData ->
-                                val powerValue = onuData.values.find { it.contains("-") && it.replace(".", "").replace("-", "").all(Char::isDigit) }
-
+                    val highSpeedResponse = response.body()
+                    if (highSpeedResponse != null && highSpeedResponse.status) {
+                        lamaProses = highSpeedResponse.lamaProses
+                        totalOnline = highSpeedResponse.totalOnline
+                        totalOffline = highSpeedResponse.totalOffline
+                        
+                        allOnuList = highSpeedResponse.results.flatMap { result ->
+                            result.onus.map { onu ->
                                 SmartOnuItem(
-                                    oltName = olt.olt_name,
-                                    onuIndex = onuData["col_0"],
-                                    name = onuData["col_1"],
-                                    sn = onuData["col_2"],
-                                    macAddress = onuData["col_2"], // sn is macAddress
-                                    status = onuData["col_3"],
-                                    power = powerValue
+                                    oltName = result.oltHost,
+                                    onuIndex = null,
+                                    name = null,
+                                    sn = onu.macAddress,
+                                    macAddress = onu.macAddress,
+                                    status = onu.status, 
+                                    power = onu.signalRx,
+                                    customerName = onu.namaPelanggan,
+                                    idPelanggan = null
                                 )
-                            } ?: emptyList()
-                        } ?: emptyList()
+                            }
+                        }
 
                         filterOnuList(binding.searchView.query.toString())
 
                     } else {
-                        binding.tvEmptyOlt.text = "Gagal memuat: Respons tidak valid."
-                        binding.tvEmptyOlt.visibility = View.VISIBLE
+                        binding.tvEmptyOlt.text = "Gagal memuat: ${highSpeedResponse?.message ?: "Unknown error"}"
                     }
                 } else {
                     binding.tvEmptyOlt.text = "Gagal memuat: Error ${response.code()}"
-                    binding.tvEmptyOlt.visibility = View.VISIBLE
                 }
             }
 
-            override fun onFailure(call: Call<OltApiResponse>, t: Throwable) {
+            override fun onFailure(call: Call<HighSpeedOltResponse>, t: Throwable) {
                 if (!isAdded) return
                 binding.progressBarSmartolt.visibility = View.GONE
                 binding.swipeRefreshSmartolt.isRefreshing = false
                 binding.tvEmptyOlt.text = "Gagal memuat: ${t.message}"
-                binding.tvEmptyOlt.visibility = View.VISIBLE
             }
         })
     }
 
     private fun normalizeMac(mac: String?): String {
-        return mac?.replace(Regex("[^A-Za-z0-9]"), "")?.toLowerCase(Locale.ROOT) ?: ""
+        return mac?.replace(Regex("[^A-Za-z0-9]"), "")?.lowercase(Locale.ROOT) ?: ""
     }
 
     private fun updateAdapterAndViews(filteredList: List<SmartOnuItem>, query: String?) {
         onuAdapter.updateData(filteredList)
 
         if (filteredList.isEmpty()) {
-            val emptyText = if (query.isNullOrBlank()) "Tidak ada ONU yang tersedia." else "Tidak ada hasil untuk: $query"
+            val emptyText = if (query.isNullOrBlank()) "Tidak ada ONU yang ditemukan." else "Tidak ada hasil untuk: $query"
             binding.tvEmptyOlt.text = emptyText
             binding.tvEmptyOlt.visibility = View.VISIBLE
             binding.rvOltList.visibility = View.GONE
         } else {
             val statusText = if (query.isNullOrBlank()) {
-                "Total OLT: $totalOltCount, Total ONU: ${allOnuList.size}"
+                "Online: $totalOnline | Offline: $totalOffline | Proses: $lamaProses"
             } else {
-                "Menampilkan ${filteredList.size} dari ${allOnuList.size} ONU (Total OLT: $totalOltCount)"
+                "Menampilkan ${filteredList.size} ONU"
             }
             binding.tvEmptyOlt.text = statusText
             binding.tvEmptyOlt.visibility = View.VISIBLE
@@ -156,52 +164,27 @@ class SmartOltMonitorFragment : BaseFragment() {
         }
 
         val normalizedQuery = normalizeMac(trimmedQuery)
-        val directResults = allOnuList.filter {
-            it.oltName.contains(trimmedQuery, ignoreCase = true) ||
-                    (it.macAddress != null && normalizeMac(it.macAddress).contains(normalizedQuery))
+        
+        val filteredResults = allOnuList.filter { onu ->
+            val normOnuMac = normalizeMac(onu.macAddress)
+            
+            val matchesDirectly = 
+                onu.oltName.contains(trimmedQuery, ignoreCase = true) ||
+                (normOnuMac.isNotEmpty() && normOnuMac.contains(normalizedQuery)) ||
+                (onu.customerName?.contains(trimmedQuery, ignoreCase = true) == true)
+
+            matchesDirectly
         }
 
-        // Update UI immediately with direct search results
-        updateAdapterAndViews(directResults, trimmedQuery)
-
-        // Perform API search for customer name to get MAC addresses
-        apiService.getDataPelanggan(search = trimmedQuery).enqueue(object : Callback<PelangganResponse> {
-            override fun onResponse(call: Call<PelangganResponse>, response: Response<PelangganResponse>) {
-                if (!isAdded || !response.isSuccessful) return
-
-                // Make sure the query hasn't changed while the API call was in flight
-                val currentQuery = binding.searchView.query.toString().trim()
-                if (currentQuery != trimmedQuery) {
-                    return
-                }
-
-                val macsFromApi = response.body()?.data
-                    ?.mapNotNull { it.macAddress }
-                    ?.map { normalizeMac(it) }
-                    ?.filter { it.isNotBlank() }
-                    ?.toSet() ?: emptySet()
-
-                if (macsFromApi.isNotEmpty()) {
-                    val apiResults = allOnuList.filter { onu ->
-                        onu.macAddress != null && normalizeMac(onu.macAddress) in macsFromApi
-                    }
-
-                    val combinedResults = (directResults + apiResults).distinctBy { it.sn }
-                    updateAdapterAndViews(combinedResults, trimmedQuery)
-                }
-            }
-
-            override fun onFailure(call: Call<PelangganResponse>, t: Throwable) {
-                // If API fails, we just stick with the direct results that are already displayed.
-                // You could add logging here.
-            }
-        })
+        updateAdapterAndViews(filteredResults, trimmedQuery)
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
         allOnuList = emptyList()
-        totalOltCount = 0
+        lamaProses = null
+        totalOnline = 0
+        totalOffline = 0
         _binding = null
     }
 }

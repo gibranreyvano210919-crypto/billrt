@@ -3,23 +3,105 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:background="@drawable/bg_bottom_sheet_white"
     android:orientation="vertical"
-    android:padding="16dp">
+    android:padding="20dp">
 
+    <!-- Handle Bar -->
+    <View
+        android:layout_width="40dp"
+        android:layout_height="4dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="16dp"
+        android:background="#DEDEDE" />
+
+    <!-- Header -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:layout_marginBottom="16dp">
+
+        <ImageView
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="@drawable/bg_circle_primary_light"
+            android:contentDescription="@null"
+            android:padding="10dp"
+            android:src="@drawable/ic_person"
+            app:tint="?attr/colorPrimary" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Menu Pelanggan"
+                android:textColor="#1E293B"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:text="Pilih tindakan pelanggan"
+                android:textColor="#64748B"
+                android:textSize="13sp" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginBottom="16dp"
+        android:background="#E2E8F0" />
+
+    <!-- Option 1: Customer Detail -->
     <TextView
         android:id="@+id/tv_customer_detail"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="16dp"
-        android:text="Customer Detail"
-        android:textAppearance="?attr/textAppearanceSubtitle1" />
+        android:layout_marginBottom="10dp"
+        android:background="@drawable/bg_button_info_light"
+        android:clickable="true"
+        android:drawableStart="@drawable/ic_info"
+        android:drawablePadding="12dp"
+        android:focusable="true"
+        android:gravity="center_vertical"
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="14dp"
+        android:text="Detail Pelanggan"
+        android:textColor="#1D4ED8"
+        android:textSize="15sp"
+        android:textStyle="bold"
+        app:drawableStartCompat="@drawable/ic_info"
+        app:drawableTint="#1D4ED8" />
 
+    <!-- Option 2: History Payment -->
     <TextView
         android:id="@+id/tv_history_payment"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="16dp"
-        android:text="History Payment"
-        android:textAppearance="?attr/textAppearanceSubtitle1" />
+        android:background="@drawable/bg_button_info_light"
+        android:clickable="true"
+        android:drawableStart="@drawable/ic_history"
+        android:drawablePadding="12dp"
+        android:focusable="true"
+        android:gravity="center_vertical"
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="14dp"
+        android:text="Riwayat Pembayaran"
+        android:textColor="#1D4ED8"
+        android:textSize="15sp"
+        android:textStyle="bold"
+        app:drawableStartCompat="@drawable/ic_history"
+        app:drawableTint="#1D4ED8" />
 
 </LinearLayout>

@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
@@ -15,9 +16,7 @@ import com.linkbit.billrt.model.StandardResponse
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import java.text.SimpleDateFormat
 import java.util.Calendar
-import java.util.Locale
 
 class EditPelangganFragment : BaseFragment() {
 
@@ -41,8 +40,19 @@ class EditPelangganFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        // Sinkronisasi Insets agar toolbar tidak menabrak status bar
+        applyWindowInsets(binding.appBarLayout)
+
+        setupToolbar()
         fetchInitialData()
         setupListeners()
+    }
+
+    private fun setupToolbar() {
+        (activity as? AppCompatActivity)?.setSupportActionBar(binding.toolbar)
+        binding.toolbar.setNavigationOnClickListener {
+            findNavController().popBackStack()
+        }
     }
 
     private fun fetchInitialData() {
@@ -60,11 +70,12 @@ class EditPelangganFragment : BaseFragment() {
     private fun populateFields(pelanggan: PelangganData) {
         currentPelanggan = pelanggan
         binding.etNamaPelanggan.setText(pelanggan.nama)
-        binding.etAlamat.setText(pelanggan.alamat)
-        binding.etTelepon.setText(pelanggan.telepon)
-        binding.etMikrotikUsername.setText(pelanggan.mikrotikUsername)
-        binding.tvTglDaftar.text = pelanggan.tglDaftar
-        binding.tvInstallationDate.text = pelanggan.installationDate
+        binding.etAlamat.setText(pelanggan.alamat ?: "")
+        binding.etTelepon.setText(pelanggan.telepon ?: "")
+        binding.etMikrotikUsername.setText(pelanggan.mikrotikUsername ?: "")
+        binding.etMikrotikPassword.setText(pelanggan.mikrotikPassword ?: "")
+        binding.tvTglDaftar.text = pelanggan.tglDaftar ?: ""
+        binding.tvInstallationDate.text = pelanggan.installationDate ?: ""
 
         // Set spinner selections
         val paketPosition = paketList.indexOfFirst { it.id_paket == pelanggan.idPaket }
@@ -146,8 +157,7 @@ class EditPelangganFragment : BaseFragment() {
     }
 
     private fun fetchPelangganDetails() {
-        val request = GetPelangganByIdRequest(id_pelanggan = args.pelangganIdToEdit)
-        apiService.getPelangganById(request).enqueue(object : Callback<GetPelangganByIdResponse> {
+        apiService.getPelangganById(args.pelangganIdToEdit).enqueue(object : Callback<GetPelangganByIdResponse> {
             override fun onResponse(call: Call<GetPelangganByIdResponse>, response: Response<GetPelangganByIdResponse>) {
                 if (!isAdded) return
                 if (response.isSuccessful && response.body()?.data != null) {
@@ -208,25 +218,27 @@ class EditPelangganFragment : BaseFragment() {
 
         setLoading(true)
 
-        val selectedPaket = paketList[binding.spinnerPaket.selectedItemPosition]
-        val selectedWilayah = wilayahList[binding.spinnerWilayah.selectedItemPosition]
+        val selectedPaket = if (paketList.isNotEmpty()) paketList[binding.spinnerPaket.selectedItemPosition] else null
+        val selectedWilayah = if (wilayahList.isNotEmpty()) wilayahList[binding.spinnerWilayah.selectedItemPosition] else null
+
+        // Buat password null jika tidak diisi agar backend tidak mengupdate field tersebut
+        val inputPassword = binding.etMikrotikPassword.text.toString().trim()
+        val finalPassword = if (inputPassword.isEmpty()) null else inputPassword
 
         val request = UpdatePelangganRequest(
             id_pelanggan = args.pelangganIdToEdit,
-            nama_pelanggan = binding.etNamaPelanggan.text.toString(),
-            alamat_pelanggan = binding.etAlamat.text.toString(),
-            telepon_pelanggan = binding.etTelepon.text.toString(),
-            id_paket = selectedPaket.id_paket,
-            id_wilayah = selectedWilayah.id_wilayah,
-            mikrotik_username = binding.etMikrotikUsername.text.toString(),
-            mikrotik_password = binding.etMikrotikPassword.text.toString(),
-            tgl_daftar = binding.tvTglDaftar.text.toString(),
-            installation_date = binding.tvInstallationDate.text.toString(),
-            tgl_expired = currentPelanggan?.tglExpired // Assuming this is not editable in this form
+            nama_pelanggan = binding.etNamaPelanggan.text.toString().trim(),
+            alamat_pelanggan = binding.etAlamat.text.toString().trim(),
+            telepon_pelanggan = binding.etTelepon.text.toString().trim(),
+            id_paket = selectedPaket?.id_paket,
+            id_wilayah = selectedWilayah?.id_wilayah,
+            mikrotik_username = binding.etMikrotikUsername.text.toString().trim(),
+            mikrotik_password = finalPassword,
+            installation_date = binding.tvInstallationDate.text.toString()
         )
 
-        apiService.updatePelanggan("edit_pelanggan", request).enqueue(object : Callback<StandardResponse> {
-            override fun onResponse(call: Call<StandardResponse>, response: Response<StandardResponse>) {
+        apiService.updatePelanggan("edit_pelanggan", request).enqueue(object : Callback<com.linkbit.billrt.model.StandardResponse> {
+            override fun onResponse(call: Call<com.linkbit.billrt.model.StandardResponse>, response: Response<com.linkbit.billrt.model.StandardResponse>) {
                 if (!isAdded) return
                 setLoading(false)
                 if (response.isSuccessful && response.body()?.status == true) {
@@ -239,7 +251,7 @@ class EditPelangganFragment : BaseFragment() {
                 }
             }
 
-            override fun onFailure(call: Call<StandardResponse>, t: Throwable) {
+            override fun onFailure(call: Call<com.linkbit.billrt.model.StandardResponse>, t: Throwable) {
                 if (!isAdded) return
                 setLoading(false)
                 Toast.makeText(context, "Error: ${t.message}", Toast.LENGTH_LONG).show()

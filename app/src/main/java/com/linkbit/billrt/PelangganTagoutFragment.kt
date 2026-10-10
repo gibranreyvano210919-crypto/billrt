@@ -37,6 +37,9 @@ class PelangganTagoutFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        // Sinkronisasi Insets agar toolbar tidak menabrak status bar
+        applyWindowInsets(binding.appBarLayout)
+        
         setupToolbar()
         setupRecyclerView()
 
@@ -90,7 +93,8 @@ class PelangganTagoutFragment : BaseFragment() {
                 catatanTagout = item.catatanTagout,
                 bulanTagihan = item.bulanTagihan.toString(),
                 tahunTagihan = item.tahunTagihan,
-                tglBayarTerakhir = null
+                tglBayarTerakhir = null,
+                namaPencatat = null
             )
 
             val menuSheet = TagoutMenuBottomSheetFragment.newInstance(pelangganItem)

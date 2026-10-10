@@ -7,6 +7,8 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.linkbit.billrt.databinding.ItemPelangganNunggakBinding
 import com.linkbit.billrt.model.PelangganNunggakItem
+import java.text.NumberFormat
+import java.util.Locale
 
 class PelangganNunggakAdapter(
     private val onItemClick: (PelangganNunggakItem) -> Unit
@@ -28,12 +30,19 @@ class PelangganNunggakAdapter(
     inner class ViewHolder(private val binding: ItemPelangganNunggakBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
+        private val formatter = NumberFormat.getCurrencyInstance(Locale("id", "ID")).apply {
+            maximumFractionDigits = 0
+        }
+
         fun bind(item: PelangganNunggakItem) {
             binding.tvNamaPelanggan.text = item.nama_pelanggan
-            binding.tvWilayah.text = item.nama_wilayah
-            binding.tvUsername.text = item.mikrotik_username
-            binding.tvTotalPiutang.text = "Rp ${item.total_tunggakan.toInt()}"
-            binding.tvInstallationDate.text = item.installation_date
+            binding.tvWilayah.text = "Wilayah: ${item.nama_wilayah}"
+            binding.tvUsername.text = "User: ${item.mikrotik_username}"
+            binding.tvTotalPiutang.text = formatter.format(item.total_tunggakan)
+            binding.tvJatuhTempo.text = "Jatuh Tempo: Tgl ${item.jatuh_tempo_tgl}"
+            binding.tvRiwayatBayar.text = "Terakhir Bayar: ${item.tgl_bayar_terakhir}"
+            binding.tvPeriode.text = "Periode: ${item.periode_nunggak}"
+            binding.tvAdmin.text = "Admin: ${item.admin_pencatat}"
         }
     }
 

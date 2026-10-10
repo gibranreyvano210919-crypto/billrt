@@ -33,6 +33,9 @@ class PelangganBaruFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        // Sinkronisasi Insets agar toolbar tidak menabrak status bar
+        applyWindowInsets(binding.appBarLayout)
+        
         setupToolbar()
         setupRecyclerView()
         setupSwipeRefresh()
@@ -40,7 +43,7 @@ class PelangganBaruFragment : BaseFragment() {
     }
 
     private fun setupToolbar() {
-        binding.toolbar.title = "Pelanggan Baru (${args.bulan}/${args.tahun})"
+        binding.toolbar.title = "Pelanggan Baru"
         binding.toolbar.setNavigationOnClickListener {
             findNavController().navigateUp()
         }
@@ -84,8 +87,12 @@ class PelangganBaruFragment : BaseFragment() {
                 binding.progressBar.visibility = View.GONE
                 binding.swipeRefreshLayout.isRefreshing = false
                 if (response.isSuccessful) {
-                    pelangganBaruList = response.body()?.data ?: emptyList()
+                    val body = response.body()
+                    pelangganBaruList = body?.data ?: emptyList()
                     pelangganBaruAdapter.updateData(pelangganBaruList)
+                    
+                    // Update toolbar title with total count from response
+                    binding.toolbar.title = "Pelanggan Baru (${body?.total ?: 0})"
                 } else {
                     Toast.makeText(context, "Gagal memuat data pelanggan baru", Toast.LENGTH_SHORT).show()
                 }

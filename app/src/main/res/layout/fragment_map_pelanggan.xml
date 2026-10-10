@@ -4,44 +4,71 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    android:background="@color/app_background"
     tools:context=".MapPelangganFragment">
 
-    <RelativeLayout
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/app_bar_layout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content"
+        android:fitsSystemWindows="true"
+        android:background="@color/purple_500"
+        app:elevation="0dp">
 
-        <com.mapbox.maps.MapView
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@color/purple_500"
+            app:navigationIcon="@drawable/ic_arrow_back"
+            app:title="Map Pelanggan"
+            app:titleTextColor="@android:color/white" />
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <org.osmdroid.views.MapView
             android:id="@+id/map_view"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
-
-        <androidx.appcompat.widget.SearchView
-            android:id="@+id/search_view_map"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:background="@android:color/white" />
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/distance_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/search_view_map"
-            android:layout_centerHorizontal="true"
             android:layout_marginTop="8dp"
             android:background="#80000000"
             android:padding="8dp"
             android:textColor="@android:color/white"
-            android:visibility="gone" />
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="Jarak: 100 meter"
+            tools:visibility="visible" />
 
         <ProgressBar
             android:id="@+id/progress_bar"
+            style="?android:attr/progressBarStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:visibility="gone" />
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:visibility="visible" />
 
-    </RelativeLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab_my_location"
@@ -49,67 +76,9 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_marginEnd="16dp"
-        android:layout_marginBottom="88dp"
-        app:srcCompat="@android:drawable/ic_menu_mylocation" />
-
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fab_tools"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_margin="16dp"
-        app:srcCompat="@android:drawable/ic_menu_sort_by_size" />
-
-    <!-- Bottom Sheet Layout -->
-    <LinearLayout
-        android:id="@+id/bottom_sheet"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@android:color/white"
-        android:orientation="vertical"
-        android:padding="16dp"
-        app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior"
-        app:behavior_peekHeight="0dp"
-        app:behavior_hideable="true">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Peralatan Peta"
-            android:textSize="18sp"
-            android:textStyle="bold" 
-            android:layout_marginBottom="16dp"/>
-
-        <Button
-            android:id="@+id/button_filter_wilayah"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Filter Wilayah" />
-
-        <Button
-            android:id="@+id/button_add_location"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Tambah Lokasi Pelanggan" />
-        
-        <Button
-            android:id="@+id/button_measure"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Ukur Jarak" />
-
-        <Button
-            android:id="@+id/button_clear_measure"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Hapus Pengukuran" />
-
-        <Button
-            android:id="@+id/button_change_style"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Ganti Gaya Peta" />
-
-    </LinearLayout>
+        android:layout_marginBottom="24dp"
+        app:backgroundTint="@color/purple_500"
+        app:srcCompat="@android:drawable/ic_menu_mylocation"
+        app:tint="@android:color/white" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

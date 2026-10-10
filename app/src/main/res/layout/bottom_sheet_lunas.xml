@@ -1,9 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:background="@drawable/bg_bottom_sheet_white"
     android:orientation="vertical"
-    android:padding="16dp">
+    android:padding="20dp">
+
+    <!-- Handle Bar -->
+    <View
+        android:layout_width="40dp"
+        android:layout_height="4dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="16dp"
+        android:background="#DEDEDE" />
 
     <!-- Initial Actions View -->
     <LinearLayout
@@ -12,28 +22,116 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/action_batalkan_pembayaran"
+        <!-- Header Lunas -->
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="?attr/selectableItemBackground"
-            android:clickable="true"
-            android:focusable="true"
-            android:padding="16dp"
-            android:text="Batalkan Pembayaran"
-            android:textAppearance="?attr/textAppearanceSubtitle1"
-            android:textColor="?attr/colorError" />
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:layout_marginBottom="16dp">
 
+            <ImageView
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@drawable/bg_circle_primary_light"
+                android:contentDescription="@null"
+                android:padding="10dp"
+                android:src="@drawable/ic_check_circle"
+                app:tint="#166534" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Status: Lunas"
+                    android:textColor="#166534"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:text="Pilih opsi transaksi pembayaran"
+                    android:textColor="#64748B"
+                    android:textSize="13sp" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginBottom="16dp"
+            android:background="#E2E8F0" />
+
+        <!-- 1. Riwayat Pembayaran -->
+        <TextView
+            android:id="@+id/action_riwayat_pembayaran"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:background="@drawable/bg_button_info_light"
+            android:clickable="true"
+            android:drawableStart="@drawable/ic_history"
+            android:drawablePadding="12dp"
+            android:focusable="true"
+            android:gravity="center_vertical"
+            android:paddingHorizontal="16dp"
+            android:paddingVertical="14dp"
+            android:text="Riwayat Pembayaran"
+            android:textColor="#1D4ED8"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            app:drawableStartCompat="@drawable/ic_history"
+            app:drawableTint="#1D4ED8" />
+
+        <!-- 2. Cetak Pembayaran -->
         <TextView
             android:id="@+id/action_cetak_pembayaran"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="?attr/selectableItemBackground"
+            android:layout_marginBottom="10dp"
+            android:background="@drawable/bg_button_info_light"
             android:clickable="true"
+            android:drawableStart="@drawable/ic_print"
+            android:drawablePadding="12dp"
             android:focusable="true"
-            android:padding="16dp"
+            android:gravity="center_vertical"
+            android:paddingHorizontal="16dp"
+            android:paddingVertical="14dp"
             android:text="Cetak Pembayaran"
-            android:textAppearance="?attr/textAppearanceSubtitle1" />
+            android:textColor="#1D4ED8"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            app:drawableStartCompat="@drawable/ic_print"
+            app:drawableTint="#1D4ED8" />
+
+        <!-- 3. Batalkan Pembayaran -->
+        <TextView
+            android:id="@+id/action_batalkan_pembayaran"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_button_danger_light"
+            android:clickable="true"
+            android:drawableStart="@drawable/ic_close"
+            android:drawablePadding="12dp"
+            android:focusable="true"
+            android:gravity="center_vertical"
+            android:paddingHorizontal="16dp"
+            android:paddingVertical="14dp"
+            android:text="Batalkan Pembayaran"
+            android:textColor="#991B1B"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            app:drawableStartCompat="@drawable/ic_close"
+            app:drawableTint="#991B1B" />
+
     </LinearLayout>
 
     <!-- Confirmation View -->
@@ -47,30 +145,35 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
             android:text="Anda yakin ingin membatalkan pembayaran ini?"
-            android:textAppearance="?attr/textAppearanceBody1"
-            android:padding="16dp"/>
+            android:textColor="#1E293B"
+            android:textSize="16sp"
+            android:textStyle="bold" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="end">
+            android:gravity="end"
+            android:orientation="horizontal">
 
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_cancel"
-                style="?attr/materialButtonOutlinedStyle"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="8dp"
-                android:text="Tidak" />
+                android:layout_marginEnd="12dp"
+                android:text="Tidak"
+                app:cornerRadius="8dp" />
 
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_confirm_cancel"
-                style="?attr/materialButtonStyle"
+                style="@style/Widget.MaterialComponents.Button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Ya, Batalkan" />
+                android:backgroundTint="#DC2626"
+                android:text="Ya, Batalkan"
+                app:cornerRadius="8dp" />
         </LinearLayout>
     </LinearLayout>
 

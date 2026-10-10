@@ -37,8 +37,10 @@ class PelangganIsolirAdapter(
     inner class PelangganViewHolder(val binding: ItemPelangganCardBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(pelanggan: PelangganIsolir) {
             binding.tvNamaPelanggan.text = pelanggan.namaPelanggan
-            binding.tvIdPelanggan.text = pelanggan.idPelanggan
-            binding.tvStatusBerlangganan.text = "Isolir"
+            binding.tvIdPelanggan.text = "ID: ${pelanggan.idPelanggan}"
+            binding.tvAlamat.text = "Alamat: ${pelanggan.alamat ?: "-"}"
+            binding.tvWilayah.text = "Wilayah: ${pelanggan.namaWilayah ?: "-"}"
+            binding.tvStatusBerlangganan.text = "Status: ${pelanggan.statusAktif ?: "Isolir"} | Tgl Isolir: ${pelanggan.tglIsolir ?: "-"}"
 
             // Hide unused buttons
             binding.btnLihatDetail.visibility = View.GONE

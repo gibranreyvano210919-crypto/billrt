@@ -2,7 +2,7 @@ package com.linkbit.billrt
 
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.View
+import android.view. View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -32,6 +32,9 @@ class MikrotikMenuFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        // Terapkan Insets pada AppBarLayout
+        applyWindowInsets(binding.appBarLayout)
+        
         setupToolbar()
         setupObservers()
         setupClickListeners()
@@ -88,13 +91,18 @@ class MikrotikMenuFragment : BaseFragment() {
             findNavController().navigate(action)
         }
 
-        binding.cardAuditUser.setOnClickListener {
-            val action = MikrotikMenuFragmentDirections.actionMikrotikMenuFragmentToAuditUserFragment(args.routerId)
+        binding.cardDaftarSecret.setOnClickListener {
+            val action = MikrotikMenuFragmentDirections.actionMikrotikMenuFragmentToDaftarSecretFragment(args.routerId)
             findNavController().navigate(action)
         }
 
-        binding.cardDaftarSecret.setOnClickListener {
-            val action = MikrotikMenuFragmentDirections.actionMikrotikMenuFragmentToDaftarSecretFragment(args.routerId)
+        binding.btnCekPppoe.setOnClickListener {
+            val action = MikrotikMenuFragmentDirections.actionMikrotikMenuFragmentToAuditUserGlobalFragment()
+            findNavController().navigate(action)
+        }
+
+        binding.btnSyncMac.setOnClickListener {
+            val action = MikrotikMenuFragmentDirections.actionMikrotikMenuFragmentToSyncMikrotikFragment()
             findNavController().navigate(action)
         }
     }

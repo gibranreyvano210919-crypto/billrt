@@ -25,6 +25,9 @@ class PelangganAktifFragment : BaseFragment() {
     private var pelangganList: List<PelangganData> = emptyList()
     private val args: PelangganAktifFragmentArgs by navArgs()
 
+    private var selectedWilayahId: Int? = null
+    private var summaryWilayahList: List<SummaryWilayahItem> = emptyList()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setFragmentResultListener("edit_result") { _, bundle ->
@@ -43,6 +46,7 @@ class PelangganAktifFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        applyWindowInsets(binding.appBarLayout)
         setupToolbar()
         setupRecyclerView()
         setupSwipeRefresh()
@@ -54,17 +58,16 @@ class PelangganAktifFragment : BaseFragment() {
             findNavController().navigateUp()
         }
 
-        // Inflate menu search ke toolbar
-        binding.toolbar.inflateMenu(R.menu.menu_search)
+        // Inflate menu baru yang ada search dan filter
+        binding.toolbar.inflateMenu(R.menu.menu_pelanggan_aktif)
+        
         val searchItem = binding.toolbar.menu.findItem(R.id.action_search)
-        val searchView = searchItem.actionView as? SearchView
+        val searchView = searchItem?.actionView as? SearchView
 
         searchView?.apply {
             queryHint = "Cari pelanggan aktif..."
             setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-                override fun onQueryTextSubmit(query: String?): Boolean {
-                    return false
-                }
+                override fun onQueryTextSubmit(query: String?): Boolean = false
 
                 override fun onQueryTextChange(newText: String?): Boolean {
                     filter(newText)
@@ -72,12 +75,43 @@ class PelangganAktifFragment : BaseFragment() {
                 }
             })
         }
+
+        binding.toolbar.setOnMenuItemClickListener { item ->
+            when (item.itemId) {
+                R.id.action_filter -> {
+                    showWilayahFilterBottomSheet()
+                    true
+                }
+                else -> false
+            }
+        }
+    }
+
+    private fun showWilayahFilterBottomSheet() {
+        if (summaryWilayahList.isEmpty()) {
+            Toast.makeText(context, "Data wilayah belum tersedia", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val bottomSheet = PelangganAktifFilterBottomSheet.newInstance(
+            summaryWilayahList,
+            selectedWilayahId
+        )
+        
+        bottomSheet.setOnWilayahSelectedListener { id, name ->
+            selectedWilayahId = id
+            fetchPelangganAktif()
+            val filterName = name ?: "Semua Wilayah"
+            Toast.makeText(context, "Filter: $filterName", Toast.LENGTH_SHORT).show()
+        }
+        
+        bottomSheet.show(childFragmentManager, "PelangganAktifFilterBottomSheet")
     }
 
     private fun setupRecyclerView() {
         pelangganAdapter = PelangganAdapter(emptyList(),
             onDetailClick = { pelanggan ->
-                val action = PelangganAktifFragmentDirections.actionPelangganAktifFragmentToPelangganAktifDetailFragment(pelanggan.idPelanggan)
+                val action = PelangganAktifFragmentDirections.actionPelangganAktifFragmentToDetailPelangganFragment(pelanggan.idPelanggan)
                 findNavController().navigate(action)
             },
             onItemLongClick = { pelanggan ->
@@ -100,45 +134,26 @@ class PelangganAktifFragment : BaseFragment() {
                 val action = PelangganAktifFragmentDirections.actionPelangganAktifFragmentToEditPelangganFragment(pelangganId)
                 findNavController().navigate(action)
             }
-            setOnIsolirClickListener { pelangganId ->
-                val pelangganToUpdate = pelangganList.find { it.idPelanggan == pelangganId }
-                pelangganToUpdate?.let { 
-                    updateStatus(it, "isolir") 
-                }
+            setOnStatusUpdateSuccessfulListener { 
+                fetchPelangganAktif()
             }
         }
         bottomSheet.show(childFragmentManager, "PelangganBottomSheet")
-    }
-
-    private fun updateStatus(pelanggan: PelangganData, newStatus: String) {
-        val request = UpdateStatusRequest(idPelanggan = pelanggan.idPelanggan, statusAktif = newStatus)
-        apiService.updateStatusPelanggan(request).enqueue(object : Callback<StandardResponse> {
-            override fun onResponse(call: Call<StandardResponse>, response: Response<StandardResponse>) {
-                if (response.isSuccessful && response.body()?.status == true) {
-                    Toast.makeText(context, "Status berhasil diubah ke $newStatus", Toast.LENGTH_SHORT).show()
-                    fetchPelangganAktif() // Refresh the list
-                } else {
-                    Toast.makeText(context, "Gagal mengubah status", Toast.LENGTH_SHORT).show()
-                }
-            }
-
-            override fun onFailure(call: Call<StandardResponse>, t: Throwable) {
-                Toast.makeText(context, "Error: ${t.message}", Toast.LENGTH_SHORT).show()
-            }
-        })
     }
 
     private fun fetchPelangganAktif() {
         if (!binding.swipeRefreshLayout.isRefreshing) {
             binding.progressBar.visibility = View.VISIBLE
         }
-        apiService.getDataPelanggan(status = "aktif").enqueue(object : Callback<PelangganResponse> {
+        apiService.getDataPelanggan(status = "aktif", idWilayah = selectedWilayahId).enqueue(object : Callback<PelangganResponse> {
             override fun onResponse(call: Call<PelangganResponse>, response: Response<PelangganResponse>) {
                 if (!isAdded) return
                 binding.progressBar.visibility = View.GONE
                 binding.swipeRefreshLayout.isRefreshing = false
                 if (response.isSuccessful) {
-                    pelangganList = response.body()?.data ?: emptyList()
+                    val body = response.body()
+                    pelangganList = body?.data ?: emptyList()
+                    summaryWilayahList = body?.summaryWilayah ?: emptyList()
                     pelangganAdapter.updateData(pelangganList)
                 } else {
                     Toast.makeText(context, "Gagal memuat data", Toast.LENGTH_SHORT).show()

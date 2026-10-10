@@ -62,11 +62,7 @@ class PelangganFragment : BaseFragment() {
         pelangganAdapter = PelangganAdapter(
             emptyList(),
             onDetailClick = { pelanggan ->
-                val action = if (showActive) {
-                    PelangganFragmentDirections.actionPelangganFragmentToPelangganAktifDetailFragment(pelanggan.idPelanggan)
-                } else {
-                    PelangganFragmentDirections.actionPelangganFragmentToPelangganNonaktifDetailFragment(pelanggan.idPelanggan)
-                }
+                val action = PelangganFragmentDirections.actionPelangganFragmentToDetailPelangganFragment(pelanggan.idPelanggan)
                 findNavController().navigate(action)
             },
             onMenuClick = { pelanggan, view ->
@@ -85,11 +81,7 @@ class PelangganFragment : BaseFragment() {
         popup.setOnMenuItemClickListener { item ->
             when (item.itemId) {
                 R.id.menu_detail -> {
-                    val action = if (showActive) {
-                        PelangganFragmentDirections.actionPelangganFragmentToPelangganAktifDetailFragment(pelanggan.idPelanggan)
-                    } else {
-                        PelangganFragmentDirections.actionPelangganFragmentToPelangganNonaktifDetailFragment(pelanggan.idPelanggan)
-                    }
+                    val action = PelangganFragmentDirections.actionPelangganFragmentToDetailPelangganFragment(pelanggan.idPelanggan)
                     findNavController().navigate(action)
                     true
                 }

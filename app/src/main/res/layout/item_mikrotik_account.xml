@@ -7,33 +7,50 @@
     android:layout_margin="8dp"
     app:cardElevation="4dp">
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
         android:padding="16dp">
 
-        <TextView
-            android:id="@+id/tv_router_name"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textStyle="bold"
-            android:textAppearance="@style/TextAppearance.AppCompat.Large"
-            tools:text="Nama Router" />
+            android:layout_toStartOf="@+id/iv_default_check"
+            android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/tv_ip_address"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-            tools:text="192.168.1.1" />
+            <TextView
+                android:id="@+id/tv_router_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                android:textStyle="bold"
+                tools:text="Nama Router" />
 
-        <TextView
-            android:id="@+id/tv_username"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            tools:text="Username: admin" />
+            <TextView
+                android:id="@+id/tv_ip_address"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                tools:text="192.168.1.1" />
 
-    </LinearLayout>
+            <TextView
+                android:id="@+id/tv_username"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                tools:text="Username: admin" />
+
+        </LinearLayout>
+
+        <ImageView
+            android:id="@+id/iv_default_check"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:src="@drawable/ic_check_circle_green"
+            android:visibility="gone"
+            tools:visibility="visible" />
+
+    </RelativeLayout>
 
 </com.google.android.material.card.MaterialCardView>

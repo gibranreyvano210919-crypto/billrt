@@ -1,9 +1,6 @@
 package com.linkbit.billrt
 
 import android.content.Context
-import android.graphics.Bitmap
-import android.graphics.Canvas
-import android.graphics.Color
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -15,11 +12,11 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
-import androidx.annotation.DrawableRes
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
-import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.ui.setupWithNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.linkbit.billrt.adapter.AutoCompleteAdapter
@@ -27,20 +24,15 @@ import com.linkbit.billrt.adapter.RadiusPelangganAdapter
 import com.linkbit.billrt.databinding.FragmentPencarianPelangganBinding
 import com.linkbit.billrt.model.*
 import com.linkbit.billrt.network.RetrofitClient
-import com.mapbox.geojson.Point
-import com.mapbox.maps.CameraOptions
-import com.mapbox.maps.EdgeInsets
-import com.mapbox.maps.MapView
-import com.mapbox.maps.Style
-import com.mapbox.maps.plugin.animation.flyTo
-import com.mapbox.maps.plugin.annotation.annotations
-import com.mapbox.maps.plugin.annotation.generated.PointAnnotationOptions
-import com.mapbox.maps.plugin.annotation.generated.createPointAnnotationManager
+import org.osmdroid.tileprovider.tilesource.TileSourceFactory
+import org.osmdroid.util.GeoPoint
+import org.osmdroid.views.MapView
+import org.osmdroid.views.overlay.Marker
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-class PencarianPelangganFragment : Fragment() {
+class PencarianPelangganFragment : BaseFragment() {
 
     private var _binding: FragmentPencarianPelangganBinding? = null
     private val binding get() = _binding!!
@@ -60,14 +52,15 @@ class PencarianPelangganFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         mapView = binding.mapView
+        mapView?.setTileSource(TileSourceFactory.MAPNIK)
+        mapView?.setMultiTouchControls(true)
 
+        val appBarLayout = binding.toolbarPencarianPelanggan.parent as? View
+        appBarLayout?.let { applyWindowInsets(it) }
+
+        setupToolbar()
         setupResultRecyclerView()
         setupAutoCompleteRecyclerView()
-        mapView?.getMapboxMap()?.loadStyleUri("mapbox://styles/mapbox/satellite-streets-v12")
-
-        binding.gantiLokasiButton.setOnClickListener {
-            findNavController().navigate(R.id.action_pencarianPelangganFragment_to_gantiLokasiFragment)
-        }
 
         binding.searchEditText.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
@@ -89,6 +82,12 @@ class PencarianPelangganFragment : Fragment() {
                 searchHandler.postDelayed(searchRunnable!!, 500)
             }
         })
+    }
+
+    private fun setupToolbar() {
+        (activity as? AppCompatActivity)?.setSupportActionBar(binding.toolbarPencarianPelanggan)
+        binding.toolbarPencarianPelanggan.setupWithNavController(findNavController())
+        binding.toolbarPencarianPelanggan.title = "Pencarian Pelanggan"
     }
 
     private fun setupResultRecyclerView() {
@@ -175,7 +174,6 @@ class PencarianPelangganFragment : Fragment() {
         binding.statusLayout.isVisible = isError
         if (isError) {
             binding.statusTextView.text = errorMessage
-            binding.gantiLokasiButton.isVisible = true
             binding.pelangganRecyclerView.isVisible = false
             radiusAdapter.updateData(null, null)
             updateMarkers(null, null)
@@ -185,36 +183,46 @@ class PencarianPelangganFragment : Fragment() {
     }
 
     private fun updateMarkers(pusat: PelangganPusat?, tetangga: List<PelangganTetangga>?) {
-        val pusatBitmap = bitmapFromDrawableRes(requireContext(), R.drawable.ic_pusat)
-        val tetanggaBitmap = bitmapFromDrawableRes(requireContext(), R.drawable.ic_tetangga)
+        val currentMapView = mapView ?: return
+        currentMapView.overlays.clear()
 
-        mapView?.annotations?.createPointAnnotationManager()?.let { annotationManager ->
-            annotationManager.deleteAll()
-            pusat?.let { p ->
-                p.latitude?.let { lat -> p.longitude?.let { lon ->
-                    val point = Point.fromLngLat(lon, lat)
-                    val options = PointAnnotationOptions().withPoint(point).withTextField(p.nama ?: "").withTextOffset(listOf(0.0, -2.5)).withTextColor(Color.WHITE).withTextHaloColor(Color.argb(192, 0, 0, 0)).withTextHaloWidth(1.5)
-                    pusatBitmap?.let { options.withIconImage(it) }
-                    annotationManager.create(options)
+        val pusatDrawable = ContextCompat.getDrawable(requireContext(), R.drawable.ic_pusat)
+        val tetanggaDrawable = ContextCompat.getDrawable(requireContext(), R.drawable.ic_tetangga)
 
-                    // Autozoom ke titik pusat dengan level zoom tetap
-                    mapView?.getMapboxMap()?.flyTo(
-                        CameraOptions.Builder()
-                            .center(point)
-                            .zoom(16.0) // Skala 200 kaki
-                            .build()
-                    )
-                }}
-            }
-            tetangga?.forEach { t ->
-                t.latitude?.let { lat -> t.longitude?.let { lon ->
-                    val point = Point.fromLngLat(lon, lat)
-                    val options = PointAnnotationOptions().withPoint(point).withTextField(t.nama ?: "").withTextOffset(listOf(0.0, -2.5)).withTextColor(Color.WHITE).withTextHaloColor(Color.argb(192, 0, 0, 0)).withTextHaloWidth(1.5)
-                    tetanggaBitmap?.let { options.withIconImage(it) }
-                    annotationManager.create(options)
-                }}
+        pusat?.let { p ->
+            val lat = p.latitude
+            val lon = p.longitude
+            if (lat != null && lon != null) {
+                val point = GeoPoint(lat, lon)
+                val marker = Marker(currentMapView).apply {
+                    position = point
+                    title = p.nama
+                    icon = pusatDrawable
+                    setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+                }
+                currentMapView.overlays.add(marker)
+
+                currentMapView.controller.setZoom(16.0)
+                currentMapView.controller.animateTo(point)
             }
         }
+
+        tetangga?.forEach { t ->
+            val lat = t.latitude
+            val lon = t.longitude
+            if (lat != null && lon != null) {
+                val point = GeoPoint(lat, lon)
+                val marker = Marker(currentMapView).apply {
+                    position = point
+                    title = t.nama
+                    icon = tetanggaDrawable
+                    setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+                }
+                currentMapView.overlays.add(marker)
+            }
+        }
+
+        currentMapView.invalidate()
     }
 
     private fun hideKeyboard() {
@@ -222,12 +230,14 @@ class PencarianPelangganFragment : Fragment() {
         imm.hideSoftInputFromWindow(binding.root.windowToken, 0)
     }
 
-    private fun bitmapFromDrawableRes(context: Context, @DrawableRes resourceId: Int): Bitmap? {
-        return ContextCompat.getDrawable(context, resourceId)?.let {
-            val bitmap = Bitmap.createBitmap(it.intrinsicWidth, it.intrinsicHeight, Bitmap.Config.ARGB_8888)
-            val canvas = Canvas(bitmap).apply { it.setBounds(0, 0, width, height); it.draw(this) }
-            bitmap
-        }
+    override fun onResume() {
+        super.onResume()
+        mapView?.onResume()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        mapView?.onPause()
     }
 
     override fun onDestroyView() {

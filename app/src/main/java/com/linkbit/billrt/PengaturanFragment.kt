@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.linkbit.billrt.databinding.FragmentPengaturanBinding
@@ -29,13 +30,21 @@ class PengaturanFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        setupToolbar()
         loadPengaturan()
 
         binding.btnSimpan.setOnClickListener {
             savePengaturan()
         }
+    }
 
-        binding.btnKembali.setOnClickListener {
+    private fun setupToolbar() {
+        (activity as? AppCompatActivity)?.setSupportActionBar(binding.toolbar)
+        (activity as? AppCompatActivity)?.supportActionBar?.apply {
+            title = "Pengaturan"
+            setDisplayHomeAsUpEnabled(true)
+        }
+        binding.toolbar.setNavigationOnClickListener {
             findNavController().popBackStack()
         }
     }
@@ -66,7 +75,6 @@ class PengaturanFragment : Fragment() {
         val bankNama = binding.etBankNama.text.toString()
         val bankAtasNama = binding.etBankAtasNama.text.toString()
         val bankNoRekening = binding.etBankNoRekening.text.toString()
-        val masaTenggang = binding.etMasaTenggang.text.toString().toIntOrNull() ?: 0
 
         ApiClient.instance.updatePengaturan(
             id = pengaturanId,
@@ -77,7 +85,7 @@ class PengaturanFragment : Fragment() {
             bank = bankNama,
             an = bankAtasNama,
             norek = bankNoRekening,
-            tenggang = masaTenggang
+            tenggang = 0
         ).enqueue(object : Callback<UpdatePengaturanResponse> {
             override fun onResponse(call: Call<UpdatePengaturanResponse>, response: Response<UpdatePengaturanResponse>) {
                 if (response.isSuccessful) {
@@ -109,7 +117,6 @@ class PengaturanFragment : Fragment() {
         binding.etBankNama.setText(data.bankNama)
         binding.etBankAtasNama.setText(data.bankAtasNama)
         binding.etBankNoRekening.setText(data.bankNoRekening)
-        binding.etMasaTenggang.setText(data.masaTenggang)
     }
 
     override fun onDestroyView() {

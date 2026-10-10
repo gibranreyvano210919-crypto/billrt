@@ -8,6 +8,7 @@
     tools:context=".PelangganBelumBayarFragment">
 
     <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/app_bar_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
@@ -30,7 +31,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent" 
             android:clipToPadding="false"
-            android:padding="8dp"/>
+            android:padding="4dp"/>
 
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 

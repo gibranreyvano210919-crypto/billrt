@@ -117,6 +117,23 @@
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_cek_pppoe"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="8dp"
+                    android:text="Cek PPPoE (Audit Global)"
+                    app:icon="@drawable/ic_search" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_sync_mac"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="8dp"
+                    android:layout_marginTop="8dp"
+                    android:text="Sync MAC"
+                    app:icon="@drawable/ic_update" />
+
                 <GridLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -227,33 +244,6 @@
                                 android:textSize="20sp"
                                 android:textStyle="bold"
                                 tools:text="15" />
-                        </LinearLayout>
-                    </com.google.android.material.card.MaterialCardView>
-
-                    <com.google.android.material.card.MaterialCardView
-                        android:id="@+id/card_audit_user"
-                        style="@style/DashboardCard"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_columnWeight="1"
-                        android:layout_margin="8dp">
-
-                        <LinearLayout
-                            style="@style/DashboardCardContent"
-                            android:layout_width="match_parent"
-                            android:layout_height="120dp">
-
-                            <ImageView
-                                android:layout_width="48dp"
-                                android:layout_height="48dp"
-                                android:src="@drawable/ic_audit" />
-
-                            <TextView
-                                style="@style/DashboardCardText"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="8dp"
-                                android:text="Audit User" />
                         </LinearLayout>
                     </com.google.android.material.card.MaterialCardView>
 

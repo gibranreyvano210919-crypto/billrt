@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.*
 import android.widget.Toast
 import androidx.appcompat.widget.SearchView
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -12,7 +11,7 @@ import com.linkbit.billrt.adapter.PelangganTelatAdapter
 import com.linkbit.billrt.databinding.FragmentPelangganTelatBinding
 import com.linkbit.billrt.viewmodel.PelangganTelatViewModel
 
-class PelangganTelatFragment : Fragment() {
+class PelangganTelatFragment : BaseFragment() {
 
     private var _binding: FragmentPelangganTelatBinding? = null
     private val binding get() = _binding!!
@@ -43,6 +42,9 @@ class PelangganTelatFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        // Sinkronisasi Insets agar toolbar tidak menabrak status bar
+        applyWindowInsets(binding.appBarLayout)
 
         viewModel = ViewModelProvider(this).get(PelangganTelatViewModel::class.java)
 
@@ -81,10 +83,20 @@ class PelangganTelatFragment : Fragment() {
     }
 
     private fun setupRecyclerView() {
-        telatAdapter = PelangganTelatAdapter { pelanggan ->
-            // Handle item click
-            Toast.makeText(context, "Clicked on ${pelanggan.namaPelanggan}", Toast.LENGTH_SHORT).show()
-        }
+        telatAdapter = PelangganTelatAdapter(
+            onItemClick = { pelanggan ->
+                // Handle item click - Misal buka detail
+                val bundle = Bundle().apply {
+                    putInt("id_pelanggan", pelanggan.idPelanggan)
+                }
+                findNavController().navigate(R.id.action_pelangganTelatFragment_to_detailTagihanFragment, bundle)
+            },
+            onItemLongClick = { pelanggan ->
+                // Munculkan Bottom Sheet saat klik lama
+                val bottomSheet = PelangganTelatBottomSheetFragment.newInstance(pelanggan)
+                bottomSheet.show(childFragmentManager, bottomSheet.tag)
+            }
+        )
         binding.rvPelangganTelat.apply {
             layoutManager = LinearLayoutManager(context)
             adapter = telatAdapter

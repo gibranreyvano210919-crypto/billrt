@@ -5,7 +5,6 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.linkbit.billrt.PelangganListItem
 import com.linkbit.billrt.databinding.ItemPelangganBinding
-import java.util.Locale
 
 class PelangganListAdapter(
     private var pelangganList: List<PelangganListItem>,
@@ -42,10 +41,10 @@ class PelangganListAdapter(
         filteredPelangganList = if (query.isEmpty()) {
             pelangganList
         } else {
-            val lowerCaseQuery = query.toLowerCase(Locale.getDefault())
+            val lowerCaseQuery = query.lowercase()
             pelangganList.filter {
-                it.namaPelanggan.toLowerCase(Locale.getDefault()).contains(lowerCaseQuery) ||
-                it.mikrotikUsername?.toLowerCase(Locale.getDefault())?.contains(lowerCaseQuery) == true
+                it.namaPelanggan.lowercase().contains(lowerCaseQuery) ||
+                it.mikrotikUsername?.lowercase()?.contains(lowerCaseQuery) == true
             }
         }
         notifyDataSetChanged()

@@ -2,6 +2,7 @@ package com.linkbit.billrt.adapter
 
 import android.annotation.SuppressLint
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.linkbit.billrt.databinding.ItemPelangganOfflineBinding
@@ -27,7 +28,7 @@ class PelangganOfflineAdapter(
     @SuppressLint("NotifyDataSetChanged")
     fun updateData(newList: List<PppoeOfflineUser>) {
         userList = newList
-        filteredList = newList // Tanpa filter, daftar yang ditampilkan sama dengan daftar asli
+        filteredList = newList
         notifyDataSetChanged()
     }
 
@@ -43,8 +44,23 @@ class PelangganOfflineAdapter(
     inner class ViewHolder(private val binding: ItemPelangganOfflineBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(user: PppoeOfflineUser) {
             binding.tvName.text = user.name
-            binding.tvProfile.text = user.profile
-            // Tambahkan logika lain jika perlu, misal untuk status disabled
+            binding.tvProfile.text = "Profile: ${user.profile}"
+            
+            // Tampilkan Last Logged Out jika ada
+            if (!user.lastLoggedOut.isNullOrBlank()) {
+                binding.tvLastLoggedOut.text = "Logout: ${user.lastLoggedOut}"
+                binding.tvLastLoggedOut.visibility = View.VISIBLE
+            } else {
+                binding.tvLastLoggedOut.visibility = View.GONE
+            }
+
+            // Tampilkan Comment jika ada dan bukan strip
+            if (!user.comment.isNullOrBlank() && user.comment != "-") {
+                binding.tvComment.text = user.comment
+                binding.tvComment.visibility = View.VISIBLE
+            } else {
+                binding.tvComment.visibility = View.GONE
+            }
         }
     }
 }

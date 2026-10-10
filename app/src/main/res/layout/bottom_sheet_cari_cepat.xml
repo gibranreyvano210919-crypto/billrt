@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_bottom_sheet_white"
+    android:orientation="vertical"
+    android:padding="20dp">
+
+    <!-- Handle Bar -->
+    <View
+        android:layout_width="40dp"
+        android:layout_height="4dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="16dp"
+        android:background="#DEDEDE" />
+
+    <!-- Header -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:layout_marginBottom="16dp">
+
+        <ImageView
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="@drawable/bg_circle_primary_light"
+            android:contentDescription="@null"
+            android:padding="10dp"
+            android:src="@drawable/ic_search"
+            app:tint="?attr/colorPrimary" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tv_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Aksi Pelanggan"
+                android:textColor="#1E293B"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tv_nama_pelanggan"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:textColor="#64748B"
+                android:textSize="13sp"
+                tools:text="Nama: agungsuroyoande" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginBottom="16dp"
+        android:background="#E2E8F0" />
+
+    <!-- Action 1: Konfirmasi Pembayaran Multi -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_bayar_multi"
+        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
+        android:backgroundTint="#F0FDF4"
+        android:gravity="start|center_vertical"
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="14dp"
+        android:text="Konfirmasi Pembayaran Multi"
+        android:textAllCaps="false"
+        android:textColor="#15803D"
+        android:textSize="15sp"
+        android:textStyle="bold"
+        app:cornerRadius="12dp"
+        app:icon="@drawable/ic_pay"
+        app:iconPadding="12dp"
+        app:iconTint="#15803D"
+        app:strokeColor="#BBF7D0"
+        app:strokeWidth="1dp" />
+
+    <!-- Action 2: History Pembayaran -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_history_pembayaran"
+        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:backgroundTint="#EFF6FF"
+        android:gravity="start|center_vertical"
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="14dp"
+        android:text="History Pembayaran"
+        android:textAllCaps="false"
+        android:textColor="#1D4ED8"
+        android:textSize="15sp"
+        android:textStyle="bold"
+        app:cornerRadius="12dp"
+        app:icon="@drawable/ic_history"
+        app:iconPadding="12dp"
+        app:iconTint="#1D4ED8"
+        app:strokeColor="#BFDBFE"
+        app:strokeWidth="1dp" />
+
+</LinearLayout>

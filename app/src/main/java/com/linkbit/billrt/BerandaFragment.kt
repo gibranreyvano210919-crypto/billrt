@@ -16,6 +16,7 @@ import com.google.firebase.database.ValueEventListener
 import com.linkbit.billrt.adapter.NotificationAdapter
 import com.linkbit.billrt.adapter.PembayaranHariIniAdapter
 import com.linkbit.billrt.api.RetrofitClient
+import com.linkbit.billrt.api.BillStatementResponse
 import com.linkbit.billrt.databinding.FragmentBerandaBinding
 import com.linkbit.billrt.NotificationItem
 import com.linkbit.billrt.model.PembayaranHariIni
@@ -24,6 +25,7 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import java.text.SimpleDateFormat
+import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 
@@ -48,13 +50,14 @@ class BerandaFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        applyWindowInsets(binding.headerGradient)
+
         if (!isUserLoggedIn()) {
             findNavController().navigate(R.id.action_berandaFragment_to_loginFragment)
             return
         }
 
         binding.loadingProgressBar.visibility = View.VISIBLE
-        binding.mainContentScrollview.visibility = View.GONE
 
         setupWelcomeMessage()
         setupDateTime()
@@ -63,12 +66,13 @@ class BerandaFragment : BaseFragment() {
         setupPembayaranHariIniRecyclerView()
         listenForLatestNotifications()
         fetchPembayaranHariIni()
+        fetchIncomeExpense()
     }
 
     private fun setupWelcomeMessage() {
         val sharedPreferences = requireActivity().getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
-        val username = sharedPreferences.getString("USER_NAME", "Pengguna")
-        binding.tvWelcome.text = "Selamat Datang, $username!"
+        val username = sharedPreferences.getString("USER_NAME", "Administrator")
+        binding.tvWelcome.text = username
     }
 
     private fun setupDateTime() {
@@ -84,13 +88,80 @@ class BerandaFragment : BaseFragment() {
 
     private fun setupCardListeners() {
         val navController = findNavController()
+        val sharedPreferences = requireActivity().getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
+        val userId = sharedPreferences.getInt("USER_ID", -1)
+
         binding.apply {
-            cardUser.setOnClickListener { navController.navigate(R.id.action_berandaFragment_to_menuPelangganFragment) }
-            cardMikrotik.setOnClickListener { navController.navigate(R.id.action_berandaFragment_to_mikrotikAccountsFragment) }
-            cardMap.setOnClickListener { navController.navigate(R.id.action_berandaFragment_to_mapMenuFragment) }
-            cardOlt.setOnClickListener { navController.navigate(R.id.action_berandaFragment_to_smartOltMonitorFragment) }
-            cardPembukuan.setOnClickListener { navController.navigate(R.id.action_berandaFragment_to_pembukuanFragment) }
-            btnLihatSemuaNotifikasi.setOnClickListener { navController.navigate(R.id.action_berandaFragment_to_riwayatNotifikasiFragment) }
+            cardUser.setOnClickListener {
+                if (navController.currentDestination?.id == R.id.berandaFragment) {
+                    navController.navigate(R.id.action_berandaFragment_to_menuPelangganFragment)
+                }
+            }
+            cardMikrotik.setOnClickListener {
+                if (navController.currentDestination?.id == R.id.berandaFragment) {
+                    navController.navigate(R.id.action_berandaFragment_to_mikrotikAccountsFragment)
+                }
+            }
+            cardMap.setOnClickListener {
+                if (navController.currentDestination?.id == R.id.berandaFragment) {
+                    navController.navigate(R.id.action_berandaFragment_to_mapMenuFragment)
+                }
+            }
+            cardOlt.setOnClickListener {
+                if (navController.currentDestination?.id == R.id.berandaFragment) {
+                    navController.navigate(R.id.action_berandaFragment_to_smartOltMonitorFragment)
+                }
+            }
+            cardMonitorOlt.setOnClickListener {
+                if (navController.currentDestination?.id == R.id.berandaFragment) {
+                    navController.navigate(R.id.action_berandaFragment_to_oltMonitorFragment)
+                }
+            }
+            cardPembukuan.setOnClickListener {
+                if (navController.currentDestination?.id == R.id.berandaFragment) {
+                    navController.navigate(R.id.action_berandaFragment_to_pembukuanFragment)
+                }
+            }
+            tvTotalIncome.setOnClickListener {
+                if (userId == 1) {
+                    if (navController.currentDestination?.id == R.id.berandaFragment) {
+                        navController.navigate(R.id.action_berandaFragment_to_billStatementFragment)
+                    }
+                }
+            }
+            tvTotalExpense.setOnClickListener {
+                if (userId == 1) {
+                    if (navController.currentDestination?.id == R.id.berandaFragment) {
+                        navController.navigate(R.id.action_berandaFragment_to_billStatementFragment)
+                    }
+                }
+            }
+
+            btnLihatSemuaNotifikasi.setOnClickListener {
+                if (navController.currentDestination?.id == R.id.berandaFragment) {
+                    navController.navigate(R.id.action_berandaFragment_to_riwayatNotifikasiFragment)
+                }
+            }
+            btnLihatSemuaPembayaran.setOnClickListener {
+                if (userId == 1) {
+                    if (navController.currentDestination?.id == R.id.berandaFragment) {
+                        navController.navigate(R.id.action_berandaFragment_to_pembayaranHariIniFragment)
+                    }
+                }
+            }
+
+            // Listener tunggal untuk Transaksi Lain (Lonceng)
+            ivTransaksiLain.setOnClickListener {
+                if (navController.currentDestination?.id == R.id.berandaFragment) {
+                    navController.navigate(R.id.action_berandaFragment_to_transaksiLainFragment)
+                }
+            }
+
+            fabAi.setOnClickListener {
+                if (navController.currentDestination?.id == R.id.berandaFragment) {
+                    navController.navigate(R.id.action_berandaFragment_to_aiFragment)
+                }
+            }
         }
     }
 
@@ -104,7 +175,10 @@ class BerandaFragment : BaseFragment() {
     }
 
     private fun setupPembayaranHariIniRecyclerView() {
-        pembayaranHariIniAdapter = PembayaranHariIniAdapter(pembayaranHariIniList)
+        val sharedPreferences = requireActivity().getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
+        val userId = sharedPreferences.getInt("USER_ID", -1)
+        
+        pembayaranHariIniAdapter = PembayaranHariIniAdapter(pembayaranHariIniList, userId)
         binding.rvPembayaranHariIni.apply {
             layoutManager = LinearLayoutManager(context)
             adapter = pembayaranHariIniAdapter
@@ -113,7 +187,7 @@ class BerandaFragment : BaseFragment() {
     }
 
     private fun listenForLatestNotifications() {
-        notificationsRef.limitToLast(10).addListenerForSingleValueEvent(object : ValueEventListener {
+        notificationsRef.limitToLast(3).addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 if (!isAdded || _binding == null) return
 
@@ -126,14 +200,11 @@ class BerandaFragment : BaseFragment() {
                 notificationAdapter.submitList(tempList.reversed())
 
                 binding.loadingProgressBar.visibility = View.GONE
-                binding.mainContentScrollview.visibility = View.VISIBLE
             }
 
             override fun onCancelled(error: DatabaseError) {
                 if (_binding != null) {
-                    Log.w("BerandaFragment", "Gagal membaca notifikasi.", error.toException())
                     binding.loadingProgressBar.visibility = View.GONE
-                    binding.mainContentScrollview.visibility = View.VISIBLE
                 }
             }
         })
@@ -142,28 +213,64 @@ class BerandaFragment : BaseFragment() {
     private fun fetchPembayaranHariIni() {
         RetrofitClient.instance.getPembayaranHariIni().enqueue(object : Callback<PembayaranHariIniResponse> {
             override fun onResponse(call: Call<PembayaranHariIniResponse>, response: Response<PembayaranHariIniResponse>) {
+                if (!isAdded || _binding == null) return
                 if (response.isSuccessful) {
                     response.body()?.let {
                         if (it.status) {
                             pembayaranHariIniList.clear()
-                            pembayaranHariIniList.addAll(it.data)
+                            pembayaranHariIniList.addAll(it.data.take(3))
                             pembayaranHariIniAdapter.notifyDataSetChanged()
-                        } else {
-                            if(isAdded && _binding != null) {
-                                Toast.makeText(context, "Gagal memuat data pembayaran", Toast.LENGTH_SHORT).show()
-                            }
                         }
-                    }
-                } else {
-                    if(isAdded && _binding != null) {
-                        Toast.makeText(context, "Gagal memuat data pembayaran", Toast.LENGTH_SHORT).show()
                     }
                 }
             }
 
             override fun onFailure(call: Call<PembayaranHariIniResponse>, t: Throwable) {
                 if (!isAdded || _binding == null) return
-                Toast.makeText(context, "Error: ${t.message}", Toast.LENGTH_SHORT).show()
+                binding.loadingProgressBar.visibility = View.GONE
+                showNetworkErrorDialog(requireContext(), t) {
+                    binding.loadingProgressBar.visibility = View.VISIBLE
+                    fetchPembayaranHariIni()
+                    fetchIncomeExpense()
+                }
+            }
+        })
+    }
+
+    private fun fetchIncomeExpense() {
+        val calendar = Calendar.getInstance()
+        val month = calendar.get(Calendar.MONTH) + 1
+        val year = calendar.get(Calendar.YEAR)
+
+        RetrofitClient.instance.getBillStatement(month, year).enqueue(object : Callback<BillStatementResponse> {
+            override fun onResponse(call: Call<BillStatementResponse>, response: Response<BillStatementResponse>) {
+                if (!isAdded || _binding == null) return
+                if (response.isSuccessful) {
+                    response.body()?.let {
+                        if (it.status) {
+                            val sharedPreferences = requireActivity().getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
+                            val userId = sharedPreferences.getInt("USER_ID", -1)
+
+                            if (userId != 1) {
+                                binding.tvTotalIncome.text = "••••••"
+                                binding.tvTotalExpense.text = "••••••"
+                            } else {
+                                binding.tvTotalIncome.text = it.summary.incomeFormat
+                                binding.tvTotalExpense.text = it.summary.expenseFormat
+                            }
+                        }
+                    }
+                }
+            }
+
+            override fun onFailure(call: Call<BillStatementResponse>, t: Throwable) {
+                if (!isAdded || _binding == null) return
+                binding.loadingProgressBar.visibility = View.GONE
+                showNetworkErrorDialog(requireContext(), t) {
+                    binding.loadingProgressBar.visibility = View.VISIBLE
+                    fetchPembayaranHariIni()
+                    fetchIncomeExpense()
+                }
             }
         })
     }

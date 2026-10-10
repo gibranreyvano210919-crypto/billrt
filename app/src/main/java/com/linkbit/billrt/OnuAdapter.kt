@@ -26,7 +26,18 @@ class OnuAdapter(private var onuList: List<SmartOnuItem>) : RecyclerView.Adapter
 
     inner class OnuViewHolder(private val binding: ItemOnuDetailBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(onu: SmartOnuItem) {
-            binding.tvOnuName.text = onu.name ?: "N/A"
+            // Logika tampilan nama:
+            // 1. Nama Pelanggan (jika ada dan valid)
+            // 2. Jika tidak ada nama pelanggan, tampilkan MAC Address (SN)
+            // 3. Jika tidak ada SN, tampilkan deskripsi dari OLT (name)
+            val displayName = when {
+                !onu.customerName.isNullOrBlank() && onu.customerName != "N/A" -> onu.customerName
+                !onu.sn.isNullOrBlank() && onu.sn != "N/A" -> onu.sn
+                !onu.name.isNullOrBlank() -> onu.name
+                else -> "N/A"
+            }
+            
+            binding.tvOnuName.text = displayName
             binding.tvOnuSn.text = "SN: ${onu.sn ?: "-"}"
             binding.tvOnuPower.text = "Power: ${onu.power ?: "-"}"
             binding.tvOltName.text = "(OLT: ${onu.oltName})"

@@ -14,7 +14,6 @@ import com.google.firebase.database.ValueEventListener
 import com.linkbit.billrt.adapter.RiwayatRedamanAdapter
 import com.linkbit.billrt.databinding.FragmentRiwayatRedamanBinding
 import com.linkbit.billrt.model.RiwayatRedamanItem
-import java.util.Locale
 
 class RiwayatRedamanFragment : BaseFragment() {
 
@@ -71,7 +70,7 @@ class RiwayatRedamanFragment : BaseFragment() {
 
     private fun fetchDataFromFirebase() {
         binding.progressBarRiwayat.visibility = View.VISIBLE
-        val macAddress = args.macAddress.toUpperCase(Locale.ROOT)
+        val macAddress = args.macAddress.uppercase()
 
         val dbRef = FirebaseDatabase.getInstance("https://redaman-5b2ae-default-rtdb.asia-southeast1.firebasedatabase.app/").getReference("redaman")
         val query = dbRef.orderByChild("mac").equalTo(macAddress)

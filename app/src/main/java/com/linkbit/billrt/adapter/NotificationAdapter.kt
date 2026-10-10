@@ -2,13 +2,13 @@ package com.linkbit.billrt.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.linkbit.billrt.NotificationItem
 import com.linkbit.billrt.databinding.ItemNotifikasiBinding
 
-class NotificationAdapter : RecyclerView.Adapter<NotificationAdapter.ViewHolder>() {
-
-    private val items = mutableListOf<NotificationItem>()
+class NotificationAdapter : ListAdapter<NotificationItem, NotificationAdapter.ViewHolder>(DiffCallback()) {
 
     class ViewHolder(val binding: ItemNotifikasiBinding) : RecyclerView.ViewHolder(binding.root)
 
@@ -18,7 +18,7 @@ class NotificationAdapter : RecyclerView.Adapter<NotificationAdapter.ViewHolder>
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val item = items[position]
+        val item = getItem(position)
         holder.binding.apply {
             tvNotificationTitle.text = item.title
             tvNotificationBody.text = item.message
@@ -26,11 +26,14 @@ class NotificationAdapter : RecyclerView.Adapter<NotificationAdapter.ViewHolder>
         }
     }
 
-    override fun getItemCount() = items.size
+    class DiffCallback : DiffUtil.ItemCallback<NotificationItem>() {
+        override fun areItemsTheSame(oldItem: NotificationItem, newItem: NotificationItem): Boolean {
+            // Menggunakan time dan title sebagai identifier unik sederhana jika tidak ada ID
+            return oldItem.time == newItem.time && oldItem.title == newItem.title
+        }
 
-    fun submitList(newItems: List<NotificationItem>) {
-        items.clear()
-        items.addAll(newItems)
-        notifyDataSetChanged()
+        override fun areContentsTheSame(oldItem: NotificationItem, newItem: NotificationItem): Boolean {
+            return oldItem == newItem
+        }
     }
 }

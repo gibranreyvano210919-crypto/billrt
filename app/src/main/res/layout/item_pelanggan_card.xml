@@ -4,99 +4,162 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="8dp"
-    app:cardElevation="4dp"
-    app:cardCornerRadius="8dp">
+    android:layout_marginHorizontal="8dp"
+    android:layout_marginVertical="3dp"
+    app:cardElevation="2dp"
+    app:cardCornerRadius="8dp"
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="?attr/selectableItemBackground">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="16dp">
+        android:orientation="vertical"
+        android:padding="8dp">
 
-        <TextView
-            android:id="@+id/tvNamaPelanggan"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/btnMenuPelanggan"
-            android:layout_marginEnd="8dp"
-            tools:text="Nama Pelanggan" />
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
 
-        <ImageButton
-            android:id="@+id/btnMenuPelanggan"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="Opsi Pelanggan"
-            android:src="@android:drawable/ic_menu_more" 
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            <TextView
+                android:id="@+id/tvNamaPelanggan"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_toStartOf="@+id/btnMenuPelanggan"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:textColor="@color/black"
+                tools:text="Nama Pelanggan" />
+
+            <ImageButton
+                android:id="@+id/btnMenuPelanggan"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:layout_alignParentEnd="true"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@android:drawable/ic_menu_more"
+                app:tint="@color/grey_600" />
+        </RelativeLayout>
 
         <TextView
             android:id="@+id/tvIdPelanggan"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tvNamaPelanggan"
-            tools:text="ID: 12345" />
-
-        <TextView
-            android:id="@+id/tvAlamat"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tvIdPelanggan"
-            app:layout_constraintEnd_toEndOf="parent"
-            tools:text="Alamat: Jl. Jendral Sudirman No. 1" />
+            android:layout_marginTop="1dp"
+            android:textSize="12sp"
+            android:textColor="@color/grey_600"
+            tools:text="ID: 100012" />
 
         <TextView
             android:id="@+id/tvWilayah"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tvAlamat"
-            app:layout_constraintEnd_toEndOf="parent"
-            tools:text="Wilayah: Nunggalan" />
-
-        <TextView
-            android:id="@+id/tvStatusBerlangganan"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:textAppearance="@style/TextAppearance.MaterialComponents.Caption"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tvWilayah"
-            tools:text="Status: Aktif" />
+            android:layout_marginTop="1dp"
+            android:textSize="12sp"
+            android:textColor="@color/grey_600"
+            tools:text="Wilayah: Kranggan" />
 
-        <Button
-            android:id="@+id/btnLihatDetail"
-            style="@style/Widget.MaterialComponents.Button.TextButton"
-            android:layout_width="wrap_content"
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginVertical="4dp"
+            android:background="#EEEEEE" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Lihat Detail"
-            android:layout_marginTop="8dp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tvStatusBerlangganan" />
+            android:orientation="horizontal"
+            android:baselineAligned="false">
 
-        <Button
-            android:id="@+id/btnEdit"
-            style="@style/Widget.MaterialComponents.Button.TextButton"
-            android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Tgl Pasang"
+                    android:textSize="11sp"
+                    android:textColor="#757575" />
+
+                <TextView
+                    android:id="@+id/tvTglPasang"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/black"
+                    tools:text="15 Feb 2026" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Alamat"
+                    android:textSize="11sp"
+                    android:textColor="#757575" />
+
+                <TextView
+                    android:id="@+id/tvAlamat"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="12sp"
+                    android:textColor="@color/black"
+                    android:maxLines="1"
+                    android:ellipsize="end"
+                    tools:text="Glonggong" />
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Edit"
-            app:layout_constraintStart_toEndOf="@+id/btnLihatDetail"
-            app:layout_constraintTop_toTopOf="@+id/btnLihatDetail"
-            app:layout_constraintBottom_toBottomOf="@+id/btnLihatDetail"
-            android:layout_marginStart="8dp" />
+            android:layout_marginTop="4dp">
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+            <TextView
+                android:id="@+id/tvStatusBerlangganan"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:textSize="11sp"
+                android:textColor="#757575"
+                android:textStyle="italic"
+                tools:text="Daftar: 2026-02-15" />
 
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnEdit"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="28dp"
+                android:layout_alignParentEnd="true"
+                android:minHeight="28dp"
+                android:padding="0dp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:text="EDIT"
+                android:textSize="11sp"
+                android:textStyle="bold"
+                app:icon="@drawable/ic_update"
+                app:iconSize="12dp" />
+
+            <Button
+                android:id="@+id/btnLihatDetail"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:visibility="gone" />
+
+        </RelativeLayout>
+
+    </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

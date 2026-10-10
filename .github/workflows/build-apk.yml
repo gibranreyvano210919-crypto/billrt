@@ -1,13 +1,16 @@
-name: Build Android APK
+name: Build Android APK and Send to Telegram
 
 on:
   push:
     branches:
-      - main  # Sekarang sudah sesuai dengan branch 'main' kamu
+      - main  # Berjalan otomatis setiap ada push ke branch main
+  workflow_dispatch:  # Bisa dijalankan manual dari tab Actions di GitHub
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
 
     steps:
       - name: Checkout Code
@@ -26,8 +29,43 @@ jobs:
       - name: Build Debug APK
         run: ./gradlew assembleDebug
 
-      - name: Upload APK Artifact
-        uses: actions/upload-artifact@v4
+      - name: Create or Update GitHub Release (Direct Download)
+        uses: ncipollo/release-action@v1
         with:
-          name: Aplikasi-Billrt-Debug
-          path: app/build/outputs/apk/debug/*.apk
+          tag: "latest"
+          name: "Latest Build APK"
+          allowUpdates: true
+          recreate: true
+          artifacts: "app/build/outputs/apk/**/*.apk"
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Send APK File directly to Telegram Bot
+        env:
+          TELEGRAM_BOT_TOKEN: "5818535303:AAE78Ew9YsjdDEjWqXW0y-NkkoZ5bGCvuzg"
+          TELEGRAM_CHAT_ID: "5396063519"
+        run: |
+          # Cari file APK hasil build (utamakan arm64-v8a atau apk pertama)
+          APK_PATH=$(find app/build/outputs/apk/ -type f -name "*.apk" | grep "arm64-v8a" | head -n 1)
+          if [ -z "$APK_PATH" ]; then
+            APK_PATH=$(find app/build/outputs/apk/ -type f -name "*.apk" | head -n 1)
+          fi
+
+          if [ -f "$APK_PATH" ]; then
+            APK_NAME=$(basename "$APK_PATH")
+            # Hitung ukuran dalam MB
+            FILE_SIZE_BYTES=$(stat -c%s "$APK_PATH")
+            FILE_SIZE_MB=$(echo "scale=2; $FILE_SIZE_BYTES / 1048576" | bc)
+            
+            DIRECT_DOWNLOAD_URL="${{ github.server_url }}/${{ github.repository }}/releases/download/latest/$APK_NAME"
+            RUN_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+            
+            CAPTION=$(printf "✅ Build APK GitHub Actions Berhasil! (Billrt Lite)\n\n📦 File: %s (%s MB)\n\n📥 Direct Download Link APK:\n%s\n\n🔗 Workflow Run:\n%s" "$APK_NAME" "$FILE_SIZE_MB" "$DIRECT_DOWNLOAD_URL" "$RUN_URL")
+
+            echo "Mengirim $APK_NAME ($FILE_SIZE_MB MB) ke Telegram..."
+            curl -s -X POST "https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/sendDocument" \
+                 -F "chat_id=$TELEGRAM_CHAT_ID" \
+                 -F "document=@$APK_PATH" \
+                 -F "caption=$CAPTION"
+          else
+            echo "File APK tidak ditemukan!"
+          fi

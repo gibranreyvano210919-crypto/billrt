@@ -5,15 +5,16 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.fragment.app.Fragment
+import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.linkbit.billrt.databinding.FragmentSettingBinding
 
-class SettingFragment : Fragment() {
+class SettingFragment : BaseFragment() {
 
     private var _binding: FragmentSettingBinding? = null
     private val binding get() = _binding!!
+    private lateinit var sessionManager: SessionManager
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -25,17 +26,21 @@ class SettingFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        sessionManager = SessionManager(requireContext())
+
+        applyWindowInsets(binding.toolbar)
+        setupUserData()
 
         val settingItems = listOf(
-            SettingItem("pengaturan_perusahaan", "Pengaturan Perusahaan", android.R.drawable.ic_menu_manage),
-            SettingItem("master_wilayah", "Master Wilayah", android.R.drawable.ic_menu_mapmode),
-            SettingItem("master_paket", "Master Paket Internet", android.R.drawable.ic_menu_sort_by_size),
-            SettingItem("generate_tagihan", "Generate Tagihan", android.R.drawable.ic_menu_add),
-            SettingItem("setting_lokasi", "Pengaturan Lokasi", android.R.drawable.ic_menu_edit),
-            SettingItem("pilih_printer", "Pilih Printer Bluetooth", android.R.drawable.ic_menu_save),
-            SettingItem("info_akun", "Informasi Akun", android.R.drawable.ic_menu_myplaces),
-            SettingItem("cek_update", "Cek Update", android.R.drawable.ic_menu_rotate),
-            SettingItem("logout", "Logout", android.R.drawable.ic_lock_power_off)
+            SettingItem("pengaturan_perusahaan", "Pengaturan Perusahaan", R.drawable.ic_business),
+            SettingItem("master_wilayah", "Master Wilayah", R.drawable.ic_map),
+            SettingItem("master_paket", "Master Paket Internet", R.drawable.ic_router),
+            SettingItem("generate_tagihan", "Generate Tagihan", R.drawable.ic_receipt),
+            SettingItem("setting_lokasi", "Pengaturan Lokasi", R.drawable.ic_location),
+            SettingItem("pilih_printer", "Pilih Printer Bluetooth", R.drawable.ic_print),
+            SettingItem("info_akun", "Informasi Akun", R.drawable.ic_person),
+            SettingItem("cek_update", "Cek Update", R.drawable.ic_update),
+            SettingItem("logout", "Logout", R.drawable.ic_logout)
         )
 
         val settingAdapter = SettingAdapter(settingItems) { selectedItem ->
@@ -65,7 +70,7 @@ class SettingFragment : Fragment() {
                     checkForUpdates()
                 }
                 "logout" -> {
-                    // TODO: Implement logout logic (clear session, navigate to login)
+                    sessionManager.logoutUser()
                     findNavController().navigate(R.id.loginFragment)
                     Toast.makeText(context, "Logout berhasil", Toast.LENGTH_SHORT).show()
                 }
@@ -75,7 +80,16 @@ class SettingFragment : Fragment() {
         binding.rvSettings.apply {
             layoutManager = LinearLayoutManager(context)
             adapter = settingAdapter
+            isNestedScrollingEnabled = false
         }
+
+        binding.tvAppVersion.text = "Versi ${BuildConfig.VERSION_NAME}"
+    }
+
+    private fun setupUserData() {
+        binding.tvUserName.text = sessionManager.getUserName() ?: "Administrator"
+        // Anda bisa menambahkan role jika tersedia di sessionManager
+        binding.tvUserRole.text = "Petugas Lapangan"
     }
 
     private fun checkForUpdates() {

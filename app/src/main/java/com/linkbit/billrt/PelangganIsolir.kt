@@ -12,8 +12,9 @@ data class PelangganIsolir(
     @SerializedName("id_pelanggan") val idPelanggan: String,
     @SerializedName("nama_pelanggan") val namaPelanggan: String?,
     @SerializedName("telepon_pelanggan") val teleponPelanggan: String?,
-    @SerializedName("id_wilayah") val idWilayah: String?,
-    @SerializedName("mikrotik_username") val mikrotikUsername: String?,
-    @SerializedName("installation_date") val installationDate: String?,
-    @SerializedName("tgl_daftar") val tglDaftar: String?
+    @SerializedName("alamat") val alamat: String?,
+    @SerializedName("status_aktif") val statusAktif: String?,
+    @SerializedName("nama_wilayah") val namaWilayah: String?,
+    @SerializedName("tgl_isolir", alternate = ["tanggal_isolasi", "tgl_isolasi", "tgl_jatuh_tempo"]) val tglIsolir: String?,
+    @SerializedName("mikrotik_username") val mikrotikUsername: String?
 )

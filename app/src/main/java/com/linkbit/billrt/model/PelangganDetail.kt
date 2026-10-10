@@ -1,5 +1,7 @@
 package com.linkbit.billrt.model
 
+import com.google.gson.annotations.SerializedName
+
 data class PelangganDetail(
     val id_pelanggan: Int,
     val no_urut: Int,
@@ -27,6 +29,7 @@ data class PelangganDetail(
     val tgl_daftar: String,
     val tgl_instalasi: String,
     val tgl_expired: String?,
+    @SerializedName("tanggal_isolasi", alternate = ["tgl_isolasi", "tgl_jatuh_tempo", "jatuh_tempo"]) val tanggal_isolasi: String? = null,
     val last_paid: String?,
     val created_at: String,
     val latitude: Double,

@@ -1,26 +1,19 @@
 package com.linkbit.billrt
 
-import android.content.Context
-import android.graphics.Bitmap
-import android.graphics.Canvas
+import android.R
 import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
-import com.google.gson.Gson
 import com.linkbit.billrt.databinding.FragmentOdpLokasiPelangganMapBinding
-import com.mapbox.geojson.Point
-import com.mapbox.maps.CameraOptions
-import com.mapbox.maps.MapView
-import com.mapbox.maps.Style
-import com.mapbox.maps.plugin.annotation.annotations
-import com.mapbox.maps.plugin.annotation.generated.*
-import com.mapbox.maps.plugin.annotation.generated.createPointAnnotationManager
-import com.mapbox.maps.plugin.annotation.generated.createPolylineAnnotationManager
+import org.osmdroid.tileprovider.tilesource.TileSourceFactory
+import org.osmdroid.util.GeoPoint
+import org.osmdroid.views.MapView
+import org.osmdroid.views.overlay.Marker
+import org.osmdroid.views.overlay.Polyline
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -30,8 +23,6 @@ class OdpLokasiPelangganMapFragment : BaseFragment() {
     private var _binding: FragmentOdpLokasiPelangganMapBinding? = null
     private val binding get() = _binding!!
     private var mapView: MapView? = null
-    private var pointAnnotationManager: PointAnnotationManager? = null
-    private var lineAnnotationManager: PolylineAnnotationManager? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentOdpLokasiPelangganMapBinding.inflate(inflater, container, false)
@@ -41,6 +32,8 @@ class OdpLokasiPelangganMapFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         mapView = binding.mapViewOdpLokasi
+        mapView?.setTileSource(TileSourceFactory.MAPNIK)
+        mapView?.setMultiTouchControls(true)
         fetchOdpData()
     }
 
@@ -68,63 +61,65 @@ class OdpLokasiPelangganMapFragment : BaseFragment() {
     }
 
     private fun setupMap(odpList: List<OdpData>) {
-        mapView?.mapboxMap?.loadStyle(Style.SATELLITE_STREETS) { style ->
-            val odpIcon = bitmapFromVector(requireContext(), android.R.drawable.ic_dialog_map)
-            if (odpIcon != null) {
-                style.addImage("odp_icon", odpIcon)
-            }
+        val currentMapView = mapView ?: return
+        currentMapView.overlays.clear()
 
-            val annotationApi = mapView?.annotations
-            pointAnnotationManager = annotationApi?.createPointAnnotationManager()
-            lineAnnotationManager = annotationApi?.createPolylineAnnotationManager()
+        val odpIcon = ContextCompat.getDrawable(requireContext(), R.drawable.ic_dialog_map)
 
-            val lineOptionsList = mutableListOf<PolylineAnnotationOptions>()
+        odpList.forEach { odp ->
+            val odpLat = odp.latitude
+            val odpLng = odp.longitude
+            if (odpLat != null && odpLng != null) {
+                val odpPoint = GeoPoint(odpLat, odpLng)
 
-            val optionsList = odpList.mapNotNull { odp ->
-                if (odp.latitude != null && odp.longitude != null) {
-                    odp.listPorts?.forEach { port ->
-                        if (port.custLat != null && port.custLng != null) {
-                            val points = listOf(Point.fromLngLat(odp.longitude, odp.latitude), Point.fromLngLat(port.custLng, port.custLat))
-                            lineOptionsList.add(
-                                PolylineAnnotationOptions()
-                                    .withPoints(points)
-                                    .withLineColor(Color.RED)
-                                    .withLineWidth(2.0)
-                            )
+                // Add ODP Marker
+                val marker = Marker(currentMapView).apply {
+                    position = odpPoint
+                    title = odp.namaOdp
+                    icon = odpIcon
+                    setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+                }
+                currentMapView.overlays.add(marker)
+
+                // Add lines to ports
+                odp.listPorts?.forEach { port ->
+                    val custLat = port.custLat
+                    val custLng = port.custLng
+                    if (custLat != null && custLng != null) {
+                        val custPoint = GeoPoint(custLat, custLng)
+                        val polyline = Polyline(currentMapView).apply {
+                            setPoints(listOf(odpPoint, custPoint))
+                            outlinePaint.color = Color.RED
+                            outlinePaint.strokeWidth = 4f
                         }
+                        currentMapView.overlays.add(polyline)
                     }
-                    PointAnnotationOptions()
-                        .withPoint(Point.fromLngLat(odp.longitude, odp.latitude))
-                        .withTextField(odp.namaOdp)
-                        .withTextColor(Color.WHITE)
-                        .withIconImage("odp_icon")
-                        .withData(Gson().toJsonTree(odp))
-                } else null
-            }
-
-            pointAnnotationManager?.create(optionsList)
-            lineAnnotationManager?.create(lineOptionsList)
-
-            if (odpList.isNotEmpty()) {
-                odpList.firstOrNull { it.latitude != null && it.longitude != null }?.let {
-                    mapView?.mapboxMap?.setCamera(CameraOptions.Builder().center(Point.fromLngLat(it.longitude!!, it.latitude!!)).zoom(12.0).build())
                 }
             }
         }
+
+        if (odpList.isNotEmpty()) {
+            odpList.firstOrNull { it.latitude != null && it.longitude != null }?.let {
+                currentMapView.controller.setZoom(13.0)
+                currentMapView.controller.setCenter(GeoPoint(it.latitude!!, it.longitude!!))
+            }
+        }
+
+        currentMapView.invalidate()
     }
 
-    private fun bitmapFromVector(context: Context, vectorResId: Int): Bitmap? {
-        val vectorDrawable = ContextCompat.getDrawable(context, vectorResId) ?: return null
-        vectorDrawable.setBounds(0, 0, vectorDrawable.intrinsicWidth, vectorDrawable.intrinsicHeight)
-        val bitmap = Bitmap.createBitmap(vectorDrawable.intrinsicWidth, vectorDrawable.intrinsicHeight, Bitmap.Config.ARGB_8888)
-        val canvas = Canvas(bitmap)
-        vectorDrawable.draw(canvas)
-        return bitmap
+    override fun onResume() {
+        super.onResume()
+        mapView?.onResume()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        mapView?.onPause()
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
-        mapView?.onDestroy()
         _binding = null
     }
 }

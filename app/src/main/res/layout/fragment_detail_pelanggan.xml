@@ -1,108 +1,443 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:context=".DetailPelangganFragment">
 
-    <LinearLayout
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="16dp">
+        app:elevation="0dp">
 
-        <com.google.android.material.card.MaterialCardView
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:cardElevation="4dp">
+            android:minHeight="?attr/actionBarSize"
+            android:background="?attr/colorPrimary"
+            app:navigationIcon="@drawable/ic_arrow_back"
+            app:title="Detail Pelanggan"
+            app:titleTextColor="@android:color/white" />
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <androidx.core.widget.NestedScrollView
+            android:id="@+id/scrollView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="16dp">
+                android:padding="12dp">
 
-                <TextView
-                    android:id="@+id/tvDetailNamaPelanggan"
-                    android:layout_width="wrap_content"
+                <!-- Card 1: Identitas -->
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textAppearance="@style/TextAppearance.MaterialComponents.Headline5"
-                    tools:text="Nama Lengkap Pelanggan" />
+                    android:layout_marginBottom="12dp"
+                    app:cardCornerRadius="12dp"
+                    app:cardElevation="2dp">
 
-                <TextView
-                    android:id="@+id/tvDetailIdPelanggan"
-                    android:layout_width="wrap_content"
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="16dp">
+
+                        <TextView
+                            android:id="@+id/tvDetailNamaPelanggan"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textAppearance="@style/TextAppearance.MaterialComponents.Headline5"
+                            android:textStyle="bold"
+                            tools:text="riskiande" />
+
+                        <TextView
+                            android:id="@+id/tvDetailIdPelanggan"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
+                            tools:text="ID: 2408" />
+
+                        <TextView
+                            android:id="@+id/tvDetailTelepon"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:background="?attr/selectableItemBackground"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:drawablePadding="8dp"
+                            app:drawableStartCompat="@drawable/ic_user"
+                            app:drawableTint="?attr/colorPrimary"
+                            tools:text="-" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- Card 2: Tagihan -->
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
-                    tools:text="ID: PEL-001" />
+                    android:layout_marginBottom="12dp"
+                    app:cardCornerRadius="12dp"
+                    app:cardElevation="2dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="16dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Status Pembayaran"
+                            android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle2"
+                            android:textColor="?attr/colorPrimary"
+                            app:drawableStartCompat="@drawable/ic_pay"
+                            app:drawableTint="?attr/colorPrimary"
+                            android:drawablePadding="8dp" />
+
+                        <TextView
+                            android:id="@+id/tvRekapStatusTagihan"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
+                            android:textStyle="bold"
+                            tools:text="4 tagihan belum dibayarkan" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- Card 3: Jaringan (Mikrotik Sync) -->
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="12dp"
+                    app:cardCornerRadius="12dp"
+                    app:cardElevation="2dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="16dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Informasi Jaringan (Real-time)"
+                            android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle2"
+                            android:textColor="?attr/colorPrimary"
+                            app:drawableStartCompat="@drawable/ic_router"
+                            app:drawableTint="?attr/colorPrimary"
+                            android:drawablePadding="8dp" />
+
+                        <TextView
+                            android:id="@+id/tvSyncStatus"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:textAppearance="@style/TextAppearance.MaterialComponents.Caption"
+                            android:textColor="@android:color/holo_red_dark"
+                            android:visibility="gone"
+                            tools:text="Error: MikroTik Unreachable"
+                            tools:visibility="visible" />
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:layout_marginTop="8dp"
+                            android:layout_marginBottom="8dp"
+                            android:background="#EEEEEE" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal">
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="PPPoE User" />
+                            <TextView
+                                android:id="@+id/tvDetailUsernameMikrotik"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textStyle="bold"
+                                tools:text="username" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:orientation="horizontal">
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="Status Koneksi" />
+                            <TextView
+                                android:id="@+id/tvStatusKoneksi"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textStyle="bold"
+                                tools:text="Online" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:orientation="horizontal">
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="Uptime" />
+                            <TextView
+                                android:id="@+id/tvUptime"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                tools:text="01:23:45" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:orientation="horizontal">
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="IP Address Aktif" />
+                            <TextView
+                                android:id="@+id/tvIpAktif"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                tools:text="-" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:orientation="horizontal">
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="MAC Live" />
+                            <TextView
+                                android:id="@+id/tvMacLive"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                tools:text="-" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:orientation="vertical">
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="MAC Address (Database)" />
+                            <TextView
+                                android:id="@+id/tvDetailMacAddress"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="2dp"
+                                android:background="?attr/selectableItemBackground"
+                                android:clickable="true"
+                                android:focusable="true"
+                                android:padding="4dp"
+                                android:textStyle="bold"
+                                tools:text="-" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:orientation="horizontal">
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="Usage Sesi Ini" />
+                            <TextView
+                                android:id="@+id/tvTotalUsage"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textStyle="bold"
+                                tools:text="0 MB" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:orientation="horizontal">
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="Terakhir Logout" />
+                            <TextView
+                                android:id="@+id/tvLastLogout"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                tools:text="-" />
+                        </LinearLayout>
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- Card 4: Detail Pemasangan -->
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="12dp"
+                    app:cardCornerRadius="12dp"
+                    app:cardElevation="2dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="16dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Detail Pemasangan"
+                            android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle2"
+                            android:textColor="?attr/colorPrimary"
+                            app:drawableStartCompat="@drawable/ic_location_pin"
+                            app:drawableTint="?attr/colorPrimary"
+                            android:drawablePadding="8dp" />
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:layout_marginTop="8dp"
+                            android:layout_marginBottom="8dp"
+                            android:background="#EEEEEE" />
+
+                        <TextView
+                            android:id="@+id/tvTglDaftar"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            tools:text="Tgl Daftar: -" />
+
+                        <TextView
+                            android:id="@+id/tvTglInstalasi"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            tools:text="Tgl Instalasi: -" />
+
+                        <TextView
+                            android:id="@+id/tvDetailAlamat"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            tools:text="Alamat: -" />
+
+                        <TextView
+                            android:id="@+id/tvKoordinat"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            tools:text="Koordinat: -" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- Card 5: Paket & Wilayah -->
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="12dp"
+                    app:cardCornerRadius="12dp"
+                    app:cardElevation="2dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="16dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Layanan &amp; Lokasi"
+                            android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle2"
+                            android:textColor="?attr/colorPrimary"
+                            app:drawableStartCompat="@drawable/ic_audit"
+                            app:drawableTint="?attr/colorPrimary"
+                            android:drawablePadding="8dp" />
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:layout_marginTop="8dp"
+                            android:layout_marginBottom="8dp"
+                            android:background="#EEEEEE" />
+
+                        <TextView
+                            android:id="@+id/tvNamaPaket"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:textStyle="bold"
+                            tools:text="-" />
+
+                        <TextView
+                            android:id="@+id/tvHargaPaket"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            tools:text="-" />
+
+                        <TextView
+                            android:id="@+id/tvProfileMikrotik"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            tools:text="Profile: -" />
+
+                        <TextView
+                            android:id="@+id/tvDetailWilayah"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            tools:text="Wilayah: -" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
             </LinearLayout>
-        </com.google.android.material.card.MaterialCardView>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:text="Informasi Kontak"
-            android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6" />
-
-        <TextView
-            android:id="@+id/tvDetailAlamat"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            tools:text="Alamat: Jl. Pahlawan No. 123" />
-
-        <TextView
-            android:id="@+id/tvDetailTelepon"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            tools:text="Telepon: 08123456789" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:text="Informasi Jaringan"
-            android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6" />
-
-        <TextView
-            android:id="@+id/tvDetailWilayah"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            tools:text="Wilayah: Suka Maju" />
-
-        <TextView
-            android:id="@+id/tvDetailUsernameMikrotik"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            tools:text="Username: pelanggan.satu" />
-
-        <TextView
-            android:id="@+id/tvDetailIpStatic"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            tools:text="IP Statis: 192.168.100.1" />
-
-        <TextView
-            android:id="@+id/tvDetailMacAddress"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            tools:text="MAC: AA:BB:CC:DD:EE:FF" />
+        </androidx.core.widget.NestedScrollView>
 
         <ProgressBar
             android:id="@+id/progressBarDetail"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginTop="16dp"
+            android:layout_gravity="center"
             android:visibility="gone" />
 
-    </LinearLayout>
-</ScrollView>
+    </FrameLayout>
+
+</LinearLayout>
