@@ -361,14 +361,14 @@ interface ApiService {
         @Field("action") action: String = "delete"
     ): Call<StandardResponse>
 
-    @GET("http://112.78.170.196:8885/billrt/api/api_mistral.php")
+    @POST("http://112.78.170.196:8885/billrt/api/api_mistral.php")
     fun getAiQuery(
         @Query("tanya_ai") pertanyaan: String,
         @Query("session_id") sessionId: String? = null,
         @Query("sql_query") sqlQuery: String? = null
     ): Call<AiQueryResponse>
 
-    @GET
+    @POST
     fun getAiQueryUrl(
         @Url url: String,
         @Query("tanya_ai") pertanyaan: String,

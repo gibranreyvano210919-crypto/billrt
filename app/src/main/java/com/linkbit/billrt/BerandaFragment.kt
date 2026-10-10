@@ -213,6 +213,7 @@ class BerandaFragment : BaseFragment() {
     private fun fetchPembayaranHariIni() {
         RetrofitClient.instance.getPembayaranHariIni().enqueue(object : Callback<PembayaranHariIniResponse> {
             override fun onResponse(call: Call<PembayaranHariIniResponse>, response: Response<PembayaranHariIniResponse>) {
+                if (!isAdded || _binding == null) return
                 if (response.isSuccessful) {
                     response.body()?.let {
                         if (it.status) {
@@ -224,7 +225,15 @@ class BerandaFragment : BaseFragment() {
                 }
             }
 
-            override fun onFailure(call: Call<PembayaranHariIniResponse>, t: Throwable) {}
+            override fun onFailure(call: Call<PembayaranHariIniResponse>, t: Throwable) {
+                if (!isAdded || _binding == null) return
+                binding.loadingProgressBar.visibility = View.GONE
+                showNetworkErrorDialog(requireContext(), t) {
+                    binding.loadingProgressBar.visibility = View.VISIBLE
+                    fetchPembayaranHariIni()
+                    fetchIncomeExpense()
+                }
+            }
         })
     }
 
@@ -235,7 +244,8 @@ class BerandaFragment : BaseFragment() {
 
         RetrofitClient.instance.getBillStatement(month, year).enqueue(object : Callback<BillStatementResponse> {
             override fun onResponse(call: Call<BillStatementResponse>, response: Response<BillStatementResponse>) {
-                if (isAdded && _binding != null && response.isSuccessful) {
+                if (!isAdded || _binding == null) return
+                if (response.isSuccessful) {
                     response.body()?.let {
                         if (it.status) {
                             val sharedPreferences = requireActivity().getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
@@ -253,7 +263,15 @@ class BerandaFragment : BaseFragment() {
                 }
             }
 
-            override fun onFailure(call: Call<BillStatementResponse>, t: Throwable) {}
+            override fun onFailure(call: Call<BillStatementResponse>, t: Throwable) {
+                if (!isAdded || _binding == null) return
+                binding.loadingProgressBar.visibility = View.GONE
+                showNetworkErrorDialog(requireContext(), t) {
+                    binding.loadingProgressBar.visibility = View.VISIBLE
+                    fetchPembayaranHariIni()
+                    fetchIncomeExpense()
+                }
+            }
         })
     }
 

@@ -83,10 +83,12 @@ class LoginFragment : BaseFragment() {
             }
 
             override fun onFailure(call: Call<LoginResponse>, t: Throwable) {
-                if (_binding == null) return
+                if (!isAdded || _binding == null) return
                 binding.progressBar.visibility = View.GONE
                 binding.btnLogin.isEnabled = true
-                Toast.makeText(context, "Error: ${t.message}", Toast.LENGTH_SHORT).show()
+                showNetworkErrorDialog(requireContext(), t) {
+                    loginUser(username, password)
+                }
             }
         })
     }
